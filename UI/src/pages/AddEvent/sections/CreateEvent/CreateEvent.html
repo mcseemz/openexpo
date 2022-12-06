@@ -1,0 +1,156 @@
+<div class="content_wrapper">
+    <div class="container">
+        <h2 class="title">{{tr('adev_title')}}</h2>
+        <div class="form_wrapper">
+
+            <div class="form_section">
+                <h3 class="big_text form_section_title"><img src="./img/basic_info_icon.svg" alt="" class="form_section_title_icon">{{tr('adev_basic_information')}}</h3>
+                <p class="form_section_text">{{tr('adev_basic_info_descr')}}</p>
+                <div class="form_input_row">
+                    <ui-textbox
+                        :label="tr('adev_event_name_label')"
+                        :placeholder="tr('adev_event_name_ph')"
+                        v-model="eventData.eventName"
+                        :maxlength="60"
+                        :invalid="eventNameTouched && ValidName(eventData.eventName,eventData.customNameWanted) || eventNameTouched && !eventData.eventName.length
+                        || eventData.eventName.length > 60"
+                        :help="eventNameMsg"
+                        @input="eventNameInputAction"
+                        v-on:touch.passive="eventNameTouched = true"
+                    >
+                    </ui-textbox>
+                </div>
+                <div class="form_input_row">
+                  <ui-checkbox v-model="eventData.customNameWanted" color="accent" @change="replaceName()">{{tr('i_want_custom_url_name')}}</ui-checkbox>
+                </div>
+                <div class="form_input_row" v-if="eventData.customNameWanted">
+                    <ui-textbox
+                        :label="tr('adev_custom_event_name_label')"
+                        :placeholder="tr('adev_custom_event_name_ph')"
+                        v-model="eventData.customEventName"
+                        :maxlength="60"
+                        :invalid="customEventNameTouched && ValidName(eventData.customEventName,eventData.customNameWanted) && customNameAvaliable
+                        || !eventData.customEventName.length && customEventNameTouched || eventData.customEventName.length > 60 "
+
+                        v-on:touch.passive="customEventNameTouched = true"
+                        :help="customEventNameMsg"
+                        @input="customNameInput()"
+                    >
+                    </ui-textbox>
+                </div>
+                <div class="form_input_row">
+                    <ui-textbox
+                        :label="tr('adev_short_desc_label')"
+                        :placeholder="tr('adev_short_desc_ph')"
+                        v-model="eventData.shortDescription"
+                        :maxlength="60"
+                        :multi-line="false"
+                        :invalid="eventSDescTouched && !eventData.shortDescription || eventData.shortDescription.length > 60 ||
+                        eventSDescTouched && ValidName(eventData.shortDescription)"
+                        v-on:touch.passive="eventSDescTouched = true"
+                        :help="eventSDescMsg"
+                    >
+                    </ui-textbox>
+                </div>
+
+                <div class="form_input_row">
+                    <div class="form_input_shr">
+                        <ui-select
+                            :label="tr('adev_category_label')"
+                            :placeholder="tr('adev_category_ph')"
+                            :options="categoriesList"
+                            v-model="eventData.category"
+                            iconPosition="right"
+                            :invalid="categoryTouched && !eventData.category"
+                        >
+                            <img slot="icon" src="./img/hsb_dropdown.svg" alt="">
+                        </ui-select>
+                    </div>
+                </div>
+
+                <div class="form_input_row flex">
+
+                    <div class="form_input_hr">
+                        <ui-datepicker
+                            :placeholder="tr('adev_date_s_ph')"
+                            iconPosition="right"
+                            v-model="dateStartInput"
+                            :lang="datepicker_lang"
+                            @input="calcDate('start')"
+                            :minDate="minFromDate"
+                            :maxDate="maxFromDate"
+                        >
+                            <img slot="icon" src="../../img/calendar.svg" alt="">
+                            {{tr('adev_date_s_label')}}
+                        </ui-datepicker>
+                    </div>
+
+                    <div class="form_input_hr">
+                        <ui-datepicker
+                            :placeholder="tr('adev_date_e_ph')"
+                            iconPosition="right"
+                            v-model="dateEndInput"
+                            :lang="datepicker_lang"
+                            @input="calcDate('end')"
+                            :minDate="minToDate"
+                            :maxDate="maxToDate"
+                        >
+                            <img slot="icon" src="../../img/calendar.svg" alt="">
+                            {{tr('adev_date_e_label')}}
+                        </ui-datepicker>
+                    </div>
+
+                </div>
+
+               <!--  <div class="form_input_row">
+                    <p class="form_input_row_label">
+                        {{tr('tags')}}
+                    </p>
+                    <vue-tags-input
+                        :placeholder="tr('adev_tags_ph')"
+                        v-model="eventData.tag"
+                        :tags="eventData.tags"
+                        :allow-edit-tags="true"
+                        @tags-changed="newTags => eventData.tags = newTags"
+                    />
+                </div> -->
+            </div>
+
+            <div class="form_section">
+                <!-- <h3 class="big_text form_section_title"><img src="./img/location_icon.svg" alt="" class="form_section_title_icon">{{tr('adev_location')}}</h3>
+                <p class="form_section_text">{{tr('adev_loc_desc')}}</p> -->
+
+                <!-- <div class="flex form_checkbox_row form_checkbox_m_row"> -->
+                    <!-- <ui-checkbox v-model="eventData.offline" color="accent">{{tr('offline_event')}}</ui-checkbox> -->
+                   <!--  <ui-checkbox v-model="eventData.online" color="accent" checked :disabled="true">{{tr('online_event')}}</ui-checkbox>
+                </div> -->
+
+               <!--  <div class="form_input_row">
+                    <ui-textbox
+                        :placeholder="tr('adev_address_ph')"
+                        v-model="eventData.address"
+                        class="ui-search-input"
+                    >
+                        <img slot="icon" src="./img/search_icon.svg" alt="">
+                    </ui-textbox>
+                </div> -->
+
+                <div class="form_input_row">
+                    <ui-select
+                        :label="tr('adev_timezone_label')"
+                        :placeholder="tr('adev_timezone_ph')"
+                        :options="timeZoneList"
+                        v-model="eventData.timezone"
+                        iconPosition="right"
+                        @input="timezoneChanged"
+                    >
+                        <img slot="icon" src="./img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                    <a class="adev_desc_link" href="https://www.timeanddate.com/worldclock/converter.html?iso=20201018T120000" target="_blank">{{tr('adev_check_timezone')}}</a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

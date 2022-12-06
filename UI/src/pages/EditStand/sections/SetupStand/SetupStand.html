@@ -1,0 +1,96 @@
+ <!-- STEP 3 -->
+<div class="content_wrapper">
+    <div class="container">
+        <div class="title_box">
+            <h2 class="title">{{standObj.name}}</h2>
+                <p class="text curs_pointer" @click="goActiveEvent()">{{eventObj.name}}</p>
+        </div>
+        <div class="content_sidebar_left flex">
+            <div class="sidebar">
+
+                <ul class="sidebar_menu">
+
+                    <li v-if="userCan('stand-edit')" class="sidebar_menu_item">
+
+                        <ui-collapsible removeIcon disableRipple :open="['main_page'].includes(selectedMenu.value)">
+                            <div class="" slot="header" @click="selectedMenu.value = 'details'">
+                                <div class="sidebar_menu_item_title">{{tr('stand_details')}}</div>
+                                <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                            </div>
+
+                            <ul class="sidebar_menu submenu">
+
+                                <li class="sidebar_menu_subitem" :class="{'active': selectedMenu.value == 'main_page'}">
+                                    <div class="sidebar_menu_item_title"  @click="selectTab('main_page', 'stand_description')">{{tr('stand_description')}}</div>
+                                </li>
+                            </ul>
+                        </ui-collapsible>
+                    </li>
+
+                    <li v-if="userCan('stand-manage-staff')" class="sidebar_menu_item">
+
+                        <ui-collapsible removeIcon disableRipple :open="['personnel'].includes(selectedMenu.value)">
+                            <div class="" slot="header">
+                                <div class="sidebar_menu_item_title">{{tr('edst_user_management')}}</div>
+                                <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                            </div>
+
+                            <ul class="sidebar_menu submenu">
+                                <li class="sidebar_menu_subitem" :class="{'active': selectedMenu.value == 'personnel'}" @click="selectTab('personnel', 'stand_description')">
+                                    <div class="sidebar_menu_item_title">{{tr('personnel')}}</div>
+                                </li>
+                            </ul>
+                        </ui-collapsible>
+
+                    </li>
+                    <li class="sidebar_menu_item" v-if="userCan('stand-edit')" :class="{'active': selectedMenu.value == 'agenda'}" @click="selectTab('agenda', 'stand_description')">
+                        <div class="sidebar_menu_item_title" @click="test">{{tr('agenda')}}</div>
+                    </li>
+
+                    <li v-if="userCan('stand-edit')" class="sidebar_menu_item">
+                        <ui-collapsible removeIcon disableRipple :open="['downloadables', 'products', 'collections'].includes(selectedMenu.value)">
+                            <div class="" slot="header">
+                                <div class="sidebar_menu_item_title">{{tr('content')}}</div>
+                                <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                            </div>
+
+                            <ul class="sidebar_menu submenu">
+                                <li class="sidebar_menu_subitem"  :class="{'active': selectedMenu.value == 'downloadables'}"  @click="selectTab('downloadables', 'downloadables')">
+                                    <div class="sidebar_menu_item_title">{{tr('downloadables')}}</div>
+                                </li>
+                                <li class="sidebar_menu_subitem" :class="{'active': selectedMenu.value == 'products'}" @click="selectTab('products', 'products')">
+                                    <div class="sidebar_menu_item_title">{{tr('products')}}</div>
+                                </li>
+                                <li class="sidebar_menu_subitem" :class="{'active': selectedMenu.value == 'collections'}" @click="selectTab('collections', 'collections')">
+                                    <div class="sidebar_menu_item_title">{{tr('collections')}}</div>
+                                </li>
+                            </ul>
+                        </ui-collapsible>
+                    </li>
+                </ul>
+            </div>
+
+            <Details :imagePlaceholders="imagePlaceholders" :standBranding="standBranding" :standObj="standObj" v-if="selectedMenu.value == 'details' && userCan('stand-edit')"></Details>
+            <div v-if="selectedMenu.value == 'main_page' && userCan('stand-edit')" class="main">
+                <MainPage objectType="stand" :imagePlaceholders="imagePlaceholders" :mainBranding="standBranding" :mainObj="standObj"></MainPage>
+            </div>
+            <Downloadables :type="'stand'" :downloadables="downloadables" v-if="selectedMenu.value == 'downloadables' && userCan('stand-edit')"
+            ></Downloadables>
+            <Personnel :type="'stand'"  :mainObj="standObj" :eventObj="eventObj" v-if="selectedMenu.value == 'personnel' && userCan('stand-manage-staff')"></Personnel>
+            <Agenda :dayList="evtDayList" :agenda="agenda" :mainObj="standObj" :eventObj="eventObj" objectType="stand" v-if="!preload && selectedMenu.value == 'agenda' && userCan('stand-edit')"></Agenda>
+            <Collections
+              :eventObj="eventObj"
+              :standObj="standObj"
+              :agenda="agenda.sessions"
+              :downloadables="downloadablesArray"
+              @collections-updated="collectionsUpdated"
+              v-if="selectedMenu.value === 'collections' && userCan('stand-edit')" />
+            <Downloadables
+              type="stand"
+              :product="true"
+              :downloadables="downloadables"
+              v-if="selectedMenu.value == 'products' && userCan('stand-edit')"   @products-updated="productsUpdated" />
+        </div>
+
+    </div>
+</div>

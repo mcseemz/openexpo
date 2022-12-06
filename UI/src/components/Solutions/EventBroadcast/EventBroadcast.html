@@ -1,0 +1,16 @@
+<article class="article-block article-block--m100" :class="{'article-block--blue': color == 'blue', 'article-block--white': color != 'blue'}">
+    <div class="article_header article_header--center content-wrapper">
+        <div class="article_header_content article_header_content-mr">
+            <h2 class="article-title article-title-m0" v-html="tr('setup_your_event_broadcast_title')"></h2>
+            <p class="article_text">{{tr('setup_your_event_broadcast_text')}}</p>
+            <ul class="unordered_list">
+                <li class="unordered_item">{{tr('setup_your_event_broadcast_tab1')}}</li>
+                <li class="unordered_item">{{tr('setup_your_event_broadcast_tab2')}}</li>
+                <li class="unordered_item">{{tr('setup_your_event_broadcast_tab3')}}</li>
+            </ul>
+        </div>
+        <div class="article_img_wrapper">
+            <img class="article_img" src="@/img/static-pages/webinar/4.png" alt="Set up your agenda">
+        </div>
+    </div>
+</article>

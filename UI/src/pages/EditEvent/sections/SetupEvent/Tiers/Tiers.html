@@ -1,0 +1,496 @@
+<div class="main preloader_wrapper">
+    <div class="preloader_overlay" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+    <div class="main_form_box">
+        <div class="main_section" v-if="currentSection == 'tiers_list' && !preload">
+            <p class="main_section_title big_text">{{tr('adev_tiers_text')}}</p>
+
+            <div class="tiers_list">
+                <div class="tier_item" v-for="item in tiers">
+                    <div class="image_box">
+                        <img src="@/img/medal3.jpg.webp" alt="" v-if="item.default_id && item.default_id == 1 || !item.default_id && item.id == 1">
+                        <img src="@/img/medal2.jpg.webp" alt="" v-if="item.default_id && item.default_id == 2 || !item.default_id && item.id == 2">
+                        <img src="@/img/medal1.jpg.webp" alt="" v-if="item.default_id && item.default_id == 3 || !item.default_id && item.id == 3">
+                    </div>
+                    <div class="content">
+                        <div class="top">
+                            <p class="item_title big_text" v-if="item.title">{{item.title}}</p>
+                            <button class="btn btn_orange" @click="editTier(item)">{{tr('edit')}}</button>
+                        </div>
+                        <div class="bottom">
+                            <strong>{{tr('status')}}: </strong>{{item.is_enabled ? tr('adev_tiers_enabled') : tr('adev_tiers_disabled')}} <br>
+                            <strong>{{tr('price')}}: </strong>{{item.price.ticket_price ? formattedPrice(item.price.ticket_price, item.price.currency) : '-'}} <br>
+                        </div>
+                    </div>
+                    
+                </div>    
+            </div>
+        </div>
+        <div class="main_section" v-if="currentSection == 'edit_tier' && editItem">
+            <div class="edit_tier_section">
+                <div class="top">
+                    <h2 class="title">{{editItem.title}}</h2>
+                    <toggle-button 
+                        :value="editItem.is_enabled"
+                        :sync="true"
+                        :labels="{checked:tr('enabled'), unchecked: tr('disabled')}"
+                        :color="{checked: '#70B9C3', unchecked: '#C6E3E7', disabled: '#CCCCCC'}"
+                        :height="40"
+                        :width="104"
+                        :font-size="14"
+                        :margin="8"
+                        v-model="editItem.is_enabled"
+                        
+                    />    
+                </div>
+                <div class="main_section tickets_main_section">
+                                
+                    <p class="main_section_title big_text">
+                        {{tr('adev_tier_price_title')}}
+                    </p>
+
+                    <div class="form_input_row form_input_tickets_row flex">
+
+                        <div class="form_input_hr">
+                            <ui-textbox 
+                                :label="tr('price')+' *'" 
+                                type="editItem.price.number"
+                                :placeholder="curSymbol+'20.00'" 
+                                v-model="editItem.price.ticket_price"
+                                :invalid="editItem.price.ticket_priceTouched && (!editItem.price.ticket_price || editItem.price.ticket_price.length > 10 || editItem.price.ticket_price < 0) "
+                                v-on:touch.passive="editItem.price.ticket_priceTouched = true"
+                                @change="forceUpdate"
+                            >
+                            </ui-textbox>    
+                        </div>
+
+                        <div class="form_input_hr">
+                            <ui-textbox 
+                                :label="tr('quantity')+' *'" 
+                                type="number"
+                                placeholder="200" 
+                                v-model="editItem.price.ticket_qty"
+                                :invalid="editItem.price.ticket_qtyTouched && (!editItem.price.ticket_qty || editItem.price.ticket_qty.length > 5 || editItem.price.ticket_qty < 1) "
+                                v-on:touch.passive="editItem.price.ticket_qtyTouched = true"
+                                @change="forceUpdate"
+                            >
+                            </ui-textbox>    
+                        </div>
+                        
+                    </div>
+
+                    <div class="button_box flex">
+                    </div>
+
+                </div>
+                <div class="middle" :class="editItem.status == 'disabled' ? 'disabled' : ''">
+                    <div class="sponsors_list">
+                        <div class="sponsors_item" @click="goToEditSponsor(sponsor)" v-for="sponsor in editItem.sponsors">
+                            <div class="left">
+                                <strong>{{tr('name')}}: </strong> {{sponsor.object_ref == 'company' ? sponsor.companyname : sponsor.username}} <br>
+                                <strong>{{tr('adev_tiers_email')}}: </strong> {{sponsor.object_ref == 'company' ? sponsor.companyemail : sponsor.useremail}} <br>    
+                            </div>
+                            <div class="right button_box">
+                                <button class="btn btn_orange">Edit sponsor</button>
+                            </div>
+                            
+                        </div>
+                    </div>    
+
+                    <div class="form_input_row">
+                        
+                        <p class="main_section_title big_text">{{tr('adev_tiers_logo')}}</p>
+                        <toggle-button 
+                            :value="editItem.switches.logo"
+                            :sync="true"
+                            :labels="{checked:tr('enabled'), unchecked: tr('disabled')}"
+                            :color="{checked: '#70B9C3', unchecked: '#C6E3E7', disabled: '#CCCCCC'}"
+                            :height="40"
+                            :width="104"
+                            :font-size="14"
+                            :margin="8"
+                            v-model="editItem.switches.logo"
+                            :disabled="!editItem.is_enabled"
+                        />
+                    </div>
+                    
+                      
+                    <div class="form_input_row">
+                        <p class="main_section_title big_text">{{tr('adev_tiers_video')}}</p>
+                        <toggle-button 
+                            :value="editItem.switches.video"
+                            :sync="true"
+                            :labels="{checked:tr('enabled'), unchecked: tr('disabled')}"
+                            :color="{checked: '#70B9C3', unchecked: '#C6E3E7', disabled: '#CCCCCC'}"
+                            :height="40"
+                            :width="104"
+                            :font-size="14"
+                            :margin="8"
+                            v-model="editItem.switches.video"
+                            :disabled="!editItem.is_enabled"
+                        /> 
+                    </div>
+                     
+                    <div class="form_input_row">
+                        <p class="main_section_title big_text">{{tr('adev_tiers_pdfimages')}}</p>
+                        <toggle-button 
+                            :value="editItem.switches.pics"
+                            :sync="true"
+                            :labels="{checked:tr('enabled'), unchecked: tr('disabled')}"
+                            :color="{checked: '#70B9C3', unchecked: '#C6E3E7', disabled: '#CCCCCC'}"
+                            :height="40"
+                            :width="104"
+                            :font-size="14"
+                            :margin="8"
+                            v-model="editItem.switches.pics"
+                            :disabled="!editItem.is_enabled"
+                        />  
+                    </div>
+                    
+                    <div class="form_input_row">
+                        <p class="main_section_title big_text">{{tr('adev_tiers_pool')}}</p>
+                        <toggle-button 
+                            :value="editItem.switches.survey"
+                            :sync="true"
+                            :labels="{checked:tr('enabled'), unchecked: tr('disabled')}"
+                            :color="{checked: '#70B9C3', unchecked: '#C6E3E7', disabled: '#CCCCCC'}"
+                            :height="40"
+                            :width="104"
+                            :font-size="14"
+                            :margin="8"
+                            v-model="editItem.switches.survey"
+                            :disabled="!editItem.is_enabled"
+                        />  
+                    </div>
+                    
+                    <div class="form_input_row">
+                        <p class="main_section_title big_text">{{tr('adev_tiers_lottery')}}</p>
+                        <toggle-button 
+                            :value="editItem.switches.lottery"
+                            :sync="true"
+                            :labels="{checked:tr('enabled'), unchecked: tr('disabled')}"
+                            :color="{checked: '#70B9C3', unchecked: '#C6E3E7', disabled: '#CCCCCC'}"
+                            :height="40"
+                            :width="104"
+                            :font-size="14"
+                            :margin="8"
+                            v-model="editItem.switches.lottery"
+                            :disabled="!editItem.is_enabled"
+                        />  
+                    </div>
+                    
+                    <div class="form_input_row">
+                        <p class="main_section_title big_text">{{tr('adev_tiers_banner')}}</p>
+                        <toggle-button 
+                            :value="editItem.switches.banner"
+                            :sync="true"
+                            :labels="{checked:tr('enabled'), unchecked: tr('disabled')}"
+                            :color="{checked: '#70B9C3', unchecked: '#C6E3E7', disabled: '#CCCCCC'}"
+                            :height="40"
+                            :width="104"
+                            :font-size="14"
+                            :margin="8"
+                            v-model="editItem.switches.banner"
+                            :disabled="!editItem.is_enabled"
+                        />    
+                    </div>
+                                     
+                </div>
+                
+                
+                <div class="button_row button_box">
+                    <button class="btn btn_orange" @click="goToList">{{tr('back')}}</button>
+                    <button class="btn btn_owhite" @click="saveTier(editItem)">{{tr('save')}}</button>
+                </div>
+            </div>
+        </div>         
+
+        <div class="main_section" v-if="currentSection == 'edit_sponsor' && editSponsor">   
+            <div class="edit_sponsor_section">
+                <h3 class="big_text form_section_title">{{editSponsor.name}}</h3>
+                <p class="main_section_title big_text">
+                    {{tr('adev_sponsor_imagelogo')}}
+                </p>
+                
+                <div class="form_input_row event_main_droparea ">
+                    <VueUploadComponent
+                    ref="event_main_upload"
+                    v-model="editSponsor.sponsorBranding.imageLogo.new"
+                    drop=".event_main_droparea"
+                    :multiple="false"
+                    @input-file="inputImageLogoFile"
+                    @input-filter="inputImageLogoFilter"
+                    class="upload_image_iconstyle"
+                    :drop-directory="false"
+                    >   
+                        <div v-if="editSponsor.placeholders.logoPlaceholder" class="preview_image_box">
+                            <img :src="editSponsor.placeholders.logoPlaceholder" alt="" class="">
+                        </div>
+                        <div v-if="!editSponsor.placeholders.logoPlaceholder" class="placeholder_text">
+                            <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                            <p class="file_upload_title">{{tr('adev_sponsor_imagelogo_ph_main')}}</p>
+                            <p class="file_upload_desc">{{tr('adev_sponsor_imagelogo_ph_desc')}}</p>    
+                        </div>
+
+                        <div class="icons_box" v-if="editSponsor.placeholders.logoPlaceholder">
+                            <span @click="removeImage('imageLogo')"><img src="../img/remove_icon.svg" alt=""></span>
+                            <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                        </div>
+                        
+                    </VueUploadComponent>
+
+                    <div class="form_input_row target_url">
+                        <ui-textbox 
+                            :label="'Logo target url'"
+                            :placeholder="'https://'" 
+                            v-model="editSponsor.logoTarget"
+                            @input="forceUpdate"
+                        >
+                        </ui-textbox> 
+
+                    </div>
+                    
+                </div>
+
+
+                <p class="main_section_title big_text">
+                    {{tr('adev_sponsor_videologo')}}
+                </p>
+                
+                <div class="form_input_row event_videologo_droparea ">
+                    <VueUploadComponent
+                    input-id="bannerInpt"
+                    ref="event_videologo_upload"
+                    v-model="editSponsor.sponsorBranding.videoLogo.new"
+                    drop=".event_videologo_droparea"
+                    :multiple="false"
+                    @input-file="inputFile"
+                    class="upload_image_iconstyle"
+                    :drop-directory="false"
+                    >   
+                        <div v-if="editSponsor.placeholders.videoPlaceholder" class="preview_image_box">
+                            <img :src="editSponsor.placeholders.videoPlaceholder" alt="" class="">
+                        </div>
+                        <div v-if="!editSponsor.placeholders.videoPlaceholder" class="placeholder_text">
+                            <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                            <p class="file_upload_title">{{tr('adev_sponsor_videologo_ph_main')}}</p>
+                            <p class="file_upload_desc">{{tr('adev_sponsor_videologo_ph_desc')}}</p>    
+                        </div>
+
+                        <div class="icons_box" v-if="editSponsor.placeholders.videoPlaceholder">
+                            <span @click="removeImage"><img src="../img/remove_icon.svg" alt=""></span>
+                            <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                        </div>
+                        
+                    </VueUploadComponent>
+
+                    <div class="form_input_row target_url">
+                        <ui-textbox 
+                            :label="'Video logo target url'"
+                            :placeholder="'https://'" 
+                            v-model="editSponsor.videoTarget"
+                            @input="forceUpdate"
+                        >
+                        </ui-textbox>  
+                    </div>
+                    
+                </div>
+
+                <p class="main_section_title big_text">
+                    {{tr('adev_sponsor_banner')}}
+                </p>
+                
+                <div class="form_input_row event_banner_droparea ">
+                    <VueUploadComponent
+                    input-id="bannerInpt2"
+                    ref="event_banner_upload"
+                    v-model="editSponsor.sponsorBranding.banner.new"
+                    drop=".event_banner_droparea"
+                    :multiple="false"
+                    @input-file="inputBannerFile"
+                    @input-filter="inputBannerFilter"
+                    class="upload_image_iconstyle"
+                    :drop-directory="false"
+                    >   
+                        <div v-if="editSponsor.placeholders.bannerPlaceholder" class="preview_image_box">
+                            <img :src="editSponsor.placeholders.bannerPlaceholder" alt="" class="">
+                        </div>
+                        <div v-if="!editSponsor.placeholders.bannerPlaceholder" class="placeholder_text">
+                            <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                            <p class="file_upload_title">{{tr('adev_sponsor_videologo_ph_main')}}</p>
+                            <p class="file_upload_desc">{{tr('adev_sponsor_videologo_ph_desc')}}</p>    
+                        </div>
+
+                        <div class="icons_box" v-if="editSponsor.placeholders.bannerPlaceholder">
+                            <span @click="removeImage('banner')"><img src="../img/remove_icon.svg" alt=""></span>
+                            <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                        </div>
+                        
+                    </VueUploadComponent>
+
+                    <div class="form_input_row target_url">
+                        <ui-textbox 
+                            :label="'Banner target url'"
+                            :placeholder="'https://'" 
+                            v-model="editSponsor.bannerTarget"
+                            @input="forceUpdate"
+                        >
+                        </ui-textbox>  
+
+                    </div>
+                    
+                </div>
+
+<!-- WHEEL OF FORTUNE WOF -->
+                <div class="wof_edit_section">
+
+                    <p class="main_section_title big_text">
+                        {{tr('adev_sponsor_wheel_of_fortune')}}
+                    </p>
+                    <p class="text">{{tr('adev_sponsor_wof_text')}}</p>
+
+                    <div class="form_input_row target_url">
+                        <ui-textbox 
+                            :label="tr('adev_sponsor_wof_title_label')"
+                            :placeholder="tr('name')" 
+                            v-model="editSponsor.wof.name"
+                            @input="forceUpdate"
+                        >
+                        </ui-textbox>  
+                    </div>
+
+                    <div class="form_input_row target_url">
+                        <ui-textbox 
+                            :label="tr('adev_sponsor_wof_descr_label')"
+                            :placeholder="tr('adev_sponsor_wof_descr_ph')" 
+                            v-model="editSponsor.wof.description"
+                            @input="forceUpdate"
+                            :multiLine="true"
+                            :rows="3"
+                        >
+                        </ui-textbox>  
+                    </div>
+
+                    <div class="form_input_row wof_date_row flex jcfs">
+        
+                        <div class="form_input_hr">
+                            <ui-datepicker
+                                :placeholder="tr('select_a_date')"
+                                iconPosition="right"
+                                v-model="wofPublishDate"
+                                :lang="datepicker_lang"
+                                @input="calcDate()"
+                                :minDate="minFromDate"
+                                :maxDate="maxFromDate"
+                                :disabled="editSponsor.wof.active"
+                            >
+                                <img slot="icon" src="../img/calendar.svg" alt="">
+                                {{tr('adev_sponsor_wof_date_label')}}
+                            </ui-datepicker>
+                        </div>
+
+                        <div class="form_input_qr">
+                            <ui-select
+                                :label="tr('adev_sponsor_wof_time_label')"
+                                :placeholder="tr('adev_time_ph')"
+                                :options="timeList"
+                                v-model="wofPublishTime"
+                                iconPosition="right"
+                                @change="calcDate()"
+                                :disabled="editSponsor.wof.active"
+                            >
+                            </ui-select>
+                        </div>
+
+                        <p class="text disabled_text" v-if="editSponsor.wof.active">{{tr('adev_lottery_started')}}</p>
+                        
+                    </div>
+
+                    <div class="form_input_row flex jcfs wof_options_row" v-for="opt, index in editSponsor.wof.options">
+        
+                        <div class="form_input_hr">
+                            <ui-textbox
+                                :label="tr('adev_sponsor_wof_option') + ' ' + (index+1)"
+                                :placeholder="tr('adev_sponsor_wof_voucher')" 
+                                v-model="opt.label"
+                                @input="forceUpdate"
+                            >
+                            </ui-textbox>  
+                        </div>
+
+                        <div class="form_input_qr">
+                            <ui-textbox 
+                                :label="tr('adev_sponsor_wof_amount_prizes')"
+                                :placeholder="tr('adev_sponsor_wof_voucher')" 
+                                v-model="opt.amount"
+                                type="number"
+                                :min="0"
+                                @input="forceUpdate"
+                                :disabled="opt.infinite"
+                            >
+                            </ui-textbox>  
+                        </div>
+
+                        <div class="form_input_qr form_checkbox_row">
+                            <ui-checkbox 
+                                :label="tr('adev_sponsor_wof_infinite')"
+                                v-model="opt.infinite"
+                                @input="forceUpdate"
+                            >
+                            </ui-checkbox>  
+                        </div>
+                        
+                    </div>
+
+                    <div class="wof_button_box">
+                        <button class="btn btn_white" @click="addOptionRow">
+                            {{tr('adev_sponsor_wof_add_option')}} <img src="@/img/sponsorship/button_plus.svg" alt="">
+                        </button>
+                    </div>
+
+                    <div class="form_input_row wof_options_row">
+                        <div class="form_input_hr">
+                            <ui-textbox 
+                                :label="tr('adev_sponsor_wof_winchance_label')"
+                                :placeholder="tr('adev_sponsor_wof_winchance_ph')" 
+                                v-model="editSponsor.wof.chance"
+                                type="number"
+                                :min="1"
+                                :max="100"
+                                @input="forceUpdate"
+                            >
+                            </ui-textbox>  
+                        </div>
+                    </div>
+
+                </div>
+                <div class="form_input_row edit_survey_row">
+                    <div class="button_row">
+                        <button class="btn btn_orange" @click="goToSurvey">{{tr('adev_sponsor_edit_survey')}}</button>
+                    </div>
+                </div>
+                <div class="button_box">
+                    <button class="btn btn_dark" @click="backToTier">{{tr('back')}}</button>
+                    
+                    <button class="btn btn_owhite" @click="requestToRefundAction(editSponsor)">{{tr('request_to_refund')}}</button>
+                    <button class="btn btn_orange" @click="saveSponsor">{{tr('save')}}</button>
+                </div>
+            </div>
+        </div>
+
+         
+        <Survey :eventObj="eventObj" :editSponsor="editSponsor" v-on:back-to-sponsor="exitSurvey" v-if="currentSection == 'edit_sponsor_survey' && editSponsor"></Survey>
+        
+    </div>
+
+    <ui-modal ref="messageTiersModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('validation_error')}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="tiersModalClose"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+    
+</div>

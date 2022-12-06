@@ -1,0 +1,57 @@
+<article class="article-block article-block--m100" :class="{'article-block--white': color == 'white', 'article-block--blue': color != 'white'}">
+    <div class="article_header article_header--center content-wrapper">
+        <div class="article_header_content article_header_content-mr">
+            <h2 class="article-title article-title-m0" v-html="tr('make_you_event_personal_title')"></h2>
+            <p class="article_text">{{tr('make_you_event_personal_text')}}</p>
+            <ul class="unordered_list">
+                <li class="unordered_item">{{tr('make_you_event_personal_tab1')}}</li>
+                <li class="unordered_item">{{tr('make_you_event_personal_tab2')}}</li>
+                <li class="unordered_item">{{tr('make_you_event_personal_tab3')}}</li>
+            </ul>
+        </div>
+
+        <div class="article_img_wrapper">
+            <img class="article_img" src="@/img/static-pages/virtual-workshop/1.png" alt="Make your event personal">
+        </div>
+    </div>
+
+    <!-- Flex block -->
+    <div class="article--litle-list content-wrapper article--litle-list--mt">
+        <div class="article--little_item">
+            <a href="#" class="article--little_link">
+                <div class="article--little_img_wrapper">
+                    <img src="@/img/static-pages/virtual-workshop/flex-1.png" alt="Customize your event with colors" class="article--little_img">
+                </div>
+                <div class="article--little_text_wrapper">
+                    <p class="article--little_title" v-html="tr('customise_your_event_with_colours_title')"></p>
+                    <p class="article--little_text">{{tr('customise_your_event_with_colours_text')}}</p>
+                </div>
+            </a>
+        </div>
+        <div class="article--little_item">
+            <a href="#" class="article--little_link">
+                <div class="article--little_img_wrapper">
+                    <img src="@/img/static-pages/virtual-workshop/flex-2.png" alt="Change logo for the event" class="article--little_img">
+                </div>
+                <div class="article--little_text_wrapper">
+                    <p class="article--little_title" v-html="tr('change_logo_for_event_title')"></p>
+                    <p class="article--little_text">{{tr('change_logo_for_event_text')}}</p>
+                </div>
+            </a>
+        </div>
+        <div class="article--little_item">
+            <a href="#" class="article--little_link">
+                <div class="article--little_img_wrapper">
+                    <img src="@/img/static-pages/virtual-workshop/flex-3.png" alt="Add another language" class="article--little_img">
+                </div>
+                <div class="article--little_text_wrapper">
+                    <p class="article--little_title" v-html="tr('add_another_language_title')"></p>
+                    <p class="article--little_text">{{tr('add_another_language_text')}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="added-info article_text--center">
+        <a :href="'/'+routes.feature+'/'+routes.event_customisation" class="primary-btn ">{{tr('learn_more_about_customisations')}}</a>
+    </div>
+</article>

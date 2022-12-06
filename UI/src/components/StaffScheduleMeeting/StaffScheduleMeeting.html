@@ -1,0 +1,151 @@
+<div>
+    <ui-modal ref="messageModal" class="schedule_staff_modal preloader_wrapper" removeHeader size="auto">
+        <div class="preloader_overlay" v-show="modalPreloader"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+        <div class="schedule_staff_modal_wrapper container" v-if="selectedUser">
+            <h2 class="modal_title flex"><span class="staff_modal_close" @click="messageModalClose"><img src="./img/backarrow.svg" alt=""></span>{{tr('staff_schedule_a_meeting')}}</h2>
+            <p class="modal_text"><strong v-if="company && company.name">{{company.name}}</strong> <span  v-if="company && company.name">||</span> {{selectedUser.name}} {{selectedUser.surname}}</p>
+
+            <div class="form_wrapper page_add_event flex">
+                <div class="left">
+                    <div class="form_item">
+                        <h3 class="form_title flex">
+                            <span class="form_title_icon">
+                                <img src="./img/loc2.svg" alt="">
+                            </span>
+                            {{tr('staff_meeting_type')}}
+                        </h3>
+                        <p class="form_text">{{tr('staff_meeting_type_text')}}</p>
+
+                        <div class="form_input_row">
+
+                            <ui-select
+                                label=" "
+                                :placeholder="tr('staff_meeting_type_ph')"
+                                :options="meetingTypeList"
+                                v-model="meetingType"
+                                iconPosition="right"
+                                class="select_empty_label select_fw"
+                            >
+                                <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                            </ui-select>
+
+                        </div>
+                    </div>
+
+                    <div class="form_item">
+                        <h3 class="form_title flex">
+                            <span class="form_title_icon">
+                                <img src="./img/duration.svg" alt="">
+                            </span>
+                            {{tr('staff_duration')}}
+                        </h3>
+                        <p class="form_text">{{tr('staff_duration_text')}}</p>
+
+                        <div class="duration_items">
+                            <div class="duration_item" @click="duration = '15'" :class="{selected: duration == '15'}">
+                                <div class="num">15</div>
+                                <div class="text">{{tr('staff_min')}}</div>
+                            </div>
+                            <div class="duration_item" @click="duration = '30'" :class="{selected: duration == '30'}">
+                                <div class="num">30</div>
+                                <div class="text">{{tr('staff_min')}}</div>
+                            </div>
+                            <div class="duration_item" @click="duration = '45'" :class="{selected: duration == '45'}">
+                                <div class="num">45</div>
+                                <div class="text">{{tr('staff_min')}}</div>
+                            </div>
+                            <div class="duration_item" @click="duration = '60'" :class="{selected: duration == '60'}">
+                                <div class="num">60</div>
+                                <div class="text">{{tr('staff_min')}}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form_item">
+                        <h3 class="form_title flex">
+                            <span class="form_title_icon">
+                                <img src="./img/aditional.svg" alt="">
+                            </span>
+                            {{tr('staff_additional_info')}}
+                        </h3>
+                        <p class="form_text">{{tr('staff_additional_info_text')}}</p>
+
+                        <div class="form_input_row">
+
+                            <ui-textbox
+                                v-model="message"
+                                :multi-line="true"
+                            >
+                            </ui-textbox>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="right">
+                    <div class="form_item">
+                        <h3 class="form_title flex">
+                            <span class="form_title_icon">
+                                <img src="./img/calendar.svg" alt="">
+                            </span>
+                            {{tr('staff_date_time')}}
+                        </h3>
+                        <p class="form_text">{{tr('staff_date_time_text')}}</p>
+
+                        <div class="form_input_row">
+
+                            <leo-calendar v-if="selectedUser" :lang="datepicker_lang" v-model="dateSelected" :minDate="minDate" :maxDate="maxDate" :color="'#000'"></leo-calendar>
+                        </div>
+
+                        <div class="time_picker">
+                            <div class="time_list flex">
+                                <div class="time_item" :class="{selected: timeSelected == item.value, disabled: item.disabled}" v-for="item in staffTimeList" @click="timeSelected = item.disabled ? timeSelected : item.value">
+                                    {{item.label}}
+                                </div>
+                            </div>
+                            <div class="gtm_select flex">
+                                <a class="info_icon_link" href="https://www.timeanddate.com/worldclock/converter.html?iso=20201018T120000" target="_blank"><img src="./img/info.svg" alt=""></a>
+
+                                <ui-select
+                                    :options="timeZoneList"
+                                    v-model="timezone"
+                                    iconPosition="right"
+                                    @select="timezoneSelected"
+                                    :disabled="true"
+                                >
+                                    <!-- <img slot="icon" src="./img/arrow_bold_right.svg" alt=""> -->
+                                </ui-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button_box flex">
+                <button class="btn btn_orange" :class="{disabled: !validationCheck || (minDate > maxDate)}" @click="sendRequest">{{tr('staff_button_text')}}</button>
+            </div>
+        </div>
+        <span class="status_modal_close" @click="messageModalClose"><img src="@/img/close12.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="successModal" class="staff_success_modal status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('staff_congrats')}}</p>
+                <p class="modal_text">{{tr('staff_congrats_text')}}</p>
+                <div class="image_box"><img src="@/img/illustration_done.svg" alt=""></div>
+                <button class="btn btn_orange" @click="successModalClose">{{tr('staff_continue')}}</button>
+            </div>
+        </div>
+    </ui-modal>
+
+    <ui-modal ref="errorModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('staff_error')}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="errorModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

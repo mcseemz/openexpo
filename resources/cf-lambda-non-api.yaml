@@ -1,0 +1,659 @@
+AWSTemplateFormatVersion: '2010-09-09'
+# '{{resolve:ssm:/rds_demo/master_username:1}} check https://github.com/garystafford/aws-rds-postgres/blob/master/parameter_store_values.sh'
+#  Description: '{{resolve:ssm-secure:/rds_demo/master_password:1}}'
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+  TimestreamSponsorTable:
+    Description: name of timestream sponsor table
+    Type: String
+  TimestreamRegion:
+    Description: name of timestream sponsor table
+    Type: String
+  TimestreamLambdasTable:
+    Description: name of timestream sponsor table
+    Type: String
+  TimestreamDatabase:
+    Description: name of timestream sponsor table
+    Type: String
+Resources:
+#=====================================================================
+
+  CWLogsPushLambdaRole: 
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: '2012-10-17'
+        Statement: 
+        - Effect: Allow
+          Principal: 
+            Service: lambda.amazonaws.com
+          Action: 
+          - sts:AssumeRole
+      Path: '/'
+      Policies: 
+      - PolicyName: logs
+        PolicyDocument: 
+          Statement: 
+          - Effect: Allow
+            Action: 
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+      - PolicyName: ec2
+        PolicyDocument: 
+          Statement: 
+          - Effect: Allow
+            Action: 
+            - ec2:CreateNetworkInterface
+            - ec2:DescribeNetworkInterfaces
+            - ec2:DeleteNetworkInterface
+            Resource: "*"
+      - PolicyName: sns
+        PolicyDocument: 
+          Statement: 
+          - Effect: Allow
+            Action: 
+            - sns:Publish
+            - sns:Subscribe
+            Resource: !ImportValue
+              Fn::Sub: 'TexSNS-LogStream-${Environment}'
+      - PolicyName: s3
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:ListBucket
+              Resource:
+                - !Join
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - '*'
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+                - s3:DeleteObject
+                - s3:GetObjectTagging
+                - s3:PutObjectTagging
+              Resource:
+                - !Join
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - '*'
+                    - /*
+      - PolicyName: dynamodb
+        PolicyDocument:
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Scan
+              Resource: '*'
+      - PolicyName: timestream
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - timestream:*
+              Resource: '*'
+      - PolicyName: secretsmanager
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: '*'
+
+  CWLogsPushLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'CWLogsProcessing-${Environment}'
+      Handler: CWLogsProcessing.handler
+      Code: ../lambdas/CloudWatch 
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !Sub ${CWLogsPushLambdaRole.Arn}
+      MemorySize: 128
+      Environment:
+        Variables:
+          LogStreamArn: !ImportValue
+              Fn::Sub: 'TexSNS-LogStream-${Environment}'
+
+  CWLogsPushLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt CWLogsPushLambda.Arn
+      Action: 'lambda:InvokeFunction'
+      Principal: !Sub 'logs.${AWS::Region}.amazonaws.com'
+
+#===============================================
+#Activity Streams
+  TexActivityStreamsLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'TexActivityStreamsLambdaRole-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - dynamodb:Scan
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - lambda:GetLayerVersion
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - lambda:invokeFunction
+                Resource: '*'
+
+  ParseLogsToActivityStreamLambda:
+    Type: AWS::Lambda::Function
+    Description: parse incoming SNS messages, and store matched into raw Activity Stream records
+    Properties:
+      FunctionName: !Sub 'ParseLogsToActivityStream-${Environment}'
+      Handler: parseLogsToActivityStream.handler
+      Layers:
+        - !ImportValue
+              Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/SNS
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !GetAtt 'TexActivityStreamsLambdaRole.Arn'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  ParseLogsToActivityStreamSubscription:
+    Type: AWS::SNS::Subscription
+    Properties: 
+      Endpoint: !GetAtt ParseLogsToActivityStreamLambda.Arn
+      Protocol: "lambda"
+      TopicArn: !ImportValue
+              Fn::Sub: 'TexSNS-LogStream-${Environment}'
+
+  ParseLogsToActivityStreamPermission: #who can call
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: 'lambda:InvokeFunction'
+        FunctionName: !Ref ParseLogsToActivityStreamLambda
+        Principal: sns.amazonaws.com
+
+#===============================================
+# Search
+  ParseLogsToSearchIndexLambda:
+    Type: AWS::Lambda::Function
+    Description: parse incoming SNS messages, identify updates and fetch data for pushing to index. Increased timeout for reindex case
+    Properties:
+      FunctionName: !Sub 'ElasticSearchIndex-${Environment}'
+      Handler: parseLogsToSearchIndex.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/SNS
+      Timeout: 500
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'es-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+          #disabling ES for search indexing. This way we can skip deploying cf-es.yaml
+          #ELASTICSEARCH_DOMAIN: !ImportValue
+          #  Fn::Sub: 'tex-es-endpoint'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  ParseLogsToSearchIndexSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt ParseLogsToSearchIndexLambda.Arn
+      Protocol: "lambda"
+      TopicArn: !ImportValue
+        Fn::Sub: 'TexSNS-LogStream-${Environment}'
+
+  ParseLogsToSearchIndexPermission: #who can call
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref ParseLogsToSearchIndexLambda
+      Principal: sns.amazonaws.com
+
+  #------------------
+  PackActivityStreamLambda:
+    Type: AWS::Lambda::Function
+    Description: schedule-based packing new raw Activity Stream records into packs
+    Properties:
+      FunctionName: !Sub 'packActivityStream-${Environment}'
+      Handler: packActivityStream.handler
+      Layers:
+        - !ImportValue
+              Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/EventBridge
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !GetAtt 'TexActivityStreamsLambdaRole.Arn'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  PackActivityStreamRule:
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: fires packActivityStream lambda to convert raw stream data into packed
+      EventBusName: default
+      Name: !Sub 'packActivityStream-${Environment}'
+      ScheduleExpression: rate(5 minutes)
+      State: ENABLED
+      Targets: 
+        - Arn: !GetAtt 
+          - PackActivityStreamLambda
+          - Arn
+          Id: !Sub 'packActivityStream-${Environment}'
+          Input: !Sub '{"env": "${Environment}"}'
+
+  PackActivityStreamPermission: #who can call
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: 'lambda:InvokeFunction'
+        FunctionName: !Ref PackActivityStreamLambda
+        Principal: events.amazonaws.com
+        SourceArn: !GetAtt 'PackActivityStreamRule.Arn'
+        SourceAccount: !Ref AWS::AccountId
+
+#------------------
+  ScheduledActivitiesLambda:
+    Type: AWS::Lambda::Function
+    Description: sponsorship activities activation
+    Properties:
+      FunctionName: !Sub 'scheduledActivities-${Environment}'
+      Handler: scheduledActivities.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/EventBridge
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !GetAtt 'TexActivityStreamsLambdaRole.Arn'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  ScheduledActivitiesRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: fires ScheduledActivities lambda to identify new activities to add to event stream
+      EventBusName: default
+      Name: !Sub 'scheduledActivities-${Environment}'
+      ScheduleExpression: rate(5 minutes)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt 'ScheduledActivitiesLambda.Arn'
+          Id: !Sub 'scheduledActivities-${Environment}'
+          Input: !Sub '{"env": "${Environment}"}'
+
+  ScheduledActivitiesPermission: #who can call
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt 'ScheduledActivitiesLambda.Arn'
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt 'ScheduledActivitiesRule.Arn'
+      SourceAccount: !Ref AWS::AccountId
+
+  #------------------
+  EventReportLambda:
+    Type: AWS::Lambda::Function
+    Description: evetn report generation
+    Properties:
+      FunctionName: !Sub 'eventReport-${Environment}'
+      Handler: eventReport.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/EventBridge
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  EventReportRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: fires EventReport lambda to generate reports
+      EventBusName: default
+      Name: !Sub 'eventReport-${Environment}'
+      ScheduleExpression: rate(1 hour)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt 'EventReportLambda.Arn'
+          Id: !Sub 'eventReport-${Environment}'
+          Input: !Sub '{"env": "${Environment}"}'
+
+  EventReportPermission: #who can call
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt 'EventReportLambda.Arn'
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt 'EventReportRule.Arn'
+      SourceAccount: !Ref AWS::AccountId
+
+  #------------------
+  TicketExpirationLambda:
+    Type: AWS::Lambda::Function
+    Description: closing expired tickets
+    Properties:
+      FunctionName: !Sub 'ticketExpiration-${Environment}'
+      Handler: ticketExpiration.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/EventBridge
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  TicketExpirationRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: fires TicketExpiration lambda to close expired tickets
+      EventBusName: default
+      Name: !Sub 'ticketExpiration-${Environment}'
+      ScheduleExpression: rate(1 hour)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt 'TicketExpirationLambda.Arn'
+          Id: !Sub 'ticketExpiration-${Environment}'
+          Input: !Sub '{"env": "${Environment}"}'
+
+  TicketExpirationPermission: #who can call
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt 'TicketExpirationLambda.Arn'
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt 'TicketExpirationRule.Arn'
+      SourceAccount: !Ref AWS::AccountId
+
+#---
+# Timestream 
+  TexTimestreamLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'TexTimestreamLambdaRole-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - lambda:GetLayerVersion
+                Resource: '*'
+#              - Effect: Allow
+#                Action:
+#                  - lambda:invokeFunction
+#                Resource: '*'
+        - PolicyName: timestream
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - timestream:*
+                Resource: '*'
+        - PolicyName: s3
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource:
+                  - !Join
+                    - ''
+                    - - 'arn:aws:s3:::'
+                      - '*'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:GetObjectTagging
+                  - s3:PutObjectTagging
+                Resource:
+                  - !Join
+                    - ''
+                    - - 'arn:aws:s3:::'
+                      - '*'
+                      - /*
+        - PolicyName: dynamodb
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:Scan
+                Resource: '*'
+
+  TimestreamSponsorPushLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'TimestreamSponsorPush-${Environment}'
+      Handler: timestreamSponsorPush.handler
+      Layers:
+        - !ImportValue
+              Fn::Sub: 'aws-sdk-2-layer-arn-${Environment}'
+      Code: ../lambdas/SNS
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !Sub ${TexTimestreamLambdaRole.Arn}
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+          TimestreamDatabase: !Ref 'TimestreamDatabase'
+          TimestreamSponsorTable: !Ref 'TimestreamSponsorTable'
+          TimestreamRegion: !Ref 'TimestreamRegion'
+          TimestreamLambdasTable: !Ref 'TimestreamLambdasTable'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+        - Key: "Creator"
+          Value: 'CF Automation'
+
+  TimestreamSponsorPushSubscription:
+    Type: AWS::SNS::Subscription
+    Properties: 
+      Endpoint: !GetAtt TimestreamSponsorPushLambda.Arn
+      Protocol: "lambda"
+      TopicArn: !ImportValue
+              Fn::Sub: 'TexSNS-LogStream-${Environment}'
+
+  TimestreamSponsorPushPermission: #who can call
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: 'lambda:InvokeFunction'
+        FunctionName: !Ref TimestreamSponsorPushLambda
+        Principal: sns.amazonaws.com
+
+#---
+  TimestreamSponsorReportLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'TimestreamSponsorReport-${Environment}'
+      Handler: timestreamSponsorReport.handler
+      Layers:
+        - !ImportValue
+              Fn::Sub: 'aws-sdk-2-layer-arn-${Environment}'
+        - !ImportValue
+              Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/EventBridge
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !Sub ${TexTimestreamLambdaRole.Arn}
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+          TimestreamDatabase: !Ref 'TimestreamDatabase'
+          TimestreamSponsorTable: !Ref 'TimestreamSponsorTable'
+          TimestreamRegion: !Ref 'TimestreamRegion'
+          TimestreamLambdasTable: !Ref 'TimestreamLambdasTable'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+        - Key: "Creator"
+          Value: 'CF Automation'
+
+  TimestreamSponsorReportRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Rule to fire sponsor reports generation
+      EventBusName: default
+      Name: !Sub 'TimestreamSponsorReport-${Environment}'
+      ScheduleExpression: rate(1 hour)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt
+          - TimestreamSponsorReportLambda
+          - Arn
+          Id: !Sub 'TimestreamSponsorReport-${Environment}'
+          Input: !Sub '{"env": "${Environment}"}'
+
+  TimestreamSponsorReportPermission: #who can call
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: 'lambda:InvokeFunction'
+        FunctionName: !Ref TimestreamSponsorReportLambda
+        Principal: events.amazonaws.com
+        SourceArn: !GetAtt 'TimestreamSponsorReportRule.Arn'
+        SourceAccount: !Ref AWS::AccountId
+
+#---
+#lambdas stats
+  TimestreamStatsPushLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'TimestreamStatsPush-${Environment}'
+      Handler: timestreamStatsPush.handler
+      Layers:
+        - !ImportValue
+              Fn::Sub: 'aws-sdk-2-layer-arn-${Environment}'
+      Code: ../lambdas/SNS
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !Sub ${TexTimestreamLambdaRole.Arn}
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+          TimestreamDatabase: !Ref 'TimestreamDatabase'
+          TimestreamSponsorTable: !Ref 'TimestreamSponsorTable'
+          TimestreamRegion: !Ref 'TimestreamRegion'
+          TimestreamLambdasTable: !Ref 'TimestreamLambdasTable'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+        - Key: "Creator"
+          Value: 'CF Automation'
+
+  TimestreamStatsPushSubscription:
+    Type: AWS::SNS::Subscription
+    Properties: 
+      Endpoint: !GetAtt TimestreamStatsPushLambda.Arn
+      Protocol: "lambda"
+      TopicArn: !ImportValue
+              Fn::Sub: 'TexSNS-LogStream-${Environment}'
+
+  TimestreamStatsPushPermission: #who can call
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: 'lambda:InvokeFunction'
+        FunctionName: !Ref TimestreamStatsPushLambda
+        Principal: sns.amazonaws.com
+
+
+#===============================================
+Outputs:
+  CWLogsPushLambdaARN:
+    Description: Log processing lambda arn
+    Value: !GetAtt CWLogsPushLambda.Arn
+    Export:
+      Name: !Sub 'log-processing-lambda-arn-${Environment}'
+
+  CWLogsPushLambdaName:
+    Description: Log processing lambda name
+    Value: !Ref CWLogsPushLambda
+    Export:
+      Name: !Sub 'log-processing-lambda-name-${Environment}'

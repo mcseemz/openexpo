@@ -1,0 +1,31 @@
+<div id="app" v-if="globalLocalesLoaded">
+	<Header
+		:key="headerType"
+		ref="headerComponent"
+		v-bind:isLoggedInG="isLoggedInG"
+		:headerType="headerType"
+		:headerTypeData="headerTypeData"
+		:changedLogo="changedLogo"
+		:logoEventId="logoEventId"
+		:logoType="logoType"
+		:pageType="pageType"
+		:pageId="pageId"
+		:pageName="pageName"
+		v-show="!$store.state.customHeader"
+		v-on:event-change-tab="changeEventTab"
+
+	></Header>
+
+	<router-view
+		ref="mainRouterView"
+		v-on:change-logo="changeLogo"
+		v-on:set-event-visitor-ui="setVisitorUi"
+		v-on:single-event-agenda-loaded="agendaLoadedAction"
+		v-on:set-page-type="setPageType"
+	></router-view>
+	<!-- FOOTER -->
+	<Footer v-show="!$store.state.customHeader"></Footer>
+
+	<ErrorNotification v-if="errorNotificationsEnabled && apiError.length"></ErrorNotification>
+
+</div>

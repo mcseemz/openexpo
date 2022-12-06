@@ -1,0 +1,109 @@
+<div class="main">
+    <div class="main_section event_datetime_section">
+        <p class="main_section_title big_text">
+            Event date and time        
+        </p>
+
+        <div class="form_input_row flex">
+        
+            <div class="form_input_hr">
+                <ui-select
+                    label="Time zone"
+                    placeholder="UTC+1"
+                    :options="edtTimeZoneList"
+                    v-model="edtTimeZoneVal"
+                    iconPosition="right"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+            
+        </div>
+
+        <div class="form_input_row flex">
+        
+            <div class="form_input_hr">
+                <ui-datepicker
+                    placeholder="Select a date"
+                    iconPosition="right"
+                    v-model="edtDateVal"
+                    :lang="datepicker_lang"
+                >
+                    <img slot="icon" src="../img/calendar.svg" alt="">
+                    Date
+                </ui-datepicker>
+            </div>
+
+            <div class="form_input_qr">
+                <ui-select
+                    label="From"
+                    placeholder="7:00 am"
+                    :options="timeList"
+                    v-model="timeFrom"
+                    iconPosition="right"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+            <div class="form_input_qr">
+                <ui-select
+                    label="To"
+                    placeholder="7:00 am"
+                    :options="timeList"
+                    v-model="timeTo"
+                    iconPosition="right"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+            <span class="icon_w_link"><img src="../img/callendar_filled.svg" alt="">Add day</span>
+            
+        </div>
+
+    </div>
+
+    <div class="main_section event_datetime_section">
+        <p class="main_section_title big_text">
+            Event Cover     
+        </p>
+
+        <div class="form_input_row flex">
+            
+            <div class="image_preview cover_preview">
+                <div class="image_preview_placeholder">
+                    <img src="../img/image_placeholder_img.svg" alt="" class="image">
+                    <p class="title_text">Drag & drop or click to add main event logo</p>
+                    <p class="descr_text small_text">JPEG or PNG, no larger than 10MB. Recommmended size: 2160x1080px</p>
+                </div>
+            </div>                    
+                
+        </div>
+
+    </div>
+
+    <div class="main_section event_datetime_section">
+        <p class="main_section_title big_text">
+            Event Logo     
+        </p>
+
+        <div class="form_input_row flex">
+            
+            <div class="image_preview logo_preview">
+                <div class="image_preview_placeholder">
+                    <img src="../img/image_placeholder_img.svg" alt="" class="image">
+                    <p class="title_text">Drag & drop or click to add main event logo</p>
+                    <p class="descr_text small_text">JPEG or PNG, no larger than 10MB. Recommended size: 250x100px</p>
+                </div>
+            </div>                    
+                
+        </div>
+
+    </div>
+
+    <div class="main_section flex">
+        <button class="btn btn_md btn_white btn_remove"><img src="../img/trash.svg" alt="">Remove Event</button>
+    </div>
+    
+</div>

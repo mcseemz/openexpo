@@ -1,0 +1,159 @@
+<div class="page_wrapper static_nik_page">
+
+	<!-- Hero -->
+    <div class="page-hero_wrapper page-hero--back-img">
+        <div class="page-hero content-wrapper">
+            <div class="breadcrumbs">
+                <ul class="breadcrumbs_list">
+                    <li class="breadcrumbs_item breadcrumbs_item--white">
+                        <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--white">{{tr('home')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--white">
+                        <span class="breadcrumbs_link breadcrumbs_link--white breadcrumbs_link--active">{{tr('solutions')}}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="hero_content hero_content--center">
+                <p class="hero_subtitle hero_subtitle--white">{{tr('openexpo_solutions_subtitle')}}</p>
+                <h1 class="hero_title hero_title--white">{{tr('openexpo_solutions_title')}}</h1>
+                <p class="hero_text hero_text--white">{{tr('openexpo_solutions_text')}}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="page-main_wrapper">
+        <main class="page-main">
+            <!-- 1 -->
+            <article class="content-wrapper article-block--row article-block--m120 article-block--white">
+                <div class="article-block--row--text">
+                    <div class="article_header article_header--m70">
+                        <div class="article_header_content article_header_content-mr">
+                            <h2 class="article-title article-title-m0" v-html="tr('find_what_exactly_openexpo_title')"></h2>
+                            <p class="article_text">{{tr('find_what_exactly_openexpo_text')}}</p>
+                        </div>
+                    </div>
+                    <div class="article_header">
+                        <ul class="features_list">
+                            <li class="features_list-item features_list-item--w50">
+                                <router-link :to="'/'+routes.solutions+'/'+routes.virtual_workshop" class="feature_link">
+                                    <div class="feature_item">
+                                        <div class="feature_logo">
+                                            <img class="feature_logo_img" src="@/img/static-pages/features/people.png" alt="Virtual workshop platform" width="62" height="70">
+                                        </div>
+                                        <h3 class="feature_title">{{tr('virtual_workshop_platform_title')}}</h3>
+                                        <p class="feature_text">{{tr('virtual_workshop_platform_text')}}</p>
+                                        <div class="feature_arrow">
+                                            <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34 " height="20 ">
+                                        </div>
+                                    </div>
+                                </router-link>
+                            </li>
+                            <li class="features_list-item features_list-item--w50">
+                                <router-link :to="'/'+routes.solutions+'/'+routes.virtual_conference" class="feature_link">
+                                    <div class="feature_item">
+                                        <div class="feature_logo">
+                                            <img class="feature_logo_img" src="@/img/static-pages/features/education.png" alt="Virtual conference platform" width="62" height="70">
+                                        </div>
+                                        <h3 class="feature_title">{{tr('host_virtual_conf_title')}}</h3>
+                                        <p class="feature_text">{{tr('host_virtual_conf_text')}}</p>
+                                        <div class="feature_arrow">
+                                            <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                        </div>
+                                    </div>
+                                </router-link>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="article-block--row-img article-block--row-img--ml">
+                    <img src="@/img/static-pages/solutions/conference.png" width="348" height="365" alt="Find what exactly Openexpo can help you with!">
+                </div>
+            </article>
+
+            <!-- 2 -->
+            <article class="content-wrapper article-block--row article-block--m120 article-block--white">
+                <div class="article-block--row-img article-block--row-img--mr">
+                    <img src="@/img/static-pages/solutions/trade.png" width="348" height="365" alt="Broadcast your success">
+                </div>
+
+                <div class="article-block--row--text">
+                    <div class="article_header article_header--m70 article_header--left">
+                        <div class="article_header_content article_header_content-mr">
+                            <h2 class="article-title article-title-m0" v-html="tr('broadcast_your_success_title')">
+                            </h2>
+                            <p class="article_text">{{tr('broadcast_your_success_text')}}</p>
+                        </div>
+                    </div>
+                    <div class="article_header">
+                        <ul class="features_list">
+                            <li class="features_list-item features_list-item--w50">
+                                <router-link :to="'/'+routes.solutions+'/'+routes.online_exhibition" class="feature_link">
+                                    <div class="feature_item">
+                                        <div class="feature_logo">
+                                        </div>
+                                        <h3 class="feature_title">{{tr('virtual_trade_show_title')}}</h3>
+                                        <p class="feature_text">{{tr('virtual_trade_show_text')}}</p>
+                                        <div class="feature_arrow">
+                                            <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34 " height="20 ">
+                                        </div>
+                                    </div>
+                                </router-link>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 3 -->
+            <article class="content-wrapper article-block--row article-block--m120 article-block--white">
+                <div class="article-block--row--text">
+                    <div class="article_header article_header--m70">
+                        <div class="article_header_content article_header_content-ml">
+                            <h2 class="article-title article-title-m0" v-html="tr('show_off_your_talent_title')"></h2>
+                            <p class="article_text">{{tr('show_off_your_talent_text')}}</p>
+                        </div>
+                    </div>
+                    <div class="article_header">
+                        <ul class="features_list">
+                            <li class="features_list-item features_list-item--w50">
+                                <router-link :to="'/'+routes.solutions+'/'+routes.virtual_festival" class="feature_link">
+                                    <div class="feature_item">
+                                        <div class="feature_logo">
+                                            <img class="feature_logo_img" src="@/img/static-pages/features/cocert.png" alt="Virtual festival platform" width="62" height="70">
+                                        </div>
+                                        <h3 class="feature_title">{{tr('virtual_film_festival_platform_title')}}</h3>
+                                        <p class="feature_text">{{tr('virtual_film_festival_platform_text')}}</p>
+                                        <div class="feature_arrow">
+                                            <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34 " height="20 ">
+                                        </div>
+                                    </div>
+                                </router-link>
+                            </li>
+                            <li class="features_list-item features_list-item--w50">
+                                <router-link :to="'/'+routes.solutions+'/'+routes.advanced_webinar" class="feature_link">
+                                    <div class="feature_item">
+                                        <div class="feature_logo">
+                                            <img class="feature_logo_img" src="@/img/static-pages/features/livestream.png" alt="Advance Webinar Platform" width="62" height="70">
+                                        </div>
+                                        <h3 class="feature_title">{{tr('advanced_webinar_title')}}</h3>
+                                        <p class="feature_text">{{tr('advanced_webinar_text')}}</p>
+                                        <div class="feature_arrow">
+                                            <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                        </div>
+                                    </div>
+                                </router-link>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="article-block--row-img article-block--row-img--mr">
+                </div>
+            </article>
+            <!-- 6 -->
+            <StaticBottomSection color="'blue'"></StaticBottomSection>
+        </main>
+    </div>
+
+</div>

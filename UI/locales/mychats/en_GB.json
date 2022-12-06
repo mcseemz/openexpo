@@ -1,0 +1,19 @@
+{
+  "mychats_title": "My Chats",
+  "mychats_standowner": "Stand Owner",
+  "mychats_visitor": "Visitor",
+  "mychats_event_organizer": "Event Organizer",
+  "mychats_start_chat": "Start chat",
+  "mychats_start_stands_chats": "Go to stands chats",
+  "mychats_open_chats": "Open chats",
+  "mychats_nochats_text": "There are still no chats your are going to attend",
+  "mychats_search_ph": "Search for events",
+  "mychats_search_events": "Search events",
+  "mychats_assign": "Assign",
+  "mychats_pending_invitation": "Pending invitation",
+  "mychats_pending_chat": "Pending chat",
+  "mychats_initiator": "Initiator",
+  "my_events_standowner_event_description": "This is how you communicate with event organiser",
+  "my_events_no_chats": "No chats here yet",
+  "chat_start_stand_from": "Stand from"
+}

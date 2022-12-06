@@ -1,0 +1,10 @@
+{
+  "all": true,
+  "include": [
+    "test/*.js",
+    "../lambdas/API/model/*.js"
+  ],
+  "exclude": [
+    "test/*.spec.js"
+  ]
+}

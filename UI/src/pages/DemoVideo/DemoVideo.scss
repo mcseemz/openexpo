@@ -1,0 +1,161 @@
+$grey80: #254854;
+$grey60: #386D7D;
+$grey40: #7096A1;
+$grey20: #AFC5CB;
+$grey10: #EBF0F2;
+$orange: #E5843D;
+$black: #1A323B;
+
+.page_my_meetings.page_wrapper  {
+	min-height: 100vh;
+	position: relative;
+	padding: 0;
+	margin-top: 0;
+
+	.meeting_custom_message {
+		font-size: 24px;
+		text-align: center;
+		margin-top: 200px;
+	}
+
+	.modal_meeting_zoom {
+		position: absolute;
+		height: 100%;
+		width: 100%;
+		background-color: #fff;
+		z-index: 1000;
+
+		.mmz_header {
+			background-color: #fff;
+			height: 72px;
+
+			.container {
+				height: 100%;
+				justify-content: space-between;
+				align-items: center;
+
+				.left {
+					align-items: center;
+				}
+
+				.vuejs-countdown {
+					// margin: 0 auto;
+					text-align: center;
+					li {
+						display: none;
+						margin: 0 4px;
+
+						&:nth-last-child(2) {
+							display: inline-block;
+						}
+						&:last-child {
+							display: inline-block;
+						}
+						&:after {
+							font-size: 18px;
+							line-height: 1.17em;
+							right: -8px;
+						}
+					}
+					.digit {
+						font-size: 22px;
+						line-height: 1.17em;
+						font-weight: 700;
+					}
+					.text {
+						display: none;
+					}
+				}
+
+				.close {
+					cursor: pointer;
+				}
+				.event_block {
+					margin-left: 88px;
+
+					.image_box {
+						width: 96px;
+						height: 48px;
+						display: flex;
+						align-items: center;
+						justify-content: flex-end;
+						margin-right: 8px;
+
+						img {
+							border-radius: 2.07678px;
+						}
+					}
+					.event_title {
+						font-size: 14px;
+						font-weight: 700;
+						line-height: 140%;
+						color: $grey80;
+					}
+				}
+			}
+		}
+
+		.breadcrumbs {
+			justify-content: flex-start;
+			align-items: center;
+			color: $grey80;
+			padding: 20px;
+			font-size: 16px;
+			line-height: 2em;
+			flex-wrap: wrap;
+
+			a {
+				color: $grey80;
+			}
+			.delimeter {
+				margin: 0 10px;
+			}
+			.current {
+				font-weight: bold;
+			}
+		}
+		.breadcrumb_line {
+			margin-bottom: 40px;
+			display: block;
+			width: 100%;
+			height: 1px;
+			background-color: #fff;
+			background: linear-gradient(to left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 10%, rgba(255,255,255,1) 90%, rgba(255,255,255,0) 100%);;
+		}
+
+		.mmz_iframe_box {
+			position: relative;
+			height: auto;
+			min-height: calc(100vh - 144px);
+			position: relative;
+			overflow: hidden;
+			height: 100%;
+			    height: calc(100% - 144px);
+
+			iframe {
+				width: 100%;
+				height: 600px;
+				position: absolute;
+				top: -106px;
+				top: 0;
+				// height: calc(100% - 106px);
+				height: calc(100% + 106px - 144px);
+				height: 100%;
+			}
+		}
+	}
+
+	.promo_video_img_link {
+    	position: absolute;
+    	cursor: pointer;
+    	right: 15px;
+	    bottom: 115px;
+    }
+    .promo_video_img {
+
+	    width: auto;
+	    height: auto;
+	    max-width: 100px;
+	    max-height: 100px;
+    }
+}

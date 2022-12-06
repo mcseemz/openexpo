@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+# '{{resolve:ssm:/rds_demo/master_username:1}} check https://github.com/garystafford/aws-rds-postgres/blob/master/parameter_store_values.sh'
+#  Description: '{{resolve:ssm-secure:/rds_demo/master_password:1}}'
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+Resources:
+#=====================================================================
+
+  TimestreamStatisticsDB:
+    Type: AWS::Timestream::Database
+    Properties: 
+      DatabaseName: !Sub 'statistics-${Environment}'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+        - Key: "Creator"
+          Value: 'Automation'
+
+  TimestreamSponsorsTable:
+    Type: AWS::Timestream::Table
+    DependsOn: TimestreamStatisticsDB
+    Properties: 
+      DatabaseName: !Sub 'statistics-${Environment}'
+      RetentionProperties: 
+        MemoryStoreRetentionPeriodInHours: "1"
+        MagneticStoreRetentionPeriodInDays: "700"
+      TableName: sponsors
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+        - Key: "Creator"
+          Value: 'Automation'
+
+  TimestreamLambdasTable:
+    Type: AWS::Timestream::Table
+    DependsOn: TimestreamStatisticsDB
+    Properties: 
+      DatabaseName: !Sub 'statistics-${Environment}'
+      RetentionProperties: 
+        MemoryStoreRetentionPeriodInHours: "1"
+        MagneticStoreRetentionPeriodInDays: "700"
+      TableName: lambdas
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+        - Key: "Creator"
+          Value: 'Automation'
+
+#=====================================================================
+
+Outputs:
+  TimestreamStatisticsDBOutput:
+    Description: Database name
+    Value: !Ref TimestreamStatisticsDB
+    Export:
+      Name: !Sub 'stats-timestream-db-name-${Environment}'
+
+  TimestreamStatisticsRegionOutput:
+    Description: Timestream Region
+    Value: !Sub '${AWS::Region}'
+    Export:
+      Name: !Sub 'stats-timestream-db-region-${Environment}'
+
+  TimestreamSponsorsOutput:
+    Description: Timestream sponsor table name
+    Value: !Ref TimestreamSponsorsTable
+    Export:
+      Name: !Sub 'stats-timestream-sponsor-${Environment}'
+
+  TimestreamLambdasOutput:
+    Description: Timestream lambdas table name
+    Value: !Ref TimestreamLambdasTable
+    Export:
+      Name: !Sub 'stats-timestream-lambdas-${Environment}'

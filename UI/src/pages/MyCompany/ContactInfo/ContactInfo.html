@@ -1,0 +1,138 @@
+<div class="main">
+    <div class="main_form_box">
+        <div class="main_section contact_info_main_section">
+      
+            <p class="main_section_title big_text">
+                {{tr('mycomp_contact_info')}}
+            </p>
+
+       
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('mycomp_contact_email_label')" 
+                        type="email"
+                        :disabled="true"
+                        :placeholder="tr('mycomp_contact_email_ph')" 
+                        v-model="companyObj.email"
+                        :invalid="companyObj.email && !validateEmail(companyObj.email)"
+                        @input="forceUpdate"
+                        
+                    >
+                    </ui-textbox>    
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('mycomp_contact_phone_label')" 
+                        type="tel"
+                        :disabled="!canEdit"
+                        :placeholder="tr('mycomp_contact_phone_ph')" 
+                        v-model="companyObj.addressesObj.phone"
+                        :invalid="companyObj.addressesObj.phone && !(/^[\d()\-#+\s]*$/.test(companyObj.addressesObj.phone))"
+                        @input="forceUpdate"
+                    >
+                    </ui-textbox>    
+                </div>
+                
+            </div>
+    
+        </div>
+
+        <div class="main_section contact_info_main_section">
+      
+            <p class="main_section_title big_text">
+                {{tr('mycomp_contact_social_network')}}
+            </p>
+
+       
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('mycomp_contact_fb_label')" 
+                        type="text"
+                        :disabled="!canEdit"
+                        :placeholder="tr('mycomp_contact_fb_ph')" 
+                        v-model="companyObj.addressesObj.facebook"
+                        :invalid="!!(companyObj.addressesObj.facebook && companyObj.addressesObj.facebook.length && !(/^(https?:\/\/)?((w{3}\.)?)facebook.com\/.*/i.test(companyObj.addressesObj.facebook)))"
+                        @input="forceUpdate"
+                    >
+                    </ui-textbox>    
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('mycomp_contact_linkedin_label')" 
+                        type="text"
+                        :disabled="!canEdit"
+                        :placeholder="tr('mycomp_contact_linkedin_ph')" 
+                        v-model="companyObj.addressesObj.linkedin"
+                        :invalid="!!(companyObj.addressesObj.linkedin && companyObj.addressesObj.linkedin.length && !(/^(https?:\/\/)?((w{3}\.)?)linkedin.com\/.*/i.test(companyObj.addressesObj.linkedin)))"
+                        @input="forceUpdate"
+                    >
+                    </ui-textbox>    
+                </div>
+                
+            </div>
+
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('mycomp_contact_twitter_label')" 
+                        type="text"
+                        :disabled="!canEdit"
+                        :placeholder="tr('mycomp_contact_twitter_ph')" 
+                        v-model="companyObj.addressesObj.twitter"
+                        :invalid="!!(companyObj.addressesObj.twitter && companyObj.addressesObj.twitter.length && ( !/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g.test(companyObj.addressesObj.twitter) && !/^(@)[-a-zA-Z0-9@:%._\+~#=]*/g.test(companyObj.addressesObj.twitter) ))"
+                        @input="forceUpdate"
+        
+                    >
+                    </ui-textbox>    
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('mycomp_contact_instagram_label')" 
+                        type="text"
+                        :disabled="!canEdit"
+                        :placeholder="tr('mycomp_contact_instagram_ph')" 
+                        v-model="companyObj.addressesObj.instagram"
+                        :invalid="!!(companyObj.addressesObj.instagram && companyObj.addressesObj.instagram.length && !(/^(https?:\/\/)?((w{3}\.)?)instagram.com\/.*/i.test(companyObj.addressesObj.instagram)))"
+                        @input="forceUpdate"
+                    >
+                    </ui-textbox>    
+                </div>
+                
+            </div>
+    
+        </div>
+
+        <div class="main_section contact_info_main_section">
+      
+            <p class="main_section_title big_text">
+                {{tr('mycomp_contact_website_label')}}
+            </p>
+
+       
+            <div class="form_input_row">
+
+                <ui-textbox 
+                    type="text"
+                    :placeholder="tr('mycomp_contact_website_ph')" 
+                    :disabled="!canEdit"
+                    v-model="companyObj.addressesObj.website"
+                    :invalid="!!(companyObj.addressesObj.website && companyObj.addressesObj.website.length && !(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g.test(companyObj.addressesObj.website)))"
+                    @input="forceUpdate"
+                >
+                </ui-textbox>    
+                
+            </div>
+    
+        </div>
+
+
+    </div>
+</div>

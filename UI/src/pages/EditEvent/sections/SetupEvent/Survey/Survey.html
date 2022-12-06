@@ -1,0 +1,208 @@
+<div class="main_section">
+    <div class="edit_sponsor_section">
+        <h3 class="big_text form_section_title">{{editSponsor.name}}</h3>
+
+       	<!-- WHEEL OF FORTUNE WOF -->
+        <div class="wof_edit_section">
+
+            <p class="main_section_title big_text">
+                {{tr('adev_sponsor_survey')}}
+            </p>
+
+            <div class="form_input_row target_url">
+                <ui-textbox 
+                    :label="tr('adev_sponsor_wof_title_label')"
+                    :placeholder="tr('name')" 
+                    v-model="editSponsor.survey.name"
+                    @input="forceUpdate"
+                >
+                </ui-textbox>  
+            </div>
+
+            <div class="form_input_row target_url">
+                <ui-textbox 
+                    :label="tr('adev_sponsor_wof_descr_label')"
+                    :placeholder="tr('adev_sponsor_wof_descr_ph')" 
+                    v-model="editSponsor.survey.description"
+                    @input="forceUpdate"
+                    :multiLine="true"
+                    :rows="3"
+                >
+                </ui-textbox>  
+            </div>
+
+            <div class="form_input_row wof_date_row flex jcfs">
+
+                <div class="form_input_hr">
+                    <ui-datepicker
+                        :placeholder="tr('select_a_date')"
+                        iconPosition="right"
+                        v-model="publishDate"
+                        :lang="datepicker_lang"
+                        @input="calcDate()"
+                        :minDate="minFromDate"
+                        :maxDate="maxFromDate"
+                        :disabled="editSponsor.survey.active"
+                    >
+                        <img slot="icon" src="../img/calendar.svg" alt="">
+                        {{tr('adev_sponsor_wof_date_label')}}
+                    </ui-datepicker>
+                </div>
+
+                <div class="form_input_qr">
+                    <ui-select
+                        :label="tr('adev_sponsor_wof_time_label')"
+                        :placeholder="tr('adev_time_ph')"
+                        :options="timeList"
+                        v-model="publishTime"
+                        iconPosition="right"
+                        @change="calcDate()"
+                        :disabled="editSponsor.survey.active"
+                    >
+                    </ui-select>
+                </div>
+
+                <p class="text disabled_text" v-if="editSponsor.survey.active">{{tr('adev_survey_started')}}</p>
+                
+            </div>
+
+            <p class="main_section_title big_text">
+	            {{tr('adev_sponsor_survey_thumbnail')}}
+	        </p>
+	        
+	        <div class="form_input_row event_survey_droparea">
+	            <VueUploadComponent
+	            input-id="surveyThumbInpt"
+	            ref="event_videologo_upload"
+	            v-model="editSponsor.sponsorBranding.surveyThumb.new"
+	            drop=".event_survey_droparea"
+	            :multiple="false"
+	            @input-file="inputFile"
+	            class="upload_image_iconstyle"
+	            :drop-directory="false"
+	            >   
+	                <div v-if="editSponsor.placeholders.surveyPlaceholder" class="preview_image_box">
+	                    <img :src="editSponsor.placeholders.surveyPlaceholder" alt="" class="">
+	                </div>
+	                <div v-if="!editSponsor.placeholders.surveyPlaceholder" class="placeholder_text">
+	                    <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+	                    <p class="file_upload_title">{{tr('adev_sponsor_surveythumb_ph_main')}}</p>
+	                    <p class="file_upload_desc">{{tr('adev_sponsor_surveythumb_ph_desc')}}</p>    
+	                </div>
+
+	                <div class="icons_box" v-if="editSponsor.placeholders.surveyPlaceholder">
+	                    <span @click="removeImage"><img src="../img/remove_icon.svg" alt=""></span>
+	                    <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+	                </div>
+	                
+	            </VueUploadComponent>
+	            
+	        </div>
+
+	        <p class="main_section_title big_text">
+	            {{tr('adev_sponsor_survey_contents')}}
+	        </p>
+	        <div class="survey_question_box" v-for="quest, index in editSponsor.survey.questions">
+	        	<div class="form_input_row flex jcfs">
+
+	                <div class="form_input_hr">
+	                    <ui-textbox
+	                        :label="tr('adev_sponsor_question_label') + ' (' + tr('adev_sponsor_survey_'+quest.type)+')'"
+	                        :placeholder="tr('name')" 
+	                        v-model="quest.label"
+	                        @input="forceUpdate"
+	                    >
+	                    </ui-textbox>  
+	                </div>
+	                <div class="survey_edit flex">
+	                	<span class="flex" @click="toggleEditType(quest)"><img src="./img/edit.svg" alt="">
+	                	{{tr('adev_sponsor_survey_edittype')}}
+	                	</span>
+
+	                	<div class="survey_edit_list" v-if="quest.showEditType">
+	                		<p class="edit_title">{{tr('adev_sponsor_survey_select_type')}}</p>
+	                		<span class="close" @click="toggleEditType(quest)">+</span>
+	                		<div class="items">
+	                			<p class="item" :class="{active: type.value == quest.type}" v-for="type in typesList" @click="changeType(quest, type.value)">{{type.label}}</p>
+	                		</div>
+	                	</div>
+	                </div>
+	                <div class="survey_edit flex" @click="removeQuestion(index)">
+	                	<img src="./img/trash_orange.svg" alt="">
+	                	{{tr('adev_sponsor_survey_remove')}}
+	                </div>
+	                
+	            </div>
+	            <div class="form_input_row" v-if="quest.type != 'free-text'" v-for="opt, index in quest.options">
+	            	<div class="form_input_hr survey_opt_input">
+	            		<ui-textbox 
+	                        :label="tr('adev_sponsor_survey_opt_label') + ' ' + (index + 1)"
+	                        :placeholder="tr('adev_sponsor_survey_opt_ph')" 
+	                        v-model="quest.options[index]"
+	                        @input="forceUpdate"
+	                    >
+	                	</ui-textbox>  
+	                	<div class="delete_box" @click="deleteOpt(quest, index)"><img src="./img/trash.svg" alt=""></div>
+	            	</div>
+	            </div>
+	            <div class="form_input_row" v-if="quest.type != 'free-text'">
+	            	<span class="survey_add_option flex" @click="addOptionRow(quest)">
+		            	<img src="./img/orange_plus.svg" alt="">
+		            	{{tr('adev_sponsor_survey_add_option')}}
+		            </span>
+	            </div>
+	        </div>
+            
+
+
+            <div class="wof_button_box">
+                <button class="btn btn_white" @click="addQuestionRow">
+                    {{tr('adev_sponsor_survey_add_question')}} <img src="@/img/sponsorship/button_plus.svg" alt="">
+                </button>
+            </div>
+
+        </div>
+
+
+        <!-- <p class="main_section_title big_text">
+            {{tr('adev_sponsor_pool_setup')}}
+        </p>
+        <div class="pool_setup_section">
+            <div class="pool_question_item" v-if="editSponsor.pool.length" v-for="quest in editSponsor.pool">
+                <div class="form_input_row">
+                    <ui-textbox 
+                        :label="'Question'"
+                        :placeholder="tr('adev_sponsor_pool_question_ph')" 
+                        v-model="quest.question"
+                    >
+                    </ui-textbox>  
+
+                </div>
+                <div class="options_box">    
+                
+                    <div class="form_input_row flex option_row" v-for="opt, index in quest.options">
+                        <ui-textbox 
+                            :label="'Option '+(index+1)"
+                            :placeholder="tr('adev_sponsor_pool_option_ph')" 
+                            v-model="quest.options[index]"
+                        >
+                        </ui-textbox>  
+                        
+                        <div class="button_box">
+                            <button class="btn btn_orange" v-if="(quest.options.length - 1) != index" @click="removeOption(quest, index)">Remove option</button>
+                            <button class="btn btn_orange" v-if="(quest.options.length - 1) == index" @click="addOption(quest)">Add option</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button_box">
+                <button class="btn btn_orange" @click="addQuestion">Add question</button>
+            </div>
+        </div> -->
+        <div class="button_box">
+            <button class="btn btn_owhite" @click="backToSponsor">{{tr('back')}}</button>
+        </div>
+    </div>
+    
+</div>

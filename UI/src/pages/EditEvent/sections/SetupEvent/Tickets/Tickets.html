@@ -1,0 +1,466 @@
+<div class="main">
+  <div class="main_form_box">
+    <div class="main_section tickets_main_section" v-if="newForm">
+      <p class="main_section_title big_text">
+        {{tr('adev_price_type')}}
+      </p>
+
+      <div class="form_input_row form_input_tickets_row flex">
+        <div class="form_input_hr">
+          <ui-textbox
+            :label="tr('adev_price_name')+' *'"
+            type="text"
+            :placeholder="tr('adev_online_price')"
+            v-model="ticket_name"
+            :maxlength="100"
+            :invalid="ticket_nameTouched && (!ticket_name || ticket_name.length > 100)"
+            @touch.passive="ticket_nameTouched = true"
+          />
+        </div>
+
+        <div class="form_input_qr">
+          <ui-textbox
+            :label="tr('price')"
+            type="number"
+            :placeholder="curSymbol+'20.00'"
+            :min=0
+            :max="ticket_manualApproval?null:0"
+            v-model="ticket_price"
+            :invalid="ticket_priceTouched && (ticket_price.length > 10 || ticket_price < 0 || (!ticket_manualApproval && +ticket_price !== 0))"
+            @touch.passive="ticket_priceTouched = true"
+          />
+        </div>
+
+        <div class="form_input_qrl">
+          <ui-textbox
+            :label="tr('quantity')+' *'"
+            type="number"
+            placeholder="200"
+            :min=1
+            v-model="ticket_qty"
+            :invalid="ticket_qtyTouched && (!ticket_qty || ticket_qty.length > 5 || ticket_qty < 1) "
+            @touch.passive="ticket_qtyTouched = true"
+          />
+        </div>
+      </div>
+
+      <div class="form_input_row">
+        <ui-textbox
+          :label="tr('description')+' *'"
+          :placeholder="tr('adev_ticket_descr_ph')"
+          v-model="ticket_descr"
+          :maxlength="120"
+          :multi-line="true"
+          :invalid="ticket_descrTouched && (!ticket_descr || ticket_descr.length > 120 || /[<>;{}$]/.test(ticket_descr) )"
+          @touch.passive="ticket_descrTouched = true"
+        />
+      </div>
+
+      <div class="form_input_row">
+        <ui-textbox
+          :label="tr('email_content')"
+          :placeholder="tr('adev_email_content_ph')"
+          v-model="ticket_email_content"
+          :maxlength="3000"
+          :multi-line="true"
+          :invalid="ticket_email_contentTouched && ticket_email_content.length > 3000"
+          @touch.passive="ticket_email_contentTouched = true"
+        />
+      </div>
+
+      <div class="form_input_row">
+        <p class="form_input_row_label">
+          {{tr('adev_tags_label')}}
+        </p>
+        <vue-tags-input
+          :placeholder="tr('adev_tags_price')"
+          v-model="tag"
+          :tags="tags"
+          :allow-edit-tags="true"
+          :add-on-key="[13,';',',']"
+          @tags-changed="tagsChanged"
+        />
+      </div>
+
+      <div class="form_input_row form_input_tickets_row flex" style="justify-content: flex-start; gap: 3%;">
+        <div class="form_input_qrl">
+          <ui-select
+            :label="tr('ticket_expiration_type_label')"
+            :options="expirationOptions"
+            v-model="ticket_expirationType"
+            iconPosition="right"
+          >
+          <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+          </ui-select>
+        </div>
+        <div class="form_input_qrl">
+          <ui-textbox
+            type="number"
+            :label="tr('ticket_expiration_duration_label')" 
+            :min=1
+            placeholder="20"
+            v-model.number="ticket_expirationDuration"
+            :invalid="ticket_expirationType.value !== expirationType_none && ticket_expirationDuration < 1"
+            :disabled="ticket_expirationType.value === expirationType_none"
+          />
+        </div>
+      </div>
+
+      <div class="form_input_row form_input_row_ar flex">
+        <div style="display: flex; margin-right: 37px; position: relative;">
+          <ui-checkbox v-model="ticket_manualApproval" color="accent" @change="()=>ticket_price=''">{{tr('ticket_manual_approval')}}</ui-checkbox>
+          <span class="question_icon ticket--approval-list_tooltip" style="margin-block: -15px;" @click="importVisitors_showTooltip=!importVisitors_showTooltip">?
+            <ui-tooltip position="top" animation="scale" :open-delay="100" open-on="click">
+              <span>{{tr('ticket_manual_approval_tooltip')}}</span>
+            </ui-tooltip>
+          </span>
+        </div>
+      </div>
+      
+      <div class="button_box flex">
+        <button class="btn btn_orange" @click="addTicket">{{tr('adev_add_prices')}}</button>
+      </div>
+    </div>
+
+      <div class="main_section agenda_main_section flex btn_action" v-if="!newForm" @click="newForm = true">
+          <button class="btn btn_oval" >+</button>  <span class="btn_oval_text">{{ tr('adev_new_activity') }}</span>
+      </div>
+
+    <div class="main_section tickets_main_section" v-if="tickets.list.length || tickets.exist">
+      <p class="main_section_title big_text">
+        {{tr('adev_price_added')}}
+      </p>
+
+      <div class="main_section tickets_main_section" v-if="tickets.list && ticket.edit" v-for="(ticket, index) in tickets.list" :key="ticket.id">
+        <div class="form_input_row form_input_tickets_row flex">
+          <div class="form_input_hr">
+            <ui-textbox
+              :label="tr('adev_price_name')+' *'"
+              type="text"
+              :placeholder="tr('adev_online_price')"
+              v-model="ticket.name"
+              :maxlength="100"
+              :invalid="ticket.isInvalidName"
+              v-on:touch="updateNewTicketNameTouched(index)"
+              v-on:input="updateNewTicketName($event, index)"
+            />
+          </div>
+
+          <div class="form_input_qr">
+            <ui-textbox
+              :label="tr('price')"
+              type="number"
+              :placeholder="curSymbol+'20.00'"
+              :min=0
+              :max="ticket.manualApproval?null:0"
+              v-model="ticket.access_price"
+              :invalid="ticket.isInvalidPrice"
+              v-on:touch="updateNewTicketPriceTouched(index)"
+              v-on:input="updateNewTicketPrice($event, index)"
+            />
+          </div>
+
+          <div class="form_input_qrl">
+            <ui-textbox
+              :label="tr('quantity')+' *'"
+              type="number"
+              :min=1
+              placeholder="200"
+              v-model="ticket.quantity"
+              :invalid="ticket.isInvalidQuantity"
+              v-on:touch="updateNewTicketQuantityTouched(index)"
+              v-on:input="updateNewTicketQuantity($event, index)"
+            />
+          </div>
+        </div>
+
+        <div class="form_input_row">
+          <ui-textbox
+            :label="tr('description')+' *'"
+            :placeholder="tr('adev_ticket_descr_ph')"
+            v-model="ticket.description_long"
+            :maxlength="120"
+            :multi-line="true"
+            :invalid="ticket.isInvalidDescription"
+            v-on:touch="updateNewTicketDescriptionTouched(index)"
+            v-on:input="updateNewTicketDescription($event, index)"
+          />
+        </div>
+
+        <div class="form_input_row">
+          <ui-textbox
+            :label="tr('email_content')"
+            :placeholder="tr('adev_email_content_ph')"
+            v-model="ticket.email_content"
+            :maxlength="3000"
+            :multi-line="true"
+          >
+          </ui-textbox>
+        </div>
+
+        <div class="form_input_row">
+          <p class="form_input_row_label">
+            {{tr('adev_tags_label')}}
+          </p>
+          <vue-tags-input
+            :placeholder="tr('adev_tags_price')"
+            v-model="ticket.tag"
+            :tags="ticket.tags"
+            :allow-edit-tags="true"
+            :add-on-key="[13,';',',']"
+            @tags-changed="newTags => ticket.tags = newTags"
+          />
+        </div>
+
+        <div class="form_input_row form_input_tickets_row flex" style="justify-content: flex-start; gap: 3%;">
+          <div class="form_input_qrl">
+            <ui-select
+              :label="tr('ticket_expiration_type_label')"
+              :options="expirationOptions"
+              placeholder="Select..."
+              v-model="ticket.expirationType"
+              iconPosition="right"
+            >
+            <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+            </ui-select>
+          </div>
+          <div class="form_input_qrl">
+            <ui-textbox
+              type="number"
+              :label="tr('ticket_expiration_duration_label')" 
+              :min=1
+              placeholder="20"
+              v-model.number="ticket.expirationDuration"
+              :invalid="ticket.expirationType.value !== expirationType_none && ticket.expirationDuration < 1"
+              :disabled="ticket.expirationType.value === expirationType_none"
+            />
+          </div>
+        </div>
+       
+        <div class="form_input_row  form_input_row_ar flex">
+          <div style="display: flex; margin-right: 37px; position: relative;">
+            <ui-checkbox :value="ticket.manualApproval"  @input="updateManualApproval($event, index, 'list')" color="accent">{{tr('ticket_manual_approval')}}</ui-checkbox>
+            <span class="question_icon ticket--approval-list_tooltip" style="margin-block: -15px;" @click="importVisitors_showTooltip=!importVisitors_showTooltip">?
+              <ui-tooltip position="top" animation="scale" :open-delay="100" open-on="click">
+                <span>{{tr('ticket_manual_approval_tooltip')}}</span>
+              </ui-tooltip>
+            </span>
+          </div>
+        </div>
+
+        <div class="button_box flex">
+          <button class="btn btn_owhite btn_margin_right" @click="updateTicket(index, false)">{{tr('adev_cancel')}}</button>
+          <button class="btn btn_orange" @click="updateTicket(index, true)">{{tr('adev_save_price')}}</button>
+        </div>
+      </div>
+
+      <div class="ticket" v-show="tickets.list && !ticket.edit" v-for="(ticket, index) in tickets.list">
+        <div class="ticket_bottom flex">
+          <div class="ticket_info">
+            <p class="ticket_subtitle">{{ticket.quantity}} {{tr('adev_tc_tickets')}} | {{tr('online_ticket')}}</p>
+            <p class="ticket_title">{{ticket.name}}</p>
+            <p class="ticket_descr">{{ticket.description_long}}</p>
+            <p class="ticket_price">{{curSymbol}}{{ticket.access_price||0}}</p> 
+            <div class="flex" >
+              <p class="ticket_price ticket_subtitle expiration_tag" v-if="ticket.manualApproval">{{tr('ticket_manual_approval')}}</p>
+              <p class="ticket_price ticket_subtitle expiration_tag" v-if="ticket.expirationType.value !== expirationType_none">{{'Expires in ' + ticket.expirationDuration + ' ' + ticket.expirationType.label}}</p>            
+            </div>           
+            <div class="ticket_tags"><span class="ti-tag"v-for="(tag, index) in ticket.tags">{{tag.text}}</span></div>
+            <p></p>
+          </div>
+
+          <div class="flex-right">
+            <div class="ticket_actions flex">
+              <span v-if="ticket.is_removable"><img src="../img/trash_sec_bold.svg" @click="deleteTicket(index)" /></span>
+              <span><img src="../img/edit_sec.svg" @click="updateTicket(index, false)" /></span>
+              <span><ui-tooltip>Don't forget to save event</ui-tooltip><img src="../img/edited_dot.svg"/></span>   
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="ticket" :class="ticket.is_enabled ? 'active' : 'disabled'" v-for="(ticket, index) in tickets.exist" :key="ticket.id">
+        <template v-if="!ticket.edit">
+          <div class="ticket_bottom flex">
+            <div class="ticket_info">
+              <p class="ticket_subtitle">{{ticket.quantity}} {{tr('adev_tc_tickets')}} | {{tr('online_ticket')}}</p>
+              <p class="ticket_title">{{ticket.name}}</p>
+              <p class="ticket_descr">{{ticket.description_long}}</p>
+              <p class="ticket_descr mt-8" v-if="ticket.sold || ticket.sold === 0">{{tr('sold')}}: {{ticket.sold}}</p>
+              <p class="ticket_price">{{curSymbol}}{{ticket.access_price}}</p>
+              <div class="flex" >
+                <p class="ticket_price ticket_subtitle expiration_tag" v-if="ticket.manualApproval">{{tr('ticket_manual_approval')}}</p>
+                <p class="ticket_price ticket_subtitle expiration_tag" v-if="ticket.expirationType.value !== expirationType_none">{{tr('ticket_expiration_type_label') + ' ' + ticket.expirationDuration + ' ' + ticket.expirationType.label}}</p>
+              </div>
+              <div class="ticket_tags"><span class="ti-tag"v-for="(tag, index) in ticket.tagsList.sort((curr, next)=>{return next.text.length-curr.text.length})">{{tag.text}}</span></div>
+            </div>
+            <div class="flex-right">
+              <div class="ticket_actions flex">
+                <span :class="ticket.is_removable ? '' : 'disabled_action'"><img src="../img/trash_sec_bold.svg" @click="deleteExistTicket(index, ticket)" />
+                  <ui-tooltip v-if="!ticket.is_removable">{{tr('adev_ticket_not_removable_hint')}}{{eventObj.status == 'active' ? tr('adev_ticket_not_removable_active_hint') : ""}}</ui-tooltip>
+                </span>
+
+                <span><img src="../img/edit_sec.svg" @click="updateExistTicketStatus(index, false)" /></span>
+                <span v-if="ticket.edited"><ui-tooltip>Don't forget to save event</ui-tooltip><img src="../img/edited_dot.svg"/></span>
+              </div>
+              <div class="flex-dropdown" :class="{ active: ticket.showHistory }" @click='updateExistTicketShowHistory(index)' v-if="ticket.version.length>0">
+                <p class="tikets-history">{{tr('ticket_history')}}</p>
+                <div>
+                  <div class="drop drop-up" v-show='ticket.showHistory'></div>
+                  <div class="drop drop-down" v-show='!ticket.showHistory'></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="change-history-block" v-show='ticket.showHistory'>
+            <p class="title-change-history">{{tr('ticket_changes_history')}}</p>
+            <div class="ticket-history-info" v-for="(version, index) in ticket.version" :key="index">
+              <p>{{tr('date')}} {{version.date}}</p>
+              <p>{{tr('user_id')}} {{version.user}}</p>
+              <p v-if="version.tickets || version.tickets === 0">{{tr('sold')}} {{version.tickets}}</p>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <div class="form_input_row form_input_tickets_row flex">
+            <div class="form_input_qrl">
+              <ui-textbox
+                :label="tr('adev_price_name')+' *'"
+                type="text"
+                :placeholder="tr('adev_online_price')"
+                v-model="ticket.name"
+                :maxlength="100"
+                :invalid="ticket.isInvalidName"
+                v-on:touch="updateExistTicketNameTouched(index)"
+                v-on:input="updateExistTicketName($event, index)"
+              />
+            </div>
+
+            <div class="form_input_qr">
+              <ui-textbox
+                :label="tr('price')"
+                type="number"
+                :min=0
+                :max="ticket.manualApproval?null:0"
+                :maxlength="10"
+                :placeholder="curSymbol+'20.00'"
+                v-model="ticket.access_price"
+                :invalid="ticket.isInvalidPrice"
+                v-on:touch="updateExistTicketPriceTouched(index)"
+                v-on:input="updateExistTicketPrice($event, index)"
+              />
+            </div>
+
+            <div class="form_input_qrl">
+              <ui-textbox
+                :label="tr('quantity')+' *'"
+                type="number"
+                :min=1
+                placeholder="200"
+                v-model="ticket.quantity"
+                :invalid="ticket.isInvalidQuantity"
+                v-on:touch="updateExistTicketQuantityTouched(index)"
+                v-on:input="updateExistTicketQuantity($event, index)"
+              />
+            </div>
+          </div>
+
+          <div class="form_input_row">
+            <ui-textbox
+              :label="tr('description')+' *'"
+              :placeholder="tr('adev_ticket_descr_ph')"
+              v-model="ticket.description_long"
+              :maxlength="120"
+              :multi-line="true"
+              :invalid="ticket.isInvalidDescription"
+              v-on:touch="updateExistTicketDescriptionTouched(index)"
+              v-on:input="updateExistTicketDescription($event, index)"
+            />
+          </div>
+
+          <div class="form_input_row">
+            <ui-textbox
+              :label="tr('email_content')"
+              :placeholder="tr('adev_email_content_ph')"
+              v-model="ticket.email_content"
+              :maxlength="3000"
+              :multi-line="true"
+              v-on:input="updateExistTicketEmailContent($event, index)"
+            >
+            </ui-textbox>
+          </div>
+
+          <div class="form_input_row">
+            <p class="form_input_row_label">
+              {{tr('adev_tags_label')}}
+            </p>
+            <vue-tags-input
+              :placeholder="tr('adev_tags_price')"
+              v-model="ticket.tag"
+              :tags="ticket.tagsList"
+              :allow-edit-tags="true"
+              :add-on-key="[13,';',',']"
+              @tags-changed="newTags => ticket.tagsList = newTags"
+            />
+          </div>
+          <div class="form_input_row form_input_tickets_row flex" style="justify-content: flex-start; gap: 3%;">
+            <div class="form_input_qrl">
+              <ui-select
+                :label="tr('ticket_expiration_type_label')"
+                :options="expirationOptions"
+                placeholder="Select..."
+                v-model="ticket.expirationType"
+                iconPosition="right"
+                v-on:input="updateExistTicketExpirationDuration(index)"
+              >
+              <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+              </ui-select>
+            </div>
+            <div class="form_input_qrl">
+              <ui-textbox
+                type="number"
+                :label="tr('ticket_expiration_duration_label')" 
+                :min=1
+                placeholder="20"
+                v-model.number="ticket.expirationDuration"
+                :invalid="ticket.expirationType.value !== expirationType_none && ticket.expirationDuration < 1"
+                :disabled="ticket.expirationType.value === expirationType_none"
+                v-on:input="updateExistTicketExpirationDuration(index)"
+              />
+            </div>
+          </div>
+          <div class="form_input_row flex">
+            <ui-checkbox v-model="ticket.is_enabled" color="accent">{{tr('enabled')}}</ui-checkbox>
+            <div style="display: flex; margin-right: 20px; position: relative;">
+              <ui-checkbox :value="ticket.manualApproval" @input="updateManualApproval($event, index, 'exist')" color="accent">{{tr('ticket_manual_approval')}}</ui-checkbox>
+              <span class="question_icon ticket--approval-list_tooltip" style="margin-block: -15px;" @click="importVisitors_showTooltip=!importVisitors_showTooltip">?
+                <ui-tooltip position="top" animation="scale" :open-delay="100" open-on="click">
+                  <span>{{tr('ticket_manual_approval_tooltip')}}</span>
+                </ui-tooltip>
+              </span>
+            </div>
+          </div>
+          <div class="button_box flex">
+            <button class="btn btn_owhite btn_margin_right" @click="updateExistTicketStatus(index, false)">{{tr('adev_cancel')}}</button>
+            <button class="btn btn_orange" @click="updateExistTicketStatus(index, true)">{{tr('adev_save_price')}}</button>
+          </div>
+          <div class="flex-dropdown" :class="{ active: toggle }" @click='updateExistTicketShowHistory(index)' v-if="ticket.version.length>0">
+            <p class="tikets-history">{{tr('ticket_history')}}</p>
+            <div>
+              <div class="drop drop-up" v-show='ticket.showHistory'></div>
+              <div class="drop drop-down" v-show='!ticket.showHistory'></div>
+            </div>
+          </div>
+          <div class="change-history-block" v-show='ticket.showHistory'>
+            <p class="title-change-history">{{tr('ticket_changes_history')}}</p>
+            <div class="ticket-history-info" v-for="(version, index) in ticket.version" :key="index">
+              <p>{{tr('date')}} {{version.date}}</p>
+              <p>{{tr('user_id')}} {{version.user}}</p>
+              <p v-if="version.tickets || version.tickets === 0">{{tr('sold')}} {{version.tickets}}</p>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</div>

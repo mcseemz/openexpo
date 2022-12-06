@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "ApiPrefixName",
+    "ParameterValue": "apidev"
+  },
+  {
+    "ParameterKey": "DomainName",
+    "ParameterValue": "enter_your.domain"
+  }
+]

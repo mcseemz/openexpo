@@ -1,0 +1,134 @@
+<div class="main">
+    <div class="main_form_box">
+
+        <div class="main_section tickets_main_section">
+
+            <p class="text">You can add two types of tickets for your event, to attend online or in person.</p>
+
+            <p class="main_section_title big_text">
+                Online tickets
+            </p>
+
+            <div class="form_input_row form_input_tickets_row flex">
+
+                <div class="form_input_hr">
+                    <ui-textbox
+                        label="Ticket name"
+                        type="text"
+                        placeholder="Online Ticket"
+                        v-model="ticket_name"
+                    >
+                    </ui-textbox>
+                </div>
+
+                <div class="form_input_qr">
+                    <ui-textbox
+                        label="Price"
+                        type="text"
+                        placeholder="€20.00"
+                        v-model="ticket_price"
+                    >
+                    </ui-textbox>
+                </div>
+
+                <div class="form_input_qrl">
+                    <ui-textbox
+                        label="Quantity"
+                        type="text"
+                        placeholder="200"
+                        v-model="ticket_qty"
+                    >
+                    </ui-textbox>
+                </div>
+
+            </div>
+
+            <div class="form_input_row">
+                <ui-textbox
+                    label="Description *"
+                    placeholder="Add a brief description about what the ticket includes"
+                    v-model="ticket_descr"
+                    :maxlength="120"
+                    :multi-line="true"
+                >
+                </ui-textbox>
+            </div>
+
+        </div>
+
+        <div class="main_section tickets_main_section">
+
+            <p class="main_section_title big_text">
+                Offline tickets
+            </p>
+
+            <div class="form_input_row form_input_tickets_row flex">
+
+                <div class="form_input_hr">
+                    <ui-textbox
+                        label="Ticket name"
+                        type="text"
+                        placeholder="Offline Ticket"
+                        v-model="off_ticket_name"
+                    >
+                    </ui-textbox>
+                </div>
+
+                <div class="form_input_qr">
+                    <ui-textbox
+                        label="Price"
+                        type="text"
+                        placeholder="€20.00"
+                        v-model="off_ticket_price"
+                    >
+                    </ui-textbox>
+                </div>
+
+                <div class="form_input_qrl">
+                    <ui-textbox
+                        label="Quantity"
+                        type="text"
+                        placeholder="200"
+                        v-model="off_ticket_qty"
+                    >
+                    </ui-textbox>
+                </div>
+
+            </div>
+
+            <div class="form_input_row">
+                <ui-textbox
+                    label="Description *"
+                    placeholder="Add a brief description about what the ticket includes"
+                    v-model="off_ticket_descr"
+                    :maxlength="120"
+                    :multi-line="true"
+                >
+                </ui-textbox>
+            </div>
+
+        </div>
+
+        <div class="main_section tickets_main_section">
+
+            <p class="main_section_title big_text">
+                Tickets added
+            </p>
+
+            <div class="ticket">
+                <p class="ticket_subtitle">200 tickets | Online ticket</p>
+                <p class="ticket_title">Online Ticket</p>
+                <p class="ticket_descr">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
+                <div class="ticket_bottom flex">
+                    <p class="ticket_price">€15.00</p>
+                    <div class="ticket_actions flex">
+                        <span><img src="../img/trash_sec_bold.svg" alt=""></span>
+                        <span><img src="../img/edit_sec.svg" alt=""></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "meetingRejectedNotification",
+    "SubjectPart": "Meeting was rejected",
+    "HtmlPart": "Meeting with {{user}} was rejected",
+    "TextPart": "Meeting with {{user}} was rejected"
+  }
+}

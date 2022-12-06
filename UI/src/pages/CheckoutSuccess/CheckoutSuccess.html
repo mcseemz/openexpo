@@ -1,0 +1,53 @@
+
+
+<div class="page_add_event page_checkout checkout_success" v-if="localesLoaded">
+    
+    <header class="add_event_header checkout_header">
+        <div class="container flex">
+            
+            <router-link :to="'/'+routes.event+'/'+$route.params.id" class="back_link flex"><img src="./img/arrow_bold_left.svg" alt="">Back to {{eventObj.name}}</router-link>
+
+        </div>
+    </header>
+    
+    <div class="content_wrapper" v-if="!tierCheckout">
+        <div class="container">
+            <div class="checkout_success_container">
+                <div class="form_section_title">You’re going to {{eventObj.name}}!</div>
+                <!-- <p class="checkout_calendar flex">
+                    <a href="#" class="icon_box"><img src="./img/calendar.svg" alt=""> Add to calendar</a>
+                </p> -->
+                <p>Your order has been saved to My Events </p>
+                <ul class="checkout_list">
+                    <li><a href="#">Order #{{orderId}}</a> {{qty}} ticket of {{formatPrice(price)}} (pay by {{paymentMethod}}) </li>
+                    <li>Your ticket has been sent to <strong>{{userEmail}}</strong></li>
+                </ul>
+                <div class="button_box flex">
+                    <router-link :to="'/'+routes.myevents+'/'" class="btn btn_orange">{{tr('my_events')}}</router-link>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content_wrapper" v-if="tierCheckout">
+        <div class="container">
+            <div class="checkout_success_container">
+                <div class="form_section_title">You become a sponsor for {{eventObj.name}}!</div>
+                <!-- <p class="checkout_calendar flex">
+                    <a href="#" class="icon_box"><img src="./img/calendar.svg" alt=""> Add to calendar</a>
+                </p> -->
+                <p>Your order has been saved</p>
+                <ul class="checkout_list">
+                    <li><a href="#">Order #{{orderId}}</a> {{qty}} ticket of {{formatPrice(price)}} (pay by {{paymentMethod}}) </li>
+                    <li>Your ticket has been sent to <strong>{{userEmail}}</strong></li>
+                </ul>
+                <div class="button_box flex">
+                    <router-link :to="'/'+routes.event+'/'+$route.params.id" class="btn btn_orange">Go to {{eventObj.name}}</router-link>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>

@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "sponsorshipBoughtToSponsor",
+    "SubjectPart": "You successfully bought a sponsorship to event '{{eventName}}'",
+    "HtmlPart": "You successfully bought a sponsorship to event '{{eventName}}'. Tier: {{tierName}}. Tier options are: {{tierOptions}}. Event link: {{eventLink}}. Event organizer email: {{organizerEmail}}, phone: {{organizerPhone}}. Please send your marketing materials to event organizer directly.",
+    "TextPart": "You successfully bought a sponsorship to event '{{eventName}}'. Tier: {{tierName}}. Tier options are: {{tierOptions}}. Event link: {{eventLink}}. Event organizer email: {{organizerEmail}}, phone: {{organizerPhone}}. Please send your marketing materials to event organizer directly."
+  }
+}

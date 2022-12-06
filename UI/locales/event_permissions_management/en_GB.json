@@ -1,0 +1,21 @@
+{
+  "page_event_permissions_management_title": "Event permission management",
+  "event_permission_subtitle": "Permission management",
+  "event_permission_title": "Event permission management",
+  "event_permission_text": "Roles and permissions are one of the key features in the event. Some staff would require certain restrictions to some of the event's places. I.e one might not need to edit logos, or sponsors.",
+  "invite_personnel_title": "Invite personnel and <span class=\"orange\">assign their roles </span>",
+  "invite_personnel_text": "With a few clicks of a button, the event \"owner\" can easily invite the staff members and assign them the needed role.",
+  "invite_personnel_tab1": "Send invites to your staff!",
+  "invite_personnel_tab2": "Manage your invites!",
+  "invite_personnel_tab3": "Have them represent their brand on your event!",
+  "see_all_personnel_title": "See a <span class=\"orange\">full list of personnel</span>, their roles and positions!",
+  "see_all_personnel_text": "On top of invites, the event owner is to manage the event's staff internally. Add or delete or change the permission roles of any of the staff members ",
+  "see_all_personnel_tab1": "Get a full list of personnel!",
+  "see_all_personnel_tab2": "Check their names and emails.",
+  "see_all_personnel_tab3": "Know their role and job position!",
+  "different_permissions_title": "<span class=\"orange\">Different permissions</span> for different roles!",
+  "different_permissions_text": "Let the event owner allocate the right permissions for each staff member. Should the member see all of the event? Should  the member just manage sponsors? Should member just be the speaker?",
+  "different_permissions_tab1": "Make the staff member public or private",
+  "different_permissions_tab2": "Assign the correct role and position",
+  "different_permissions_tab3": "Let the staff member see a particular part of the event"
+}

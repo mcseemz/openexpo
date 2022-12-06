@@ -1,0 +1,131 @@
+<div class="page_wrapper static_nik_page" v-if="localesLoaded">
+
+	<!-- Hero -->
+    <div class="page-hero_wrapper">
+        <div class="page-hero content-wrapper">
+            <div class="breadcrumbs">
+                <ul class="breadcrumbs_list">
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('home')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'+routes.all_features" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('openexpo_features')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray ">
+                        <span class="breadcrumbs_link breadcrumbs_link--gray breadcrumbs_link--active">{{tr('page_booths_and_stands_title')}}</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="hero_content">
+                <div class="hero_content_inner">
+                    <div class="hero_content_text hero_content_text--mr">
+                        <p class="hero_subtitle hero_subtitle--gray">{{tr('stands_and_booths_subtitle')}}</p>
+                        <h1 class="hero_title hero_title--gray">{{tr('stands_and_booths_title')}}</h1>
+                        <p class="hero_text hero_text--gray">{{tr('stands_and_booths_text')}}</p>
+                        <div class="hero--btns">
+                            <router-link :to="'/'+routes.addevent" class="primary-btn">{{tr('create_event_btn')}}</router-link>
+                            <button @click="requestDemoClick" class="primary-btn primary-btn--reverse">{{tr('request_a_demo_btn')}}</button>
+                        </div>
+                    </div>
+                    <div class="hero_content_img">
+                        <img class="hero_img--people" src="@/img/static-pages/numbers-of-booths/hero.png" alt="Unlimited number of stands/booth">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="page-main_wrapper">
+        <main class="page-main">
+            <!-- 1 -->
+            <article class="article-block article-block--m100 article-block--blue">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/numbers-of-booths/1.png" alt="Invite stand owners">
+                    </div>
+                    <div class="article_header_content article_header_content--big article_header_content-ml">
+                        <h2 class="article-title article-title-m0" v-html="tr('invite_stand_owner_title')"></h2>
+                        <p class="article_text">{{tr('invite_stand_owner_text')}}</p>
+                        <ul class="unordered_list">
+                            <li class="unordered_item">{{tr('invite_stand_owner_tab1')}}</li>
+                            <li class="unordered_item">{{tr('invite_stand_owner_tab2')}}</li>
+                            <li class="unordered_item">{{tr('invite_stand_owner_tab3')}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 2 -->
+            <article class="article-block article-block--m100 article-block--white">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_header_content article_header_content--big article_header_content-mr">
+                        <h2 class="article-title article-title-m0" v-html="tr('schedule_meetings_chat_title')"></h2>
+                        <p class="article_text">{{tr('schedule_meetings_chat_text')}}</p>
+                        <ul class="unordered_list">
+                            <li class="unordered_item">{{tr('schedule_meetings_chat_tab1')}}</li>
+                            <li class="unordered_item">{{tr('schedule_meetings_chat_tab2')}}</li>
+                            <li class="unordered_item">{{tr('schedule_meetings_chat_tab3')}}</li>
+                        </ul>
+                    </div>
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/numbers-of-booths/2.png" alt="Schedule meetings">
+                    </div>
+                </div>
+            </article>
+
+            <!-- 3 -->
+            <article class="article-block article-block--m100 article-block--blue">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_header_content article_header_content-mr article_header_content--w100">
+                        <h2 class="article-title article-title-m0 article-title--w70 article-title--center" v-html="tr('more_information_about_stand_title')"></h2>
+                        <div class="article--litle-list content-wrapper article--litle-list--mt">
+                            <div class="article--little_item">
+                                <a href="#" class="article--little_link">
+                                    <div class="article--little_img_wrapper">
+                                        <img src="@/img/static-pages/numbers-of-booths/l1.png" alt="Customize your stands" class="article--little_img">
+                                    </div>
+                                    <div class="article--little_text_wrapper">
+                                        <p class="article--little_title" v-html="tr('customise_your_stand_title')"></p>
+                                        <p class="article--little_text">{{tr('customise_your_stand_text')}}</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="article--little_item">
+                                <a href="#" class="article--little_link">
+                                    <div class="article--little_img_wrapper">
+                                        <img src="@/img/static-pages/numbers-of-booths/l2.png" alt="Unlimited number of booth" class="article--little_img">
+                                    </div>
+                                    <div class="article--little_text_wrapper">
+                                        <p class="article--little_title" v-html="tr('tag_your_booth_title')"></p>
+                                        <p class="article--little_text">{{tr('tag_your_booth_text')}}</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="article--little_item">
+                                <a href="#" class="article--little_link">
+                                    <div class="article--little_img_wrapper">
+                                        <img src="@/img/static-pages/numbers-of-booths/l3.png" alt="Filter stands that interest you" class="article--little_img">
+                                    </div>
+                                    <div class="article--little_text_wrapper">
+                                        <p class="article--little_title" v-html="tr('filter_stands_title')"></p>
+                                        <p class="article--little_text">{{tr('filter_stands_text')}} </p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 5 -->
+            <OtherFeatures></OtherFeatures>
+
+            <!-- 6 -->
+            <StaticBottomSection></StaticBottomSection>
+        </main>
+    </div>
+
+    <RequestDemo ref="request_demo"></RequestDemo>
+</div>

@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "dev"
+  }, 
+  {
+    "ParameterKey": "DBInstanceClass",
+    "ParameterValue": "db.t3.micro"
+  }, 
+  {
+    "ParameterKey": "DBName",
+    "ParameterValue": "db_name_dev"
+  },
+  {
+    "ParameterKey": "DBUser",
+    "ParameterValue": "db_user_dev"
+  },
+  {
+    "ParameterKey": "DBPassword",
+    "ParameterValue": "db_password_dev"
+  }
+]

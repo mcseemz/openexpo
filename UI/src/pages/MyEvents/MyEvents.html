@@ -1,0 +1,35 @@
+<div class="page_wrapper myevents_page" v-if="localesLoaded">
+
+	<div class="subheader">
+		<div class="container flex">
+			<h2 class="title">{{tr('myevents_title')}}</h2> 
+			<div class="left flex">
+				<router-link 
+					:to="'/'+routes.addevent" 
+					class="btn btn_orange" 
+					v-if="route.path == '/'+routes.myevents+'/'+routes.myevents_organizer"
+				>{{tr('myevents_create_event')}}</router-link>
+				<div class="subnavigation">
+					<router-link 
+						:to="routes.myevents_vistors" 
+						class="subnav_buttons" 
+						v-bind:class="{ active: route.path == '/'+routes.myevents+'/'+routes.myevents_vistors }"
+					><span>{{tr('myevents_visitor')}}</span></router-link>
+					<router-link 
+						:to="routes.myevents_organizer" 
+						class="subnav_buttons" 
+						v-bind:class="{ active: route.path == '/'+routes.myevents+'/'+routes.myevents_organizer }"
+					><span>{{tr('myevents_organizer')}}</span></router-link>
+					<router-link 
+						:to="routes.myevents_standowner" 
+						class="subnav_buttons" 
+						v-bind:class="{ active: route.path == '/'+routes.myevents+'/'+routes.myevents_standowner }"
+					><span>{{tr('myevents_standowner')}}</span></router-link>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<router-view></router-view>
+
+</div>

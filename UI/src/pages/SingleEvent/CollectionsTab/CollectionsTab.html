@@ -1,0 +1,191 @@
+<section class="collections_tab_section preloader_wrapper color-black" >
+  <div class="preloader_overlay preload_overlay_white" v-show="preload"><ui-progress-circular color="primary"></ui-progress-circular></div>
+  <div class="container">
+    <template v-if="parsedCollections.length">
+      <div class="main-container flex jcc" v-if="!selectedCollection">
+        <div class="collection" @click="selectCollection(collection)" v-for="(collection,i) in parsedCollections" :class="{'disabled': !collection.allowed}" >
+          <div class="image-wrapper">
+            <img :src="collection.thumbnail" v-if="collection.thumbnail" />
+            <img src="./img/sample-collection.png" v-else />
+          </div>
+          <div class="flex mt-8 jcsb name-wrapper">
+            <div class="text-small text-bold name">{{collection.name}}</div>
+            <div class="text-small color-grey items">{{collection.contentSize}} items</div>
+          </div>
+        </div>
+      </div>
+      <div class="main-container" v-else :class="{'thin': selectedProduct}">
+        <template v-if="!selectedProduct">
+          <div class="flex aic jcsb">
+            <div @click="resetCollection" class="category-title flex collections-back">
+              <img src="./img/arrow.svg" />
+              <div class="ml-12 text-small color-s-accent">{{tr('back')}}</div>
+            </div>
+          </div>
+          <div v-if="selectedCollection.hero" class="hero-wrapper mt-8">
+            <!-- <div class="hero-mask" :style="backgroundColor">
+            </div> -->
+            <div class="hero-info">
+              <div class="text-34 mb-16" style="text-shadow: 1px 1px 12px black;">{{selectedCollection.name}}</div>
+              <div class="description" v-if="selectedCollection.description">{{selectedCollection.description}}</div>
+            </div>
+            <img :src="selectedCollection.hero" />
+          </div>
+          <div class="collection-content mt-32 flex">
+            <div
+              v-for="(item,ind) in selectedCollection.parsedItems"
+              class="collection-item"
+              :class="{'disabled': !item.allowed}"
+              @click="collectionItemAction(item, selectedCollection.ref)">
+              <div class="image-wrapper">
+                <img :src="parsedCollections[ind].thumbnail" v-if="parsedCollections[ind].thumbnail" />
+                <img src="@/img/image_placeholder_img.svg" v-else />
+              </div>
+              <div class="text-small mt-8">{{item.name}}</div>
+              <div class="additional-info">
+                <template v-if="selectedCollection.ref === 'article'">
+                  <span class="mt-8 text-micro">{{getArticleDate(selectedCollection.publishDate)}}</span>
+                </template>
+                <template v-if="selectedCollection.ref === 'activity'">
+                  <span class="mt-8 text-micro">{{getAgendaTime(item)}} {{eventObj.timezoneObj.abbr}}</span>
+                  <div class="flex mt-8" v-if="item.attendees">
+                    <template v-for="user in item.attendees">
+                      <img :src="user.url" v-if="user.url" class="ml-8" />
+                      <img src="@/img/default_avatar.svg" v-else class="ml-8" />
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+            <div v-if="linkToFilm">
+                <div class="flex" style="align-items: self-start; cursor:pointer;" @click="selectedProduct = null">
+                    <img src="./img/arrow.svg" style="margin-top: 12px;" />
+                    <span class="ml-12 text-34">{{selectedCollection.name}}</span>
+                </div>
+                <div class="flex aic jcsb  mt-32">
+                    <div class="category-title flex" style="cursor: initial">
+                        <div class="ml-12 text-48">{{selectedProduct.name}}</div>
+                    </div>
+                </div>
+                <div class="product-content mt-32 flex">
+                    <div class="mt-20 flex jcsb">
+                        <img :src="selectedProduct.heroBanner" class="hero-banner"/>
+                        <iframe
+                                :src="vimeoLink"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; fullscreen; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen />
+                    </div>
+                    <div class="mt-24" v-html="selectedProduct.description"></div>
+                    <div class="tags flex mt-16">
+                        <div class="tag color-grey text-tiny" v-for="tag in filteredProductTags">{{tag}}</div>
+                    </div>
+                    <div class="film-info flex mt-24" v-if="parsedFilmDetails && parsedFilmDetails.length">
+                        <template v-for="item in parsedFilmDetails">
+                            <div class="info">
+                                <div class="text-bold">{{item.detail}}:</div>
+                                <div :style="textColor">{{item.value}}</div>
+                            </div>
+                            <div class="line" :style="borderColor"></div>
+                        </template>
+                    </div>
+
+                    <div class="film-info flex mt-24" v-else>
+                        <template v-if="selectedProduct.about">
+                            <div class="info">
+                                <div class="text-bold">{{tr('director')}}:</div>
+                                <div :style="textColor">{{selectedProduct.about}}</div>
+                            </div>
+                            <div class="line" :style="borderColor"></div>
+                        </template>
+                        <template v-if="parsedFilmCast">
+                            <div class="info">
+                                <div class="text-bold">{{tr('stars')}}:</div>
+                                <div :style="textColor">{{parsedFilmCast}}</div>
+                            </div>
+                            <div class="line" :style="borderColor"></div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <div v-else >
+                <div class="flex" style="align-items: self-start; cursor:pointer;" @click="selectedProduct = null">
+                    <img src="./img/arrow.svg" style="margin-top: 12px;" />
+                    <span class="ml-12 text-34">{{selectedCollection.name}}</span>
+                </div>
+                <div style="display: flex">
+                    <div style="display: flex">
+
+                        <div class="mt-20 flex jcsb" style="display: inline-block;margin: 20px 30px 0 20px;">
+                            <img :src="selectedProduct.heroBanner" class="hero-banner"/>
+                            <iframe
+                                    :src="vimeoLink"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; fullscreen; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen />
+                        </div>
+                    </div>
+                    <div style="padding: 17px">
+                        <div class="flex aic jcsb">
+                            <div  class="category-title flex" style="cursor: initial">
+
+                                <div class="ml-12 text-48">{{selectedProduct.name}}</div>
+                            </div>
+                        </div>
+                        <div class="product-content mt-32 flex">
+                            <div class="mt-24" v-html="selectedProduct.description"></div>
+                            <div class="tags flex mt-16">
+                                <div class="tag color-grey text-tiny" v-for="tag in filteredProductTags">{{tag}}</div>
+                            </div>
+                            <div class="film-info flex mt-24" v-if="parsedFilmDetails && parsedFilmDetails.length">
+                                <template v-for="item in parsedFilmDetails">
+                                    <div class="info">
+                                        <div class="text-bold">{{item.detail}}:</div>
+                                        <div :style="textColor">{{item.value}}</div>
+                                    </div>
+                                    <div class="line" :style="borderColor"></div>
+                                </template>
+                            </div>
+
+                            <div class="film-info flex mt-24" v-else>
+                                <template v-if="selectedProduct.about">
+                                    <div class="info">
+                                        <div class="text-bold">{{tr('director')}}:</div>
+                                        <div :style="textColor">{{selectedProduct.about}}</div>
+                                    </div>
+                                    <div class="line" :style="borderColor"></div>
+                                </template>
+                                <template v-if="parsedFilmCast">
+                                    <div class="info">
+                                        <div class="text-bold">{{tr('stars')}}:</div>
+                                        <div :style="textColor">{{parsedFilmCast}}</div>
+                                    </div>
+                                    <div class="line" :style="borderColor"></div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </template>
+      </div>
+    </template>
+    <p v-else class="text-middle">{{tr('no_saved_collections')}}</p>
+  </div>
+
+  <ui-modal ref="errorModal" class="status_modal fields_error_modal" removeHeader size="auto">
+    <div class="status_modal_wrapper">
+      <div class="content">
+        <p class="modal_text">{{tr('no_rights_to_view')}}</p>
+      </div>
+    </div>
+
+    <span class="status_modal_close" @click="closeErrorModal"><img src="@/img/close_medium.svg" alt=""></span>
+  </ui-modal>
+</section>

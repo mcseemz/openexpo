@@ -1,0 +1,56 @@
+$grey80: #254854;
+$grey60: #386D7D;
+$grey40: #7096A1;
+$grey20: #AFC5CB;
+$grey10: #EBF0F2;
+$orange: #E5843D;
+$black: #1A323B;
+$secondary: #70B9C3;
+$secondary20: #E2F1F3;
+
+
+.webinar_organizer_content {
+	padding: 270px 0 100px;
+	width: 100%;
+	display: flex;
+
+	.webinar_video_content {
+		width: 100%;
+		display: flex;
+
+		.video_box_wrapper {
+			width: 50%;
+			padding: 0 10px;
+			position: relative;
+			text-align: center;
+
+			.video_box {
+				width: 100%;
+				height: 400px;
+				background-color: #333;
+				margin-bottom: 10px;
+			}
+			video {
+				width: 100%;
+				height: 100%;
+			}
+			.share_button {
+				position: absolute;
+				top: -50px;
+				left: 10px;
+			}
+		}
+		.local_video {
+
+		}
+		.remote_video {
+
+		}
+	}
+}
+.fp-localVideo {
+    border: 1px double #777;
+    width: 322px;
+    height: 242px;
+    margin: 0 auto;
+}

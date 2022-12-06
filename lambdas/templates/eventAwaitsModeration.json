@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "eventAwaitsModeration",
+    "SubjectPart": "New Event for moderation",
+    "HtmlPart": "Event awaits moderation: {{eventLink}}<br /><br />Accept: {{acceptLink}}<br />Reject: {{rejectLink}}",
+    "TextPart": "Event awaits moderation: {{eventLink}}. Accept: {{acceptLink}}. Reject: {{rejectLink}}"
+  }
+}

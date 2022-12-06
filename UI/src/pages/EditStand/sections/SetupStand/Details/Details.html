@@ -1,0 +1,233 @@
+<div class="main">
+    <div class="main_form_box">
+
+        <div class="main_section details_main_section">
+
+           <div class="form_section">
+                <p class="big_text main_section_title">
+                    {{tr('edst_event_name_label')}}
+                </p>
+                <div class="form_input_row">
+                    <ui-textbox
+                        :placeholder="tr('edst_event_name_ph')"
+                        v-model="standObj.name"
+                        v-on:touch.passive="standNameTouched = true"
+                        :maxlength="100"
+                        :invalid="standNameTouched && standObj.name.length === 0 || standObj.name.length > 100 ||
+                        ValidName(standObj.name,customNameWanted) && standObj.name.length"
+                        :help="standNameMsg"
+                        @change="inputChange"
+                        @input="inputChange"
+                    >
+                    </ui-textbox>
+                </div>
+
+               <div class="form_input_row">
+                   <ui-checkbox v-model="customNameWanted" color="accent">{{ tr('i_want_custom_url_name') }}</ui-checkbox>
+               </div>
+
+               <div class="form_input_row" v-if="customNameWanted">
+                   <ui-textbox
+                       :label="tr('edst_stand_custom_label')"
+                       :placeholder="tr('edst_stand_custom_ph')"
+                       v-model="standObj.customName"
+                       :maxlength="100"
+                       :invalid="sessionCustomTouched && !standObj.customName.length || standObj.customName.length > 100 ||
+                        ValidName(standObj.customName,customNameWanted) && standObj.customName.length"
+                       :help="customAgendaNameMsg"
+                       @touch="sessionCustomTouched = true"
+                       @input="customNameInput(true)"
+                   >
+                   </ui-textbox>
+               </div>
+
+                <p class="big_text main_section_title flex">
+                    {{tr('edst_stand_cover')}}
+                    <span class="question_icon">?<span class="tooltip_image_box"><img src="@/img/template_cover_tooltip.jpg.webp" alt=""></span></span>
+                </p>
+                <div class="form_input_row stand_cover_droparea">
+                    <VueUploadComponent
+                    ref="stand_main_upload"
+                    v-model="standBranding.templateCover.new"
+                    drop=".stand_cover_droparea"
+                    :multiple="false"
+                    @input-file="inputFile"
+                    class="upload_image_iconstyle"
+                    :drop-directory="false"
+                    >
+                        <div v-if="templateCoverUrl" class="preview_image_box">
+                            <img :src="templateCoverUrl" alt="" class="">
+                        </div>
+                        <div v-if="!templateCoverUrl" class="placeholder_text">
+                            <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                            <p class="file_upload_title">{{tr('edst_stand_cover_ph_main')}}</p>
+                            <p class="file_upload_desc">{{tr('edst_stand_cover_ph_desc')}}</p>
+                        </div>
+
+                        <div class="icons_box" v-if="templateCoverUrl">
+                            <span @click="removeImage('templateCover', 'stand_main_preview_url')"><img src="../img/remove_icon.svg" alt=""></span>
+                            <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                        </div>
+
+                    </VueUploadComponent>
+
+                </div>
+
+                <p class="main_section_title big_text flex">
+                    {{tr('edst_stand_banner')}}
+                    <span class="question_icon">?<span class="tooltip_image_box"><img src="@/img/banner_tooltip.jpg.webp" alt=""></span></span>
+                </p>
+
+                <div class="form_input_row stand_banner_droparea ">
+                    <VueUploadComponent
+                    input-id="bannerInpt"
+                    ref="stand_banner_upload"
+                    v-model="standBranding.templateBanner.new"
+                    drop=".stand_banner_droparea"
+                    :multiple="false"
+                    @input-file="inputBannerFile"
+                    @input-filter="inputBannerFilter"
+                    class="upload_image_iconstyle"
+                    :drop-directory="false"
+                    >
+                        <div v-if="bannerUrl" class="preview_image_box">
+                            <img :src="bannerUrl" alt="" class="">
+                        </div>
+                        <div v-if="!bannerUrl" class="placeholder_text">
+                            <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                            <p class="file_upload_title">{{tr('edst_stand_banner_ph_main')}}</p>
+                            <p class="file_upload_desc">{{tr('edst_stand_banner_ph_desc')}}</p>
+                        </div>
+
+                        <div class="icons_box" v-if="bannerUrl">
+                            <span @click="removeImage('templateBanner', 'stand_banner_preview_url')"><img src="../img/remove_icon.svg" alt=""></span>
+                            <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                        </div>
+
+                    </VueUploadComponent>
+
+                </div>
+
+               <div class="main_section event_datetime_section">
+
+                   <p class="main_section_title big_text flex">
+                       {{tr('adev_stands_logo')}}
+<!--                       <span class="question_icon">?<span class="tooltip_image_box"><img src="@/img/banner_tooltip.jpg.webp" alt=""></span></span>-->
+                   </p>
+
+
+                   <div class="form_input_row flex logo_droparea">
+
+                       <div class="image_preview logo_preview">
+                           <VueUploadComponent
+                                   input-id="logoInpt"
+                                   ref="treee"
+                                   v-model="standBranding.logo.new"
+                                   drop=".logo_droparea"
+                                   :multiple="false"
+                                   @input-file="inputLogoFile"
+                                   @input-filter="inputFilter"
+                                   class="upload_image_iconstyle"
+                                   :drop-directory="false"
+                           >
+                               <div v-if="logoUrl" class="preview_image_box">
+                                   <img :src="logoUrl" alt="" class="">
+                               </div>
+                               <div v-if="!logoUrl" class="placeholder_text">
+                                   <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                                   <p class="file_upload_title">{{tr('adev_event_logo_ph_main')}}</p>
+                                   <p class="file_upload_desc">{{tr('adev_event_logo_ph_desc')}}</p>
+                               </div>
+
+                               <div class="icons_box" v-if="logoUrl">
+                                   <span @click="removeImage('logo')"><img src="../img/remove_icon.svg" alt=""></span>
+                                   <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                               </div>
+
+                           </VueUploadComponent>
+                       </div>
+
+                   </div>
+
+               </div>
+
+                <div class="form_input_row">
+                    <div class="ui-textbox">
+                        <div>
+                            <div class="ui-textbox__label-text custom_styled_label">{{tr('edst_stand_color')}}</div>
+                            <input @input="standObj.colorSelected = true" label="qwe" type="color" name="color" id="color" v-model="standObj.color">
+                        </div>
+                    </div>
+
+                </div>
+
+                <p class="big_text main_section_title">{{tr('edst_show_empty_tabs_title')}}</p>
+                <div class="flex form_checkbox_row">
+                    <ui-checkbox v-model="standObj.show_empty" @change="inputChange" color="accent">{{tr('edst_show_empty_tabs')}}</ui-checkbox>
+                    <ui-checkbox v-model="standObj.chat_enable" @change="inputChange" color="accent">{{tr('edst_chat_enable_tabs')}}</ui-checkbox>
+                </div>
+
+                <p class="big_text main_section_title">{{tr('edst_short_desc_label')}}</p>
+                <div class="form_input_row">
+                    <ui-textbox
+                        :placeholder="tr('edst_short_desc_ph')"
+                        v-model="standObj.description_short"
+                        :maxlength="120"
+                        :multi-line="true"
+                        :invalid="standObj.description_short.length > 120"
+                        v-on:touch.passive="standSDescTouched = true"
+                        :help="standSDescMsg"
+                        @change="inputChange"
+                        @input="inputChange"
+                    >
+                    </ui-textbox>
+                </div>
+
+                <p v-if="false" class="big_text main_section_title">{{tr('edst_contact_email_label')}}</p>
+                <div v-if="false" class="form_input_row">
+                    <ui-textbox
+                        type="email"
+                        :placeholder="tr('edst_contact_email_ph')"
+                        v-model="standObj.contacts.email"
+                        :invalid="standObj.contacts.email.length && !validateEmail(standObj.contacts.email)"
+                        @input="inputChange"
+                    >
+                    </ui-textbox>
+                </div>
+
+                <p class="big_text main_section_title">{{tr('edst_tags_label')}}</p>
+                <div class="form_input_row">
+                    <vue-tags-input
+                        :placeholder="tr('edst_tags_ph')"
+                        v-model="standObj.tag"
+                        :tags="standObj.tagsList"
+                        :allow-edit-tags="true"
+                        :add-on-key="[13,';',',']"
+                        @tags-changed="newTags => standObj.tagsList = newTags"
+                    />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <ui-modal ref="croppModal" dismissOn="close-button" class="status_modal cropp_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <clipper-fixed
+                    ref="croppBox"
+                    :src="coverUrlForCropp"
+                    :ratio="croppRatio"
+                    v-if="coverUrlForCropp"
+                ></clipper-fixed>
+                <p class="text">
+                    {{tr('edst_scale_message')}}
+                </p>
+                <div class="button_box flex">
+                    <button class="btn btn_owhite" @click="backCropp">{{tr('back')}}</button>
+                    <button class="btn btn_orange" @click="saveCropp">{{tr('save')}}</button>
+                </div>
+            </div>
+        </div>
+    </ui-modal>
+</div>

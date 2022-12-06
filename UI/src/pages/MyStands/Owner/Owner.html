@@ -1,0 +1,259 @@
+<section class="my_events_main preloader_wrapper">
+
+	<div class="preloader_overlay" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+	
+	<div class="container" :class="{'op_loading': preload}">
+		<div class="my_events_not_found" v-if="notFound">
+			<img src="../img/illustration_calendar.svg" alt="">
+			<div class="big_text">{{tr('mystands_nostands_text')}}</div>
+			<!-- <router-link :to="'/'+routes.discover" class="btn btn_orange btn_md">
+				{{tr('mystands_search_stands')}}
+			</router-link> -->
+		</div>
+		<div class="my_events_grid_section" v-if="!notFound">
+			
+			<div class="my_events_search_block events_search_block">
+				<div class="events_search">
+					<div class="events_search_left flex">
+						<div class="search_input_block">
+							<input type="search" v-model="searchString" class="search_input" :placeholder="tr('mystands_search_stands')">
+							<a href="#" class="search_btn"><img src="../../../img/search_icon.svg" alt=""></a>
+						</div>	
+					</div>
+
+					<div class="events_search_right flex">
+						<div class="events_search_date">
+							<ui-datepicker
+				                :placeholder="tr('select_a_date')"
+				                iconPosition="right"
+				                v-model="date_val"
+				                :lang="datepicker_lang"
+				            >
+				            	<img slot="icon" src="../../../img/dropdown_arrow.svg" alt="">
+				            	{{tr('date')}}
+				            </ui-datepicker>
+						</div>
+						<!-- <div class="filter_trigger_block"><a href="#" @click="triggerFilter" class="filter_trigger"><img src="../../../img/filter_icon.svg" alt=""></a></div> -->
+					</div>
+				</div>
+				<div class="events_search_filter_items" v-if="expand_filter">
+					<!-- <div class="filter_item">
+						<div class="text">
+							<div class="item_title">{{tr('order_by')}}:</div>
+							<div class="item_text">Upcoming First</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div>
+					<div class="filter_item">
+						<div class="text">
+							<div class="item_title">{{tr('event_type')}}</div>
+							<div class="item_text">Select type</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div> -->
+				<!-- 	<div class="filter_item">
+						<div class="text">
+							<div class="item_title">Country</div>
+							<div class="item_text">Select country</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div>
+					<div class="filter_item">
+						<div class="text">
+							<div class="item_title">City</div>
+							<div class="item_text">Select city</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div> -->
+					
+				</div>
+
+			</div>
+
+			<div class="event_grid_new">
+
+				<div class="item" v-if="ilq"v-for="stand in filteredInvitationsList">
+					<div class="image_box" :class="{'image_placeholder': !eventsList[stand.event].templateCoverUrl }">
+						<img class="item_image" :src="eventsList[stand.event].templateCoverUrl" alt="">
+						<div class="hover_box">
+							<div class="hover_top">
+								<div class="follow" style="opacity: 0">
+									<div class="icon_box"><img src="@/img/ICON_Follow.svg" alt=""></div>
+									<span>{{tr('follow')}}</span>
+								</div>
+							</div>
+							<div class="hover_text">{{stand.description_short}}</div>
+							<div class="button_box invitation_button_box">
+								<button @click="accept(stand.id)" class="btn btn_orange btn_sm">{{tr('mystands_accept')}}</button>
+								<button @click="refuse(stand.id)" class="btn btn_sm btn_tr">{{tr('mystands_refuse')}}</button>
+							</div>
+						</div>
+					</div>
+					<div class="text_box">
+						<p class="name">{{stand.name ? stand.name : tr('noname_stand_name')}}</p>
+						<p class="price">{{dateLeft(eventsList[stand.event])}}</p>
+					</div>
+					<div class="event_name_text">
+						<p class="name"><strong>{{tr('mystands_event')}}: </strong>{{eventsList[stand.event].name}}</p>
+					</div>
+					<div class="date">
+						<div class="icon_box"><img src="@/img/ICON_calendar.svg" alt=""></div>
+						<p>{{eventsList[stand.event].evtItemDate.month}} {{eventsList[stand.event].evtItemDate.date}}</p>
+					</div>
+					<div class="invitation_message">
+						<span>{{tr('mystands_pending_invitation')}}</span>
+					</div>
+				</div>
+
+				<router-link :to="'/'+routes.stand+'/'+(stand.customName ? stand.customName :stand.id)" class="item" v-if="eventsList[stand.eventId] && slq"v-for="stand in filteredStandsList">
+					<div class="image_box" :class="{'image_placeholder': !stand.templateCoverUrl }">
+						<img class="item_image" :src="stand.templateCoverUrl" alt="">
+						<div class="hover_box">
+							<div class="hover_top">
+								<div class="follow" style="opacity: 0">
+									<div class="icon_box"><img src="@/img/ICON_Follow.svg" alt=""></div>
+									<span>{{tr('follow')}}</span>
+								</div>
+							</div>
+							<div class="hover_text">{{stand.description_short}}</div>
+							<div class="button_box invitation_button_box">
+								<button class="btn btn_tr">{{tr('view')}}</button>
+								<router-link :to="'/'+routes.editstand+'/'+stand.id" class="btn btn_tr">
+									{{tr('edit')}}
+								</router-link>
+							</div>
+						</div>
+					</div>
+					<div class="text_box">
+						<p class="name">{{stand.name ? stand.name : tr('noname_stand_name')}}</p>
+						<p class="price">{{dateLeft(eventsList[stand.eventId])}}</p>
+					</div>
+					<div class="event_name_text">
+						<p class="name"><strong>{{tr('mystands_event')}}: </strong>{{eventsList[stand.eventId].name}}</p>
+					</div>
+					<div class="date">
+						<div class="icon_box"><img src="@/img/ICON_calendar.svg" alt=""></div>
+						<p>{{eventsList[stand.eventId].evtItemDate.month}} {{eventsList[stand.eventId].evtItemDate.date}}</p>
+					</div>
+					<div class="invitation_message">
+						<span>{{stand.status}}</span>
+					</div>
+				</router-link>
+
+			</div>
+				
+
+				<!-- <div class="events_grid events_stand_items_grid"> -->
+<!-- INVITATION ITEMS -->
+					<!-- <div class="events_item events_stand_item" v-if="ilq"  v-for="stand in filteredInvitationsList">
+						<router-link :to="'/'+routes.event+'/'+stand.event" class="img_block">
+							<img v-if="eventsList[stand.event]" :src="eventsList[stand.event].templateCoverUrl" alt="">
+						</router-link>
+						<div class="content">
+							<div class="top flex">
+								<div class="logo"><img v-if="eventsList[stand.event]" :src="eventsList[stand.event].logoUrl" alt=""></div>
+								
+							</div>
+							<div class="main">
+								<router-link :to="'/'+routes.event+'/'+stand.event" >
+									<h3 class="title" v-if="eventsList[stand.event]" >{{eventsList[stand.event].name}}</h3>
+								</router-link>
+							</div>
+
+						</div>
+						<div class="events_item_footer stand_footer">
+
+
+								<div class="button_box">
+									<button @click="refuse(stand.id)" class="btn btn_sm btn_tr">{{tr('mystands_refuse')}}</button>
+									<button @click="accept(stand.id)" class="btn btn_orange btn_sm">{{tr('mystands_accept')}}</button>
+								</div> -->
+
+							<!-- <p class="events_item_footer_stand">
+								Stand 6A 05
+							</p>
+							<div class="action_buttons">
+								<a href="#" class="action_button"><img src="../../../img/preview_filled.svg" alt=""><span>Preview</span></a>
+								<a href="#" class="action_button"><img src="../../../img/edit_filled.svg" alt=""><span>Edit</span></a>	
+							</div> -->
+						<!-- </div>
+						<div class="time_remaning pending">{{tr('mystands_pending_invitation')}}</div>
+					</div> -->
+<!-- STAND ITEMS -->
+					<!-- <div class="events_item events_stand_item" v-if="eventsList[stand.eventId] && slq" :class="{'event_item_past' : tmpstatus == 'past'}"  v-for="stand in filteredStandsList">
+						<router-link :to="'/'+routes.event+'/'+stand.eventId" class="img_block">
+							<img :src="eventsList[stand.eventId].templateCoverUrl" alt="">
+						</router-link>
+						<div class="content">
+							<div class="top flex">
+								<div class="logo"><img :src="eventsList[stand.eventId].logoUrl" alt=""></div>
+								<router-link :to="'/'+routes.stand+'/'+stand.id" class="date" > -->
+									<!-- <div class="top_stand_num">{{stand.name ? stand.name : tr('noname_stand_name')}}
+									</div> -->
+									<!-- <p class="month">{{calcDisplayDate(eventsList[stand.eventId].dateStart, eventsList[stand.eventId].dateEnd, eventsList[stand.eventId].timezone).month}}</p>
+									<p class="nums">{{calcDisplayDate(eventsList[stand.eventId].dateStart, eventsList[stand.eventId].dateEnd, eventsList[stand.eventId].timezone).date}}</p>
+								</router-link>
+
+							</div>
+							<div class="main">
+								<router-link :to="'/'+routes.event+'/'+stand.eventId" >
+									<h3 class="title">{{eventsList[stand.eventId].name}}</h3>
+								</router-link>
+							</div> -->
+<!-- 							<div class="bottom flex">
+								<div class="location flex">
+									<img src="../../../img/loc2.svg" alt="">
+									<p>London, UK</p>
+								</div>
+								<div class="price_box">
+									<p class="text">Starts at</p>
+									<p class="price">€29.99</p>
+								</div>
+							</div> -->
+						<!-- </div>
+						<div class="events_item_footer stand_footer">
+
+							<div class="stand_footer_img_box"><img :src="stand.templateCoverUrl" alt=""></div>
+
+							<div class="stand_footer_content">
+
+								<div class="title_box">
+									<router-link :to="'/'+routes.stand+'/'+stand.id" >
+										<p class="title">{{stand.name ? stand.name : tr('noname_stand_name')}}</p>	 -->
+										<!-- <p class="title">{{calcDisplayDate(eventsList[stand.eventId].dateStart, eventsList[stand.eventId].dateEnd, eventsList[stand.eventId].timezone)}}</p> -->
+									<!-- </router-link>
+									<div class="users"> -->
+										<!-- <span class="user"><img src="../img/user_default.svg" alt=""></span>
+										<span class="user"><img src="../img/user_default.svg" alt=""></span>
+										<span class="user"><img src="../img/user_default.svg" alt=""></span>
+										<span class="user"><img src="../img/user_default.svg" alt=""></span> -->
+								<!-- 	</div>
+								</div> -->
+
+								<!-- <div class="button_box">
+									<router-link :to="'/'+routes.stand+'/'+stand.id" class="action_button">
+										<img src="../../../img/preview_filled.svg" alt=""><span>{{tr('preview')}}</span>
+									</router-link>
+									<router-link :to="'/'+routes.editstand+'/'+stand.id" class="action_button">
+										<img src="../../../img/edit_filled.svg" alt=""><span>{{tr('edit')}}</span>
+									</router-link>
+								</div>
+ -->
+							<!-- </div> -->
+							<!-- <p class="events_item_footer_stand">
+								Stand 6A 05
+							</p>
+							<div class="action_buttons">
+								<a href="#" class="action_button"><img src="../../../img/preview_filled.svg" alt=""><span>Preview</span></a>
+								<a href="#" class="action_button"><img src="../../../img/edit_filled.svg" alt=""><span>Edit</span></a>	
+							</div> -->
+						<!-- </div>
+						<div class="time_remaning">{{dateLeft(eventsList[stand.eventId])}}</div>
+						<div v-if="tmpstatus == 'past'" class="time_remaning past">{{tr('past')}}</div> -->
+				<!-- 	</div>
+
+				</div> -->
+
+		</div>
+	</div>
+</section>

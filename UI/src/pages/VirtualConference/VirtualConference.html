@@ -1,0 +1,69 @@
+<div class="page_wrapper static_nik_page" v-if="localesLoaded">
+
+	<!-- Hero -->
+    <div class="page-hero_wrapper">
+        <div class="page-hero content-wrapper">
+            <div class="breadcrumbs">
+                <ul class="breadcrumbs_list">
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('home')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'+routes.solutions" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('solutions')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray ">
+                        <span class="breadcrumbs_link breadcrumbs_link--gray breadcrumbs_link--active">{{tr('virtual_conference_subtitle')}}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="hero_content">
+                <div class="hero_content_inner">
+                    <div class="hero_content_text hero_content_text--mr">
+                        <p class="hero_subtitle hero_subtitle--gray">{{tr('virtual_conference_subtitle')}}</p>
+                        <h1 class="hero_title hero_title--gray">{{tr('virtual_conference_title')}}</h1>
+                        <p class="hero_text hero_text--gray">{{tr('virtual_conference_text')}}</p>
+
+                        <div class="hero--btns">
+                            <router-link :to="'/'+routes.addevent" class="primary-btn">{{tr('create_event_btn')}}</router-link>
+                            <button @click="requestDemoClick" class="primary-btn primary-btn--reverse">{{tr('request_a_demo_btn')}}</button>
+                        </div>
+                    </div>
+                    <div class="hero_content_img">
+                        <img class="hero_img--people" src="@/img/static-pages/virtual-conference/hero.jpg" alt="Virtual Conference with Openexpo!">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="page-main_wrapper">
+        <main class="page-main">
+            <!-- 1 -->
+            <Customisation></Customisation>
+
+            <!-- 2 -->
+            <InviteSponsors></InviteSponsors>
+
+            <!-- 3 -->
+            <FindAnything></FindAnything>
+
+            <!-- 4 -->
+            <EveryInOnePlace></EveryInOnePlace>
+
+            <!-- 5 -->
+            <EngageSponsors></EngageSponsors>
+
+            <!-- 6 -->
+            <AddCustomFields></AddCustomFields>
+
+            <!-- 7 -->
+            <SolutionsCarousel></SolutionsCarousel>
+
+            <!-- 8 -->
+            <StaticBottomSection></StaticBottomSection>
+        </main>
+    </div>
+
+    <RequestDemo ref="request_demo"></RequestDemo>
+</div>

@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "meetingNotification",
+    "SubjectPart": "New meeting scheduled",
+    "HtmlPart": "You can reject it at: {{url}}",
+    "TextPart": "You can reject it at: {{url}}"
+  }
+}

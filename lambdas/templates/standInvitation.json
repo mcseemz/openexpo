@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "StandInvitation",
+    "SubjectPart": "Invitation to join the stand",
+    "HtmlPart": "{{text}}<br/><br/>{{url}}",
+    "TextPart": "{{text}} {{url}}"
+  }
+}

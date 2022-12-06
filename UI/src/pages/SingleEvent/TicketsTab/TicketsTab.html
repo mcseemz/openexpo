@@ -1,0 +1,75 @@
+<div class="tabs_tickets_section preloader_wrapper" v-if="eventObj.pricing">
+    <div class="preloader_overlay preload_overlay_white" style="opacity:0.51" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+    <div class="container">
+        <h2 class="title">{{tr('se_tickets')}}</h2>
+        
+        <div class="tickets_section" v-if="eventObj.pricing">
+
+            <div class="ticket_fw flex"  v-for="(pricing, index) in eventObj.pricing" :key="pricing.id">
+                <div class="ticket_fw_left flex">
+                    <div class="ticket_title" style="display: flex;flex-direction: column;flex-wrap: nowrap;align-items: baseline;height: 100%;justify-content: space-evenly;">
+                        <div>
+                            <p class="big_text" style="font-size: large;" v-show="pricing.manualApproval">{{tr('ticket_manual_approval')}}</p>
+                        </div>
+                        <div>
+                            <p class="big_text" v-show="pricing.access_price != 0">{{ pricing.access_price }}  {{pricing.access_currency}}</p>
+                        </div>
+                        <div>
+                            <p class="big_text" style="font-size: larger;"v-show="pricing.expiration">{{getPricingExpirationString(pricing.expiration)}}</p>
+                        </div>
+                    </div>
+                    <div class="ticket_cutline">
+                        <span class="big_dot"></span>
+                        <span class="dot" v-for="n in 7"></span>
+                        <span class="big_dot"></span>
+                    </div>
+                </div>
+                <div class="ticket_fw_center flex">
+                    <div style="width: 100%;display: flex;flex-direction: column-reverse;">
+                        <div v-for="strInfo in pricing.strings" >
+                            <div class="ticket_title" :class="strInfo.category == 'name' ? 'big_text' : ''">
+                                {{strInfo.category == 'name' ? strInfo.value : strInfo.category == 'description_long' ? strInfo.value:''}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="checked_item">{{tr('se_access_to_praticipants')}}</p>
+                    <p class="checked_item">{{tr('se_access_to_mats')}}</p>
+                    <p class="checked_item">{{tr('se_access_to_webinars')}}</p>
+                </div>
+                <div class="ticket_fw_right flex">
+                    <div class="ticket_price big_text">{{priceF}}</div>
+                    <button class="btn btn_orange btn_md" @click="buyTicketAction(pricing.id)">{{tr('se_join_the_event')}}</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <ui-modal ref="ticketModal" class="status_modal" removeCloseButton size="auto" title="The ticket is yours!">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_text" style="text-align: center;">{{tr('se_buy_free_event_msg')}} <strong>{{eventObj.name}}</strong>!</p>
+                    <div v-if="joinPricingTooltip.length"
+                        style="width: 50%;padding: 5px;margin: 10px auto 0 auto;background-color: #F5F5F5;box-shadow: 0 1px 1px rgb(0 0 0 / 16%);">
+                    <ul>
+                        <li v-for="(tooltip, index) in joinPricingTooltip" :key="index">{{tooltip}}</li>
+                    </ul>    
+                </div>            
+            </div>
+        </div>
+
+        <button class="btn btn_orange btn_md" @click="closeModal" style="margin: 20px auto 0 auto;">{{tr('se_event_thank')}}</button>
+    </ui-modal>
+    <ui-modal ref="ticketErrorModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <h4 class="modal_text">{{tr('se_pricing_unavailable_msg')}} </h4>
+                <p class="modal_text">{{tr('se_pricing_unavailable_msg_tooltip')}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="closeErrorModal"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

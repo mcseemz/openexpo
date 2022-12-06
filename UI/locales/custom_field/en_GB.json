@@ -1,0 +1,9 @@
+{
+  "page_custom_field_title": "Custom field",
+  "custom_field_subtitle": "Register with custom fields",
+  "custom_field_title": "Register with custom fields at Openexpo!",
+  "custom_field_text": "Event organiser would want to know their customer on the registration, that is why we allow to add custom fields at the registration point. Such fields like profession, company position would help match attendees with potential counterparts.",
+  "view_custom_fields_title": "<span class=\"orange\">View custom fields </span> for each user visiting your event!",
+  "view_custom_fields_text1": "Our portal allows the user to register with custom fields that our defined by the event organiser. This is useful for the event organiser to identify who is attending the event and also gives great insight for the other attendees",
+  "view_custom_fields_text2": "The event organiser in the admin panel would be able to view the attendees and filter these out by a specific define parameter, i.e. by company position or by a company name"
+}

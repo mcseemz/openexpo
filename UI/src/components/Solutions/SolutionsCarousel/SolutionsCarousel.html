@@ -1,0 +1,59 @@
+<article class="article-block" :class="{'article-block--white': color == 'white', 'article-block--blue': color != 'white'}">
+    <div class="content-wrapper content-wrapper--w100">
+        <h2 class="article-title article-title--center article-title-m" v-html="tr('other_features_title')"></h2>
+
+        <div class="features__slider">
+            <splide class="splide">
+                <splide-slide class="splide__slide">
+                    <ul class="features_list features-grid article-block--blue">
+                        <li class="features_list-item features-grid_big">
+                            <router-link :to="'/'+routes.solutions+'/'+routes.virtual_festival" class="feature_link">
+                                <div class="feature_item">
+                                    <div class="feature_logo">
+                                        <img class="feature_logo_img" src="@/img/static-pages/features/cocert.png" alt="Virtual festival platform" width="62" height="70">
+                                    </div>
+                                    <h3 class="feature_title">{{tr('virtual_festival_platform_title')}}</h3>
+                                    <p class="feature_text">{{tr('virtual_festival_platform_text')}}</p>
+                                    <div class="feature_arrow">
+                                        <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                    </div>
+                                </div>
+                            </router-link>
+                        </li>
+                        <li class="features_list-item features-grid_big">
+                            <router-link :to="'/'+routes.solutions+'/'+routes.online_exhibition" class="feature_link">
+                                <div class="feature_item">
+                                    <div class="feature_logo">
+                                    </div>
+                                    <h3 class="feature_title">{{tr('online_exhibition_host_title')}}</h3>
+                                    <p class="feature_text">{{tr('online_exhibition_host_text')}}</p>
+                                    <div class="feature_arrow">
+                                        <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                    </div>
+                                </div>
+                            </router-link>
+                        </li>
+                        <li class="features_list-item features-grid_big">
+                            <router-link :to="'/'+routes.solutions+'/'+routes.virtual_conference" class="feature_link">
+                                <div class="feature_item">
+                                    <div class="feature_logo">
+                                        <img class="feature_logo_img" src="@/img/static-pages/features/education.png" alt="Virtual/online Exhibition Platform" width="62" height="70">
+                                    </div>
+                                    <h3 class="feature_title">{{tr('host_virtual_conf_title')}}</h3>
+                                    <p class="feature_text">{{tr('host_virtual_conf_text')}}</p>
+                                    <div class="feature_arrow">
+                                        <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                    </div>
+                                </div>
+                            </router-link>
+                        </li>
+                    </ul>
+                </splide-slide>
+            </splide>
+        </div>
+
+        <div class="added-info article_text--center">
+            <router-link :to="'/'+routes.solutions" class="primary-btn">{{tr('event_solutions_page_btn')}}</router-link>
+        </div>
+    </div>
+</article>

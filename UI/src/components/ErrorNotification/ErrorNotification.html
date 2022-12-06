@@ -1,0 +1,27 @@
+<div v-if="apiError && apiError.length" class="error_report_block">
+    <span v-if="!notificationOpened" class="error_report_icon" @click="notificationOpened = true">
+        <svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+            <path fill="#dba617" d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z" class=""></path>
+        </svg>
+    </span>
+    <div class="error_report_notification" v-if="notificationOpened">
+        <span class="error_report_close" @click="closeModal">
+            <img src="@/img/close12.svg" alt="">
+        </span>	
+        <div class="text" v-html="tr('errors_notification_text')"></div>
+        <div class="error_report_details_trigger flex jcc aic" :class="{opened: detailsOpened}" @click="detailsOpened = !detailsOpened">
+            <span>{{tr(detailsOpened ? 'errors_notification_hide_details' : 'errors_notification_show_details')}}</span>
+            <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13.1756 0.57573C12.9413 0.341415 12.5614 0.341415 12.3271 0.57573L6.87564 6.0272L1.42417 0.575731C1.18985 0.341416 0.809953 0.341416 0.575638 0.575731C0.341324 0.810045 0.341324 1.18994 0.575638 1.42426L6.45241 7.30103C6.68673 7.53535 7.06662 7.53535 7.30094 7.30103C7.31099 7.29098 7.32061 7.28066 7.3298 7.2701L13.1756 1.42426C13.41 1.18994 13.41 0.810045 13.1756 0.57573Z" fill="#E5843D"/>
+            </svg>
+                
+        </div>
+        <div class="error_report_details_block" v-if="detailsOpened">
+            <div class="error_report_item" v-for="err in apiError">
+                <p class="text"><span>Url: </span> {{err.url}}</p>
+                <p class="text"><span>Method: </span> {{err.method}}</p>
+                <p class="text"><span>Error: </span> {{err.errorMsg}}</p>
+            </div>
+        </div>
+    </div>
+</div>

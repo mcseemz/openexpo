@@ -1,0 +1,527 @@
+<div class="page_wrapper preloader_wrapper" :lang="getLocaleName" v-if="localesLoaded">
+
+	<section class="section_banner_landing homepage_banner desktop_only">
+		<div class="container flex">
+			<div class="left">
+				<h1 class="banner_title">{{tr('home_page_title')}}</h1>
+				<p class="banner_text">{{tr('home_banner_text')}}</p>
+				<div class="button_box flex">
+					<router-link :to="'/'+routes.addevent" class="btn btn_md btn_orange">
+                        {{tr('home_banner_create_event_button')}}
+                    </router-link>
+                    <router-link :to="'/'+routes.request_demo" class="btn btn_md btn_otr">
+                        {{tr('home_request_demo_button')}}
+                    </router-link>
+				</div>
+			</div>
+			<div class="right">
+				<div class="image_box">
+					<img src="@/img/home/banner_img.png.webp" width="568" height="352" alt="">
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div class="section_online_events section_home_style desktop_only">
+		<div class="container flex">
+			<div class="left">
+				<div class="image_box">
+					<img src="@/img/home/online_events.jpg.webp" width="538" height="359" alt="">
+				</div>
+			</div>
+			<div class="right">
+				<h2 class="section_title" v-html="tr('home_l_online_events_title')"></h2>
+				<div class="text_box" v-html="tr('home_l_online_events_textbox')"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="section_features_home section_home_style desktop_only">
+		<div class="container">
+			<h2 class="section_title" v-html="tr('home_l_features_title')"></h2>
+			<div class="items">
+				<div class="item flex">
+					<div class="left text_box" v-html="tr('home_l_features_1_textbox')"></div>
+					<div class="right image">
+						<div class="image_box">
+							<img src="@/img/home/features1.jpg.webp" width="538" height="317" alt="">
+						</div>
+					</div>
+				</div>
+				<div class="item flex">
+					<div class="left image">
+						<div class="image_box">
+							<img src="@/img/home/features2.jpg.webp" width="538" height="317" alt="">
+						</div>
+					</div>
+					<div class="right text_box" v-html="tr('home_l_features_2_textbox')"></div>
+				</div>
+				<div class="item flex">
+					<div class="left text_box">
+						<div v-html="tr('home_l_features_3_textbox')"></div>
+						<div class="image_row">
+							<img src="@/img/home/youtube.png.webp" width="54" height="38" alt="">
+							<img src="@/img/home/twitch.png.webp" width="47" height="48" alt="">
+							<img src="@/img/home/vimeo.png.webp" width="53" height="46" alt="">
+							<img src="@/img/home/zoom.png.webp" width="55" height="48" alt="">
+						</div>
+					</div>
+					<div class="right image">
+						<div class="image_box">
+							<img src="@/img/home/features3.jpg.webp" width="540" height="318" alt="">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="bottom_button_box" v-if="false">
+				<p class="text">{{tr('home_l_features_bottom_text')}}</p>
+				<button class="btn btn_md btn_orange">{{tr('home_l_features_bottom_button')}}</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="section_customize_home section_home_style desktop_only">
+		<div class="container">
+			<h2 class="section_title" v-html="tr('home_l_customize_title')"></h2>
+			<div class="items flex">
+				<div class="item">
+					<div class="image_box">
+						<img src="@/img/home/customize1.png.webp" width="85" height="85" alt="">
+					</div>
+					<h3 class="item_title">{{tr('home_l_customize_item1_title')}}</h3>
+					<p class="text">{{tr('home_l_customize_item1_text')}}</p>
+				</div>
+				<div class="item">
+					<div class="image_box"><img src="@/img/home/customize2.png.webp" width="112" height="85" alt=""></div>
+					<h3 class="item_title">{{tr('home_l_customize_item2_title')}}</h3>
+					<p class="text">{{tr('home_l_customize_item2_text')}}</p>
+				</div>
+				<div class="item item3">
+					<div class="image_box"><img src="@/img/home/customize3.png.webp" width="86" height="86" alt=""></div>
+					<h3 class="item_title">{{tr('home_l_customize_item3_title')}}</h3>
+					<p class="text">{{tr('home_l_customize_item3_text')}}</p>
+				</div>
+			</div>
+			<div class="bottom_button_box">
+				<p class="text">{{tr('home_l_customize_bottom_text')}}</p>
+				<router-link :to="'/'+routes.addevent" class="btn btn_md btn_orange">{{tr('home_banner_create_event_button')}}!</router-link>
+			</div>
+		</div>
+	</div>
+
+	<div class="section_features_home section_stands_home section_home_style desktop_only">
+		<div class="container">
+			<div class="items">
+				<div class="item flex">
+					<div class="left text_box">
+						<h2 class="section_title" v-html="tr('home_l_stands_title')"></h2>
+						<div v-html="tr('home_l_stands_textbox')"></div>
+					</div>
+					<div class="right image">
+						<div class="image_box">
+							<img src="@/img/home/stands_img.jpg.webp" width="538" height="390" alt="">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="section_useopenexpo_home section_home_style desktop_only">
+		<div class="container">
+			<h2 class="section_title" v-html="tr('home_l_useopenexpo_title')"></h2>
+			<div class="items flex">
+				<div class="item">
+					<img src="@/img/home/use1.png.webp" width="255" height="159" alt="">
+					<h3 class="item_title">{{tr('home_l_useopenexpo_item1_title')}}</h3>
+					<p class="text">
+						{{tr('home_l_useopenexpo_item1_text')}}
+					</p>
+				</div>
+				<div class="item">
+					<img src="@/img/home/use2.png.webp" width="255" height="159" alt="">
+					<h3 class="item_title">{{tr('home_l_useopenexpo_item2_title')}}</h3>
+					<p class="text">
+						{{tr('home_l_useopenexpo_item2_text')}}
+					</p>
+				</div>
+				<div class="item">
+					<img src="@/img/home/use3.png.webp" width="255" height="159" alt="">
+					<h3 class="item_title">{{tr('home_l_useopenexpo_item3_title')}}</h3>
+					<p class="text">
+						{{tr('home_l_useopenexpo_item3_text')}}
+					</p>
+				</div>
+				<div class="item">
+					<img src="@/img/home/use4.png.webp" width="255" height="159" alt="">
+					<h3 class="item_title">{{tr('home_l_useopenexpo_item4_title')}}</h3>
+					<p class="text">
+						{{tr('home_l_useopenexpo_item4_text')}}
+					</p>
+				</div>
+				<div class="item">
+					<img src="@/img/home/use5.png.webp" width="255" height="159" alt="">
+					<h3 class="item_title">{{tr('home_l_useopenexpo_item5_title')}}</h3>
+					<p class="text">
+						{{tr('home_l_useopenexpo_item5_text')}}
+					</p>
+				</div>
+				<div class="item">
+					<img src="@/img/home/use6.png.webp" width="255" height="159" alt="">
+					<h3 class="item_title">{{tr('home_l_useopenexpo_item6_title')}}</h3>
+					<p class="text">
+						{{tr('home_l_useopenexpo_item6_text')}}
+					</p>
+				</div>
+				<div class="item">
+					<img src="@/img/home/use7.png.webp" width="255" height="159" alt="">
+					<h3 class="item_title">{{tr('home_l_useopenexpo_item7_title')}}</h3>
+					<p class="text">
+						{{tr('home_l_useopenexpo_item7_text')}}
+					</p>
+				</div>
+				<div class="item">
+					<img src="@/img/home/use8.png.webp" width="255" height="159" alt="">
+					<h3 class="item_title">{{tr('home_l_useopenexpo_item8_title')}}</h3>
+					<p class="text">
+						{{tr('home_l_useopenexpo_item8_text')}}
+					</p>
+				</div>
+			</div>
+			<div class="bottom_button_box">
+				<p class="text" v-html="tr('home_l_useopenexpo_bottom_text')"></p>
+				<router-link :to="'/'+routes.addevent" class="btn btn_md btn_orange">{{tr('home_banner_create_event_button')}}!</router-link>
+			</div>
+		</div>
+	</div>
+
+	<div class="section_features_home section_blognews_home section_home_style desktop_only">
+		<div class="container">
+			<div class="items">
+				<div class="item flex">
+					<div class="left image">
+						<div class="image_box">
+							<img src="@/img/home/blognews.png.webp" width="538" height="405" alt="">
+						</div>
+					</div>
+					<div class="right text_box">
+						<h2 class="section_title" v-html="tr('home_l_features_title')"></h2>
+						<div v-html="tr('home_l_features_textbox')"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<section class="section_faq_home section_home_style desktop_only">
+		<div class="container">
+			<h2 class="section_title" v-html="tr('home_l_faq_title')"></h2>
+			<div class="accordeon">
+				<ui-collapsible removeIcon disableRipple v-for="faq in getFaq">
+	                <div class="accordeon_header" slot="header">
+	                    <div class="icon_block"></div><div class="accordeon_title">{{faq.item_title}}</div>
+	                </div>
+
+	                <div class="accordeon_text" v-html="faq.item_text">{{faq.item_text}}</div>
+	            </ui-collapsible>
+			</div>
+			<div class="bottom_button_box">
+				<p class="text">{{tr('home_l_faq_bottom_text')}}</p>
+				<router-link :to="'/'+routes.howitworks" class="btn btn_md btn_orange">{{tr('home_l_faq_bottom_button')}}</router-link>
+			</div>
+		</div>
+	</section>
+
+
+
+
+	<section class="section_banner_new homepage_banner mobile_only">
+		<div class="container">
+			<h1 class="banner_title">{{tr('home_page_title')}}</h1>
+			<div class="banner_items flex">
+				<div class="item flex">
+					<p class="title" v-html="tr('home_banner_create_event')"></p>
+					<router-link :to="'/'+routes.addevent" class="btn btn_white">
+                        {{tr('home_banner_get_started')}}
+                        <div class="icon_box">
+                            <svg x="0px" y="0px">
+                                <path class="st0" d="M13.9,5.8L9,1C8.6,0.7,8,0.7,7.6,1C7.4,1.2,7.3,1.5,7.3,1.7s0.1,0.5,0.3,0.7l3.2,3.1h-9c-0.6,0-1,0.4-1,1
+                                s0.5,1,1,1h9l-3.2,3.1c-0.2,0.2-0.3,0.4-0.3,0.7s0.1,0.5,0.3,0.7c0.2,0.2,0.4,0.3,0.7,0.3S8.8,12.1,9,12l4.9-4.8
+                                c0.2-0.2,0.3-0.4,0.3-0.7S14.1,6,13.9,5.8z"/>
+                            </svg>
+                        </div>
+                    </router-link>
+				</div>
+				<div class="item flex" v-if="features.discover">
+					<p class="title" v-html="tr('home_banner_discover')"></p>
+					<router-link :to="'/'+routes.discover" class="btn btn_white">
+						{{tr('home_banner_get_started')}}
+						<div class="icon_box">
+							<svg x="0px" y="0px">
+								<path class="st0" d="M13.9,5.8L9,1C8.6,0.7,8,0.7,7.6,1C7.4,1.2,7.3,1.5,7.3,1.7s0.1,0.5,0.3,0.7l3.2,3.1h-9c-0.6,0-1,0.4-1,1
+								s0.5,1,1,1h9l-3.2,3.1c-0.2,0.2-0.3,0.4-0.3,0.7s0.1,0.5,0.3,0.7c0.2,0.2,0.4,0.3,0.7,0.3S8.8,12.1,9,12l4.9-4.8
+								c0.2-0.2,0.3-0.4,0.3-0.7S14.1,6,13.9,5.8z"/>
+							</svg>
+						</div>
+					</router-link>
+				</div>
+				<div class="item flex" v-if="features.discover">
+					<p class="title" v-html="tr('home_banner_exhibit')"></p>
+					<router-link :to="'/'+routes.discover" class="btn btn_white">
+                        {{tr('home_banner_get_started')}}
+                        <div class="icon_box">
+                            <svg x="0px" y="0px">
+                                <path class="st0" d="M13.9,5.8L9,1C8.6,0.7,8,0.7,7.6,1C7.4,1.2,7.3,1.5,7.3,1.7s0.1,0.5,0.3,0.7l3.2,3.1h-9c-0.6,0-1,0.4-1,1
+                                s0.5,1,1,1h9l-3.2,3.1c-0.2,0.2-0.3,0.4-0.3,0.7s0.1,0.5,0.3,0.7c0.2,0.2,0.4,0.3,0.7,0.3S8.8,12.1,9,12l4.9-4.8
+                                c0.2-0.2,0.3-0.4,0.3-0.7S14.1,6,13.9,5.8z"/>
+                            </svg>
+                        </div>
+                    </router-link>
+				</div>
+				<div class="item flex">
+					<p class="title" v-html="tr('home_banner_request_demo')"></p>
+					<router-link :to="'/'+routes.request_demo" id="requestDemoButton" class="btn btn_white">
+                        {{tr('home_request_demo')}}
+                        <div class="icon_box">
+                            <svg x="0px" y="0px">
+                                <path class="st0" d="M13.9,5.8L9,1C8.6,0.7,8,0.7,7.6,1C7.4,1.2,7.3,1.5,7.3,1.7s0.1,0.5,0.3,0.7l3.2,3.1h-9c-0.6,0-1,0.4-1,1
+                                s0.5,1,1,1h9l-3.2,3.1c-0.2,0.2-0.3,0.4-0.3,0.7s0.1,0.5,0.3,0.7c0.2,0.2,0.4,0.3,0.7,0.3S8.8,12.1,9,12l4.9-4.8
+                                c0.2-0.2,0.3-0.4,0.3-0.7S14.1,6,13.9,5.8z"/>
+                            </svg>
+                        </div>
+                    </router-link>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- EVENTS TABS GRID -->
+	<section class="trending_events_new mobile_only" v-if="features.discover">
+		<div class="container_big container">
+			<h2 class="title_n">{{tr('home_trending_title')}}</h2>
+
+			<ui-tabs>
+                <ui-tab :id="cat.value" :key="cat.value" v-for="cat in categoriesList" @select="changeTab">
+                    <div slot="header" class="tab_header_new	">
+                        <img :src="tabsImages[cat.value]" alt="" class="tab_nav_img">
+                        <p class="tab_nav_text" :cat_value="cat.value">{{ cat.label }}</p>
+                    </div>
+
+                    <div class="tab_content">
+
+                    	<div class="event_grid_new">
+                    		<router-link :to="'/'+routes.event+'/'+(event.customName ? event.customName :event.id)" class="item" v-if="catEventList && catEventList[cat.value]" v-for="event in catEventList[cat.value]">
+                    			<div class="image_box" :class="{'image_placeholder': !event.templateCoverUrl }">
+                    				<img class="item_image" :src="event.templateCoverUrl" alt="">
+                    				<div class="hover_box">
+                    					<div class="hover_top">
+                    						<div class="follow" style="opacity: 0">
+                    							<div class="icon_box"><img src="@/img/ICON_Follow.svg" alt=""></div>
+                    							<span>{{tr('follow')}}</span>
+                    						</div>
+                    					</div>
+                    					<div class="hover_text">{{event.description_short}}</div>
+                    					<div class="button_box">
+                    						<button class="btn btn_tr">{{tr('learn_more')}}</button>
+                    					</div>
+                    				</div>
+                    			</div>
+                    			<div class="text_box">
+                    				<p class="name">{{event.name}}</p>
+                    				<p class="price">{{startPricing(event)}}</p>
+                    			</div>
+                    			<div class="date">
+                    				<div class="icon_box"><img src="@/img/ICON_calendar.svg" alt=""></div>
+                    				<p>{{event.evtItemDate.month}} {{event.evtItemDate.date}}</p>
+                    			</div>
+                    		</router-link>
+
+                    	</div>
+
+						<div class="preloader_overlay" v-show="!catEventList[cat.value] && preload[cat.value]"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+					</div>
+                </ui-tab>
+            </ui-tabs>
+
+			<div class="more_button_block flex">
+				<router-link :to="'/'+routes.discover" class="btn btn_md btn_white">{{tr('discover_more_events')}}</router-link>
+			</div>
+
+		</div>
+	</section>
+
+<!-- STEPS SECTION -->
+	<section class="home_steps_section mobile_only">
+		<div class="container">
+			<h2 class="title" v-html="tr('home_steps_title')"></h2>
+			<div class="steps_items">
+				<div class="steps_line"></div>
+				<div class="item">
+					<div class="image_box">
+						<img src="./img/step1.png.webp" width="45" height="40" alt="">
+					</div>
+					<div class="number">1</div>
+					<p class="item_title">{{tr('home_steps_1')}}</p>
+				</div>
+				<div class="item">
+					<div class="image_box">
+						<img src="./img/step2.png.webp" width="45" height="40" alt="">
+					</div>
+					<div class="number">2</div>
+					<p class="item_title">{{tr('home_steps_2')}}</p>
+				</div>
+				<div class="item">
+					<div class="image_box">
+						<img src="./img/step3.png.webp" width="45" height="40" alt="">
+					</div>
+					<div class="number">3</div>
+					<p class="item_title">{{tr('home_steps_3')}}</p>
+				</div>
+				<div class="item">
+					<div class="image_box">
+						<img src="./img/step4.png.webp" width="45" height="40" alt="">
+					</div>
+					<div class="number">4</div>
+					<p class="item_title">{{tr('home_steps_4')}}</p>
+				</div>
+				<div class="item">
+					<div class="image_box">
+						<img src="./img/step5.png.webp" width="45" height="40" alt="">
+					</div>
+					<div class="number">5</div>
+					<p class="item_title">{{tr('home_steps_5')}}</p>
+				</div>
+			</div>
+			<div class="button_box">
+				<router-link :to="'/'+routes.addevent" class="btn btn_orange">{{tr('home_steps_button')}}</router-link>
+			</div>
+		</div>
+	</section>
+
+<!-- HOW IT WORKS  -->
+	<section class="how_it_works" style="display:none">
+		<div class="container">
+			<p class="subtitle">{{tr('how_it_works')}}</p>
+			<h2 class="title">{{tr('home_how_it_works_title')}}</h2>
+
+			<div class="items flex">
+				<div class="item">
+					<div class="img_box"><img src="./img/heart_filled.svg" alt=""></div>
+					<h3 class="item_title">{{tr('home_how_it_1_title')}}</h3>
+					<p class="item_text">{{tr('home_how_it_1_text')}}</p>
+				</div>
+				<div class="item active">
+					<div class="img_box"><img src="./img/heart_filled.svg" alt=""></div>
+					<h3 class="item_title">{{tr('home_how_it_2_title')}}</h3>
+					<p class="item_text">{{tr('home_how_it_2_text')}}</p>
+				</div>
+				<div class="item">
+					<div class="img_box"><img src="./img/heart_filled.svg" alt=""></div>
+					<h3 class="item_title">{{tr('home_how_it_3_title')}}</h3>
+					<p class="item_text">{{tr('home_how_it_3_text')}}</p>
+				</div>
+			</div>
+		</div>
+		<img src="./img/illustration_triangle.svg" alt="" class="bg_img">
+	</section>
+
+	<section class="faq_section" style="display:none">
+		<div class="background_block">
+			<img src="./img/dots_3.png.webp" alt="" class="dotts_img">
+		</div>
+		<div class="container flex">
+			<div class="left">
+				<picture>
+					<source srcset="../../img/faq_main.webp" type="image/webp">
+					<img src="./img/faq_main.png.webp" alt="" class="main_img">
+				</picture>
+				<!-- <img src="./img/faq_main.png.webp" alt="" class="main_img"> -->
+				<img src="./img/illustration_decoration_02.svg" alt="" class="bg_img">
+			</div>
+			<div class="right">
+				<p class="subtitle">{{tr('faqs')}}</p>
+				<h2 class="title">{{tr('home_faqs_title')}}</h2>
+				<div class="accordeon">
+					<ui-collapsible removeIcon disableRipple v-for="faq in getFaq">
+		                <div class="accordeon_header" slot="header">
+		                    <div class="icon_block"></div><div class="accordeon_title">{{faq.item_title}}</div>
+		                </div>
+
+		                <div class="accordeon_text" v-html="faq.item_text">{{faq.item_text}}</div>
+		            </ui-collapsible>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="tellus_section" style="display:none">
+		<div class="container">
+			<h2 class="title">{{tr('home_tell_us_title')}}</h2>
+			<p class="description">{{tr('home_tell_us_text')}}</p>
+			<a href="#" class="btn btn_orange btn_md">{{tr('home_tell_us_button_text_lets_go')}}</a>
+		</div>
+	</section>
+
+
+	<ui-modal ref="requestDemoModal" class="status_modal get_in_touch_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content get_in_touch_section">
+                <form action="#" class="contact_form">
+    				<p class="form_title big_text">{{tr('home_contact_us')}}</p>
+    				<ui-textbox
+	                    :placeholder="tr('home_name_ph')"
+	                    v-model="request.name"
+	                    :invalid="reqNameTouched && !request.name"
+	                    v-on:touch.passive="reqNameTouched = true"
+	                    id="reqDemoNameField"
+	                >
+	                </ui-textbox>
+	                <ui-textbox
+	                    :placeholder="tr('home_email_ph')"
+	                    v-model="request.email"
+	                    :invalid="(reqMailTouched && !request.email) || (reqTelTouched && request.email && !validateEmail(request.email))"
+	                    v-on:touch.passive="reqMailTouched = true"
+	                    id="reqDemoEmailField"
+	                >
+	                </ui-textbox>
+	                <ui-textbox
+	                    :placeholder="tr('home_phone_ph')"
+	                    v-model="request.tel"
+	                    :invalid="(reqTelTouched && !request.tel) || (reqTelTouched && request.tel && !(/^[\d()\-#+\s]*$/.test(request.tel)))"
+	                    v-on:touch.passive="reqTelTouched = true"
+	                    id="reqDemoPhoneField"
+	                >
+	                </ui-textbox>
+	                <ui-textbox
+	                    :placeholder="tr('home_msg_ph')"
+	                    v-model="request.msg"
+                        :multi-line="true"
+                        id="reqDemoMsgField"
+	                >
+	                </ui-textbox>
+    				<div class="form_footer flex">
+    					<ui-checkbox id="reqDemoTermsCheckbox" v-model="terms" color="accent">
+    						<span v-html="tr('terms_html')"></span>
+    					</ui-checkbox>
+    					<button class="btn btn_orange" id="reqDemoSendButton" @click.prevent="sendRequest">{{tr('home_send')}}</button>
+    				</div>
+    			</form>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="modalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="messageModal" class="status_modal" :class="{status_modal_success: statusModalSuccess}" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{modalTitle}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+</div>

@@ -1,0 +1,32 @@
+<div class="main">
+
+<div class="company_sponsors_section">
+    <div class="sponsor_event_list">
+        
+        <div class="item" v-for="item in sponsorshipList">
+            <div class="image_box">
+                <img :src="item.templateCoverUrl" v-if="item.templateCoverUrl" alt="">
+            </div>
+            <div class="middle">
+                <p class="middle_title">
+                    {{item.name}}                       
+                </p>
+                <p class="text" v-if="item.organizer"><strong>{{tr('organizer')}}:</strong> {{item.organizer}}</p>
+                <p class="text" v-if="item.contacts.email"><strong>{{tr('email')}}:</strong> {{item.contacts.email}}</p>
+                <p class="text" v-if="item.contacts.phone"><strong>{{tr('phone')}}:</strong> {{item.contacts.phone}}</p>
+            </div>
+            <div class="button_box">
+                <router-link :to="'/'+routes.report+'/'+item.id" class="btn btn_orange">
+                    {{tr('spons_go_to_report')}}
+                </router-link>
+                <button class="btn btn_dark">{{tr('request_to_refund')}}</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- 1. Link to report page
+2. Event organizer name, email, phone
+3. "Request for refund" button -->
+    
+</div>

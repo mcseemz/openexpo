@@ -1,0 +1,52 @@
+<article class="article-block article-block--m100" :class="{'article-block--white': color == 'white', 'article-block--blue': color != 'white'}">
+    <div class="article_header article_header--center content-wrapper">
+        <div class="article_header_content article_header_content-mr">
+            <h2 class="article-title article-title-m0" v-html="tr('find_anything_on_event_title')"></h2>
+            <p class="article_text">{{tr('find_anything_on_event_text')}}</p>
+            <ul class="unordered_list">
+                <li class="unordered_item">{{tr('find_anything_on_event_tab1')}}</li>
+                <li class="unordered_item">{{tr('find_anything_on_event_tab2')}}</li>
+                <li class="unordered_item">{{tr('find_anything_on_event_tab3')}}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="article--litle-list content-wrapper article--litle-list--mt">
+        <div class="article--little_item">
+            <a href="#" class="article--little_link">
+                <div class="article--little_img_wrapper">
+                    <img src="@/img/static-pages/virtual-workshop/event-1.jpg" alt="People Search" class="article--little_img">
+                </div>
+                <div class="article--little_text_wrapper">
+                    <p class="article--little_title" v-html="tr('people_search_title')"></p>
+                    <p class="article--little_text">{{tr('people_search_text')}}</p>
+                </div>
+            </a>
+        </div>
+        <div class="article--little_item">
+            <a href="#" class="article--little_link">
+                <div class="article--little_img_wrapper">
+                    <img src="@/img/static-pages/virtual-workshop/event-2.jpg" alt="Stand Search" class="article--little_img">
+                </div>
+                <div class="article--little_text_wrapper">
+                    <p class="article--little_title" v-html="tr('stand_search_title')"></p>
+                    <p class="article--little_text">{{tr('stand_search_text')}}</p>
+                </div>
+            </a>
+        </div>
+        <div class="article--little_item">
+            <a href="#" class="article--little_link">
+                <div class="article--little_img_wrapper">
+                    <img src="@/img/static-pages/virtual-workshop/event-3.jpg" alt="Tag Search" class="article--little_img">
+                </div>
+                <div class="article--little_text_wrapper">
+                    <p class="article--little_title" v-html="tr('tag_search_title')"></p>
+                    <p class="article--little_text">{{tr('tag_search_text')}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="added-info article_text--center">
+        <a :href="'/'+routes.feature+'/'+routes.advanced_search" class="primary-btn" target="_blank">{{tr('learn_more_about_search')}}</a>
+    </div>
+</article>

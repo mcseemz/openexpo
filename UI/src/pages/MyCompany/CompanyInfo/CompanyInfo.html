@@ -1,0 +1,223 @@
+<div class="main">
+
+
+    <div class="main_section event_datetime_section">
+        <p class="main_section_title big_text">
+            {{tr('mycomp_logo_text')}}
+        </p>
+
+        <div class="form_input_row flex logo_droparea">
+            
+            <div class="image_preview logo_preview">
+                <VueUploadComponent
+                    input-id="logoInpt"
+                    ref="company_logo"
+                    v-model="companyBranding.logo.new"
+                    drop=".logo_droparea"
+                    :multiple="false"
+                    @input-file="inputLogoFile"
+                    class="upload_image_iconstyle"
+                    :drop-directory="false"
+                    :disabled="!canEdit"
+                    >   
+                    <div v-if="logoUrl" class="preview_image_box">
+                        <img :src="logoUrl" alt="" class="">
+                    </div>
+                    <div v-if="!logoUrl" class="placeholder_text">
+                        <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                        <p class="file_upload_title">{{tr('mycomp_logo_ph_main')}}</p>
+                        <p class="file_upload_desc">{{tr('mycomp_logo_ph_desc')}}</p>    
+                    </div>
+
+                    <div class="icons_box" v-if="logoUrl && canEdit">
+                        <span @click="removeImage('logo')"><img src="../img/remove_icon.svg" alt=""></span>
+                        <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                    </div>
+                    
+                </VueUploadComponent>
+            </div>                    
+                
+        </div>
+
+    </div>
+
+    <div class="main_section">
+      
+        <p class="main_section_title big_text">
+            {{tr('mycomp_business_details_title')}}
+        </p>
+
+   
+        <div class="form_input_row">
+
+            <ui-textbox 
+                :label="tr('mycomp_company_name_label')" 
+                type="text"
+                :placeholder="tr('mycomp_company_name_ph')" 
+                v-model="companyObj.name"
+                @input="forceUpdate"
+                :disabled="!canEdit"
+                :maxlength="100"
+                :invalid="companyObj.name && companyObj.name.length && ( companyObj.name.length > 100 ||
+                /[<>$;]/.test(companyObj.name) )"
+            >
+            </ui-textbox>    
+
+
+            
+        </div>
+
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr">
+                <ui-textbox 
+                    :label="tr('mycomp_vat_label')" 
+                    type="text"
+                    :placeholder="tr('mycomp_vat_ph')" 
+                    v-model="companyObj.vat"
+                    :disabled="!canEdit"
+                    @input="forceUpdate"
+                    :maxlength="20"
+                    :invalid="companyObj.vat && companyObj.vat.length && ( companyObj.vat.length > 20 ||
+                    !(/[a-zA-Z0-9]+/.test(companyObj.vat)) )"
+                >
+                </ui-textbox>    
+            </div>
+
+            <div class="form_input_hr">
+                <ui-select
+                    :label="tr('mycomp_industry_label')" 
+                    :placeholder="tr('mycomp_industry_ph')" 
+                    :options="industryList"
+                    v-model="companyObj.industryArr"
+                    :disabled="!canEdit"
+                    iconPosition="right"
+                    :multiple="true"
+                    @input="forceUpdate"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>  
+            </div>
+            
+        </div>
+
+    </div>
+
+    <div class="main_section">
+      
+        <p class="main_section_title big_text">
+            {{tr('mycomp_address_title')}}
+        </p>
+
+   
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr">
+                <ui-textbox 
+                    :label="tr('mycomp_address1_label')" 
+                    type="text"
+                    :placeholder="tr('mycomp_address1_ph')" 
+                    v-model="companyObj.addressesObj.address1"
+                    :disabled="!canEdit"
+                    @input="forceUpdate"
+                    :maxlength="40"
+                    :invalid="companyObj.addressesObj.address1 && companyObj.addressesObj.address1.length && ( companyObj.addressesObj.address1.length > 40 ||
+                    /[<>;$]/.test(companyObj.addressesObj.address1) )"
+                >
+                </ui-textbox>    
+            </div>
+
+            <div class="form_input_hr">
+                <ui-textbox 
+                    :label="tr('mycomp_address2_label')" 
+                    type="text"
+                    :placeholder="tr('mycomp_address2_ph')" 
+                    v-model="companyObj.addressesObj.address2"
+                    @input="forceUpdate"
+                    :disabled="!canEdit"
+                    :maxlength="40"
+                    :invalid="companyObj.addressesObj.address2 && companyObj.addressesObj.address2.length && ( companyObj.addressesObj.address2.length > 40 ||
+                    /[<>;$]/.test(companyObj.addressesObj.address2) )"
+                >
+                </ui-textbox>    
+            </div>
+            
+        </div>
+
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr">
+                <ui-textbox 
+                    :label="tr('mycomp_city_label')" 
+                    type="text"
+                    :placeholder="tr('mycomp_city_ph')" 
+                    v-model="companyObj.addressesObj.city"
+                    @input="forceUpdate"
+                    :disabled="!canEdit"
+                    :maxlength="20"
+                    :invalid="companyObj.addressesObj.city && companyObj.addressesObj.city.length && ( companyObj.addressesObj.city.length > 20 ||
+                    /[<>;$()]/.test(companyObj.addressesObj.city) )"
+                >
+                </ui-textbox>    
+            </div>
+
+            <div class="form_input_qr">
+                <ui-textbox 
+                    :label="tr('mycomp_state_label')" 
+                    type="text"
+                    :placeholder="tr('mycomp_state_ph')" 
+                    v-model="companyObj.addressesObj.state"
+                    @input="forceUpdate"
+                    :disabled="!canEdit"
+                    :maxlength="20"
+                    :invalid="companyObj.addressesObj.state && companyObj.addressesObj.state.length && ( companyObj.addressesObj.state.length > 20 ||
+                    /[<>;$()]/.test(companyObj.addressesObj.state) )"
+                >
+                </ui-textbox>    
+            </div>
+
+            <div class="form_input_qr">
+                <ui-textbox 
+                    :label="tr('mycomp_postcode_label')" 
+                    type="text"
+                    :placeholder="tr('mycomp_postcode_ph')" 
+                    v-model="companyObj.addressesObj.code"
+                    @input="forceUpdate"
+                    :disabled="!canEdit"
+                    :maxlength="10"
+                    :invalid="companyObj.addressesObj.code && companyObj.addressesObj.code.length && ( companyObj.addressesObj.code.length > 10 ||
+                    !(/^[\d]*$/.test(companyObj.addressesObj.code)) )"
+                >
+                </ui-textbox>    
+            </div>
+            
+        </div>
+
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr">
+                <ui-select
+                    :label="tr('mycomp_country_label')" 
+                    :placeholder="tr('mycomp_country_ph')" 
+                    :options="countryList"
+                    :disabled="!canEdit"
+                    v-model="companyObj.selectedCountry"
+                    iconPosition="right"
+                    @change="forceUpdate"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>  
+            </div>
+
+            
+        </div>
+
+        <div class="form_checkbox_row">
+            <ui-checkbox :disabled="!canEdit" v-model="companyObj.addressesObj.use_as_billing" color="accent" @change="forceUpdate" >
+                {{tr('mycomp_use_billing_label')}}
+            </ui-checkbox>
+        </div>
+
+    </div>
+    
+</div>

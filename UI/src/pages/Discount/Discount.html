@@ -1,0 +1,37 @@
+<div class="page_wrapper static_nik_page" v-if="localesLoaded">
+
+  <div class="preloader_overlay fixed preload_overlay_white" v-show="globalPreload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+	<NotFound v-if="!discountAvailable"></NotFound>
+  <template v-else>
+    <div class="page-hero_wrapper">
+      <div class="page-hero content-wrapper">
+        <div class="breadcrumbs">
+          <ul class="breadcrumbs_list">
+            <li class="breadcrumbs_item breadcrumbs_item--gray">
+              <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('home')}}</router-link>
+            </li>
+            <li class="breadcrumbs_item breadcrumbs_item--gray">
+              <span class="breadcrumbs_link breadcrumbs_link--gray breadcrumbs_link--active">{{tr('create_event')}}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-main_wrapper content-wrapper">
+      <div class="section first">
+        <div class="info">
+          <div class="hero_subtitle hero_subtitle--gray">{{tr('create_new_event')}}</div>
+          <div class="hero_title hero_title--gray">
+            {{tr('exclusive_discount_first')}} <span class="orange">{{discount.definition.amount}}</span> {{tr('exclusive_discount_last')}}
+          </div>
+          <div class="hero_subtitle hero_subtitle--gray">
+            {{tr('discount_take_advantage_first')}} {{discount.definition.amount}} {{tr('discount_take_advantage_last')}}
+          </div>
+          <button class="btn btn_orange" @click="createEventWithDiscount">{{tr('create_event')}}</button>
+        </div>
+      </div>
+    </div>
+  </template>
+</div>

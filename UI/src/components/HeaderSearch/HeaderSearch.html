@@ -1,0 +1,63 @@
+<div class="header_search_wrapper flex" v-if="pageType && pageId">
+	<div class="header_search_block">
+		<input type="search" v-on:keyup.enter="searchAction" v-model="search" class="search_input" :placeholder="searchPlaceholder">
+		<ui-checkbox v-model="global" color="accent" class="global" v-if="pageType && pageId" :disabled="!pageType || !pageId">{{tr('search_global_search')}}</ui-checkbox>
+		<span class="search_btn" @click="searchAction"><img src="./img/search-icon.svg" alt=""></span>
+
+		<div class="header_search_dropdown" v-if="searchDropdownOpened">
+			<!-- <div class="preloader_overlay preload_overlay_white" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div> -->
+
+			<div class="header_search_dropdown_tabs flex">
+				<div class="dt_item" :class="{active: scope == 'all'}" @click="changeScope('all')"><span>{{tr('search_all')}}</span></div>
+				<div class="dt_item" :class="{active: scope == 'event'}" v-if="pageType != 'event'" @click="changeScope('event')"><span>{{tr('search_events')}}</span></div>
+				<div class="dt_item" :class="{active: scope == 'personnel'}" @click="changeScope('personnel')"><span>{{tr('search_people')}}</span></div>
+				<div class="dt_item" :class="{active: scope == 'stand'}" v-if="pageType != 'stand'" @click="changeScope('stand')"><span>{{tr('search_stands')}}</span></div>
+				<div class="dt_item" :class="{active: scope == 'news'}" @click="changeScope('news')"><span>{{tr('search_news')}}</span></div>
+				<!-- <div class="dt_item" :class="{active: scope == 'tags'}" @click="changeScope('tags')"><span>{{tr('search_tags')}}</span></div> -->
+			</div>
+			<div class="header_search_dropdown_not_found" v-if="!searchResult && !searchPreloader">{{tr('search_no_result_message')}}</div>
+			<div class="dropdown_preload flex" v-if="searchPreloader"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+			<searchResults :searchResult="searchResult" v-if="searchResult && !searchPreloader"></searchResults>
+
+			
+			<div id="search_view_all" @click="viewAllClick" v-if="searchResult && !searchPreloader" class="hsd_bottom">{{tr('search_view_all')}}</div>
+		</div>
+	</div>
+	
+	<div class="search_overlay" v-if="searchDropdownOpened"></div>
+	<ui-modal @close="viewAllOnClose" ref="viewAllModal" class="pagelike_modal" removeHeader size="auto">
+        <div class="preloader_wrapper">
+        	<div class="preloader_overlay preload_overlay_white" v-show="searchPreloader"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+        	<div class="container">
+        		<div class="title flex"><img class="title_close" @click="viewAllModalClose" src="./img/backarrow.svg" alt=""> <span>{{tr('search_results_for')}} {{search}}</span></div>
+
+        		<div class="header_search_dropdown_tabs flex">
+					<div class="dt_item" :class="{active: scope == 'all'}" @click="changeScope('all')"><span>{{tr('search_all')}}</span></div>
+					<div class="dt_item" :class="{active: scope == 'event'}" v-if="pageType != 'event'" @click="changeScope('event')"><span>{{tr('search_events')}}</span></div>
+					<div class="dt_item" :class="{active: scope == 'personnel'}" @click="changeScope('personnel')"><span>{{tr('search_people')}}</span></div>
+					<div class="dt_item" :class="{active: scope == 'stand'}" v-if="pageType != 'stand'" @click="changeScope('stand')"><span>{{tr('search_stands')}}</span></div>
+					<div class="dt_item" :class="{active: scope == 'news'}" @click="changeScope('news')"><span>{{tr('search_news')}}</span></div>
+					<!-- <div class="dt_item" :class="{active: scope == 'tags'}" @click="changeScope('tags')"><span>{{tr('search_tags')}}</span></div> -->
+				</div>
+				<div class="header_search_dropdown_not_found" v-if="!searchResult && !searchPreloader">{{tr('search_no_result_message')}}</div>
+        		<searchResults :searchResult="searchResult" v-if="searchResult && !searchPreloader"></searchResults>
+
+        		<div class="pagination_pagination flex">
+			        <span class="prev" :class="{disabled: start == 1}" @click="changePage(start - 1)">< {{tr('prev')}}</span>
+			        <input 
+			            v-model="start"
+			            type="number"
+			            @change="changePage(start)"
+			            class="pagination_input"
+			        >
+			        </input>
+			        <span class="next" :class="{disabled: !more}" @click="changePage(start + 1)">{{tr('next')}} ></span>
+			    </div>
+        	</div>
+        </div>
+
+    </ui-modal>
+</div>
+		

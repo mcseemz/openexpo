@@ -1,0 +1,132 @@
+<div class="main preloader_wrapper visitors_section">
+    <div class="preloader_overlay preload_overlay_white preload_overlay_semitrans" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+    <div class="main_section personnel_main_section managerequests_main_section">
+
+        <p class="main_section_title big_text">
+           {{tr('adev_visitors_title')}}
+        </p>
+
+        <div class="form_input_row search_row flex">
+            <div class="left flex">
+               <div class="form_input_hr">
+                    <ui-textbox
+                        :placeholder="tr('adev_visitors_search_ph')"
+                        v-model="search"
+                        class="ui-search-input"
+                    >
+                        <img @click="getVisitors" slot="icon" src="@/img/search_icon.svg" alt="">
+                    </ui-textbox>
+                </div>
+                <div class="form_input_qr">
+                    <ui-select
+                        :label="tr('adev_visitors_status_label')"
+                        :options="statusList"
+                        v-model="status"
+                        iconPosition="right"
+                        class="ui-select-labelin"
+                        @select="getVisitors"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+            </div>
+            <div class="visitors--right flex">
+                <button @click="exportVisitors" class="btn btn_owhite">{{tr('adev_visitors_export_button')}}</button>
+                <a href="#" v-show="false" target="_blank" id="visitors_download_file_link"></a>
+                <input type="file" style="display: none" ref="importList" accept="text/csv" @change="visitorsPostAction"/>
+                <div class="visitors--import" style="position: relative;">
+                    <button type="button" @click.prevent="selectVisitors" class="btn btn_owhite visitors--import-button">{{tr('adev_visitors_import_button')}}</button>
+                    <span class="question_icon visitors--import-tooltip" @click="importVisitors_showTooltip=!importVisitors_showTooltip">?
+                        <ui-tooltip position="top" animation="scale" :open-delay="100" open-on="click">
+                        <span v-html="importVisitorsTooltip"/>
+                        </ui-tooltip>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <p class="visitors_empty_text" v-if="!visitorsList.length && !preload">{{tr('adev_visitors_empty_msg')}}</p>
+
+        <div class="mr_items mr_items--center" v-if="visitorsList.length && !preload">
+            <div class="mr_item" :key="item.id" v-for="item in visitorsList">
+                <div class="top flex">
+                    <div class="left flex">
+                        <div class="image_box">
+                            <img :src="'https://'+configs.binary+'/'+item.branding[0]" alt="" v-if="item.branding && item.branding.length">
+                            <img src="@/img/default_avatar.svg" alt="" v-if="!item.branding || !item.branding.length">
+                        </div>
+                        <div class="text_box">
+                            <p class="name">{{item.name}} {{item.surname}}</p>
+                            <p class="email">{{item.email}}</p>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <img :class="{active: item.expanded}" @click="expandItem(item)" src="@/img/dropdown_icon.svg" alt="">
+                    </div>
+                </div>
+                <div class="center">
+                    <p><span>{{tr('adev_visitors_status_label')}}:</span> {{tr('adev_visitors_status_'+item.payment_status)}}</p>
+                    <p v-if="eventObj.userfields.length && item.fields && item.fields[fieldname]" v-show="item.expanded || index < 1" v-for="(fieldname, index) in eventObj.userfields"><span>{{getFieldName(fieldname)}}:</span> {{item.fields[fieldname]}}</p>
+                </div>
+                <div class="bottom flex">
+                    <button @click="ticketAction(item, 'ban')" v-if="item.payment_status == 'payed'" class="btn btn_orange">{{tr('adev_visitors_block_button')}}</button>
+                    <button @click="ticketAction(item, 'unban')" v-if="item.payment_status == 'banned'" class="btn btn_orange">{{tr('adev_visitors_unblock_button')}}</button>
+                    <button @click="ticketAction(item, 'confirm')" v-if="item.payment_status == 'not_payed' && item.manual_approval" class="btn btn_orange">{{tr('ticket_manual_approval_confirm')}}</button>
+
+                    <span @click="ticketAction(item, 'refund')" class="mr_item_link" v-if="item.payment_status == 'payed'">{{tr('adev_visitors_refund_button')}}</span>
+                    <span @click="ticketAction(item, 'cancel')" class="mr_item_link" v-if="item.payment_status == 'not_payed'">{{tr('adev_visitors_cancel_button')}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mr_items mr_items--center" v-if="visitorsList.length && preload">
+            <div class="mr_item" :style="{'opacity': '0.4'}" :key="item.id" v-for="item in 10">
+                <div class="top flex">
+                    <div class="left flex">
+                        <div class="image_box">
+                            <img src="@/img/default_avatar.svg" alt="">
+                        </div>
+                        <div class="text_box">
+                            <p class="name"></p>
+                            <p class="email"></p>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <img src="@/img/dropdown_icon.svg" alt="">
+                    </div>
+                </div>
+                <div class="center" :style="{'background-image': 'linear-gradient(to left, rgba(255,0,0,0),#6E7C8D)'}">
+                    <p><span>{{tr('adev_visitors_status_label')}}:</span></p>
+                </div>
+                <div class="bottom flex" :style="{'background-image': 'linear-gradient(to left, rgba(255,0,0,0),#E5853C)'}">
+                    <span class="mr_item_link">{{tr('adev_visitors_cancel_button')}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div ref="visitors_pagination" v-if="firstLoad && visitorsList.length" class="visitors_pagination flex">
+            <span v-show="currentPage > 1" class="prev" @click="changePage(currentPage - 1)"><< {{tr('prev')}}</span>
+            <ui-textbox
+                v-model.number="currentPage"
+                type="number"
+                :style="{'margin-left':currentPage == 1 ? '54.25px': '20px', 'text-align': 'center'}"
+                @change="getVisitors"
+            >
+            </ui-textbox>
+            <span v-show="!isLastPage" class="next" @click="changePage(currentPage + 1)">{{tr('next')}} >></span>
+        </div>
+
+    </div>
+
+    <ui-modal ref="messageModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content tac">
+<!--                 <p class="modal_title">{{tr('validation_error')}}</p> -->
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

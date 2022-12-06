@@ -1,0 +1,280 @@
+<!-- STEP 3 -->
+<div class="content_wrapper">
+    <div class="container">
+        <div class="title_box">
+            <h2 class="title">{{ eventObj.name }}</h2>
+        </div>
+        <div class="content_sidebar_left flex">
+            <div class="sidebar" :class="{sticky: isScrolled}">
+                <div class="sidebar_sticky_wrapper">
+                    <ul class="sidebar_menu">
+                        <li class="sidebar_menu_item" v-if="userCan('event-edit')">
+
+                            <ui-collapsible v-if="userCan('event-edit')" removeIcon disableRipple
+                                            :open="selectedMenu.value == 'customize'" @open="openCustomizeList">
+                                <div class="" slot="header">
+                                    <div class="sidebar_menu_item_title">{{ tr('adev_event_details') }}</div>
+                                    <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                                </div>
+                                <ul class="sidebar_menu submenu">
+                                    <li class="sidebar_menu_subitem"
+                                        :class="{'active': (selectedMenu.value == 'customize' && (!selectedMenu.customizeAnchor || selectedMenu.customizeAnchor == 'basic_information'))}"
+                                        @click="selectTab('customize', 'basic_information')">
+                                        <a href="#basic_information"
+                                           class="sidebar_menu_item_title">{{ tr('adev_basic_information') }}</a>
+                                    </li>
+                                    <li class="sidebar_menu_subitem"
+                                        :class="{'active': (selectedMenu.value == 'customize' && selectedMenu.customizeAnchor == 'customize')}"
+                                        @click="selectTab('customize', 'customize')">
+                                        <a href="#customize" class="sidebar_menu_item_title">{{ tr('visuals') }}</a>
+                                    </li>
+                                    <li class="sidebar_menu_subitem"
+                                        :class="{'active': (selectedMenu.value == 'customize' && selectedMenu.customizeAnchor == 'event_page')}"
+                                        @click="selectTab('customize', 'event_page')">
+                                        <a href="#event_page"
+                                           class="sidebar_menu_item_title">{{ tr('adev_event_page') }}</a>
+                                    </li>
+                                    <li class="sidebar_menu_subitem"
+                                        :class="{'active': (selectedMenu.value == 'customize' && selectedMenu.customizeAnchor == 'customize_tabs')}"
+                                        @click="selectTab('customize', 'customize_tabs')">
+                                        <a href="#customize_tabs"
+                                           class="sidebar_menu_item_title">{{ tr('adev_customize_tabs') }}</a>
+                                    </li>
+                                    <li class="sidebar_menu_subitem"
+                                        :class="{'active': (selectedMenu.value == 'customize' && selectedMenu.customizeAnchor == 'contact_info')}"
+                                        @click="selectTab('customize', 'contact_info')">
+                                        <a href="#contact_info"
+                                           class="sidebar_menu_item_title">{{ tr('contact_info') }}</a>
+                                    </li>
+                                </ul>
+                            </ui-collapsible>
+
+                        </li>
+
+                        <li class="sidebar_menu_item" v-if="userCan('event-manage-money')"
+                            :class="{'active': selectedMenu.value == 'tickets'}" @click="selectTab('tickets')">
+                            <div class="sidebar_menu_item_title">{{ tr('price_types') }}</div>
+                        </li>
+
+                        <li v-if="userCan('event-edit') || userCan('event-manage-staff') || userCan('event-view-report')"
+                            class="sidebar_menu_item">
+
+                            <ui-collapsible removeIcon disableRipple
+                                            :open="['personnel', 'visitors', 'custom_user_fields'].includes(selectedMenu.value)">
+                                <div class="" slot="header">
+                                    <div class="sidebar_menu_item_title">{{ tr('adev_user_management') }}</div>
+                                    <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                                </div>
+
+                                <ul class="sidebar_menu submenu">
+                                    <li class="sidebar_menu_subitem" v-if="userCan('event-manage-staff')"
+                                        :class="{'active': selectedMenu.value == 'personnel'}"
+                                        @click="selectTab('personnel')">
+                                        <div class="sidebar_menu_item_title">{{ tr('personnel') }}</div>
+                                    </li>
+                                    <li class="sidebar_menu_subitem" v-if="userCan('event-view-report')"
+                                        :class="{'active': selectedMenu.value == 'visitors'}"
+                                        @click="selectTab('visitors')">
+                                        <div class="sidebar_menu_item_title">{{ tr('adev_visitors') }}</div>
+                                    </li>
+                                    <li class="sidebar_menu_subitem" v-if="userCan('event-edit')"
+                                        :class="{'active': selectedMenu.value == 'custom_user_fields'}"
+                                        @click="selectTab('custom_user_fields')">
+                                        <div class="sidebar_menu_item_title">{{ tr('adev_custom_user_fields') }}</div>
+                                    </li>
+                                </ul>
+                            </ui-collapsible>
+
+                        </li>
+
+                        <li v-if="userCan('event-invite-stand')" class="sidebar_menu_item">
+
+                            <ui-collapsible removeIcon disableRipple
+                                            :open="['invitations', 'manage_requests', 'stands_list'].includes(selectedMenu.value)">
+                                <div class="" slot="header">
+                                    <div class="sidebar_menu_item_title">{{ tr('stand_management') }}</div>
+                                    <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                                </div>
+
+                                <ul class="sidebar_menu submenu">
+                                    <li class="sidebar_menu_subitem"
+                                        :class="{'active': selectedMenu.value == 'invitations'}"
+                                        @click="selectTab('invitations')">
+                                        <div class="sidebar_menu_item_title">{{ tr('adev_invitations') }}</div>
+                                    </li>
+                                    <li class="sidebar_menu_subitem"
+                                        :class="{'active': selectedMenu.value == 'stands_list'}"
+                                        @click="selectTab('stands_list')">
+                                        <div class="sidebar_menu_item_title">{{ tr('adev_stands_list') }}</div>
+                                    </li>
+                                </ul>
+                            </ui-collapsible>
+
+                        </li>
+
+                        <li class="sidebar_menu_item" v-if="userCan('event-edit')"
+                            :class="{'active': selectedMenu.value == 'agenda'}" @click="selectTab('agenda')">
+                            <div class="sidebar_menu_item_title">{{ tr('agenda') }}</div>
+                        </li>
+
+
+                        <li v-if="userCan('event-edit')" class="sidebar_menu_item">
+
+                            <ui-collapsible removeIcon disableRipple
+                                            :open="['downloadables', 'articles', 'collections', 'products'].includes(selectedMenu.value)">
+                                <div class="" slot="header">
+                                    <div class="sidebar_menu_item_title">{{ tr('content') }}</div>
+                                    <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                                </div>
+
+                                <ul class="sidebar_menu submenu">
+                                    <li class="sidebar_menu_subitem"
+                                        :class="{'active': selectedMenu.value == 'downloadables'}"
+                                        @click="selectTab('downloadables')">
+                                        <div class="sidebar_menu_item_title">{{ tr('downloadables') }}</div>
+                                    </li>
+                                    <li class="sidebar_menu_subitem"
+                                        :class="{'active': selectedMenu.value == 'articles'}"
+                                        @click="selectTab('articles')">
+                                        <div class="sidebar_menu_item_title">{{ tr('articles') }}</div>
+                                    </li>
+                                    <li class="sidebar_menu_subitem"
+                                        :class="{'active': selectedMenu.value === 'collections'}"
+                                        @click="selectTab('collections')">
+                                        <div class="sidebar_menu_item_title">{{ tr('collections') }}</div>
+                                    </li>
+                                    <li class="sidebar_menu_subitem"
+                                        :class="{'active': selectedMenu.value === 'products'}"
+                                        @click="selectTab('products')">
+                                        <div class="sidebar_menu_item_title">{{ tr('products') }}</div>
+                                    </li>
+                                </ul>
+                            </ui-collapsible>
+
+                        </li>
+
+                        <li v-if="userCan('event-edit')" class="sidebar_menu_item">
+
+                            <ui-collapsible removeIcon disableRipple
+                                            :open="['tiers','sponsors_custom','sponsors_report'].includes(selectedMenu.value)">
+                                <div class="" slot="header">
+                                    <div class="sidebar_menu_item_title">{{ tr('sponsorship') }}</div>
+                                    <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                                </div>
+
+                                <ul class="sidebar_menu submenu">
+                                    <li class="sidebar_menu_subitem" :class="{'active': selectedMenu.value == 'tiers'}"
+                                        @click="selectTab('tiers')">
+                                        <div class="sidebar_menu_item_title" @click="selectTab('tiers')">
+                                            {{ tr('tiers') }}
+                                        </div>
+                                    </li>
+                                    <li class="sidebar_menu_subitem" :class="{'active': selectedMenu.value == 'sponsors_custom'}" @click="selectTab('sponsors_custom')">
+                                        <div class="sidebar_menu_item_title"  @click="selectTab('sponsors_custom')">{{tr('adev_sponsors_custom')}}</div>
+                                    </li>
+                                    <li class="sidebar_menu_subitem" :class="{'active': selectedMenu.value == 'sponsors_report'}" @click="selectTab('sponsors_report')">
+                                        <div class="sidebar_menu_item_title"  @click="selectTab('sponsors_report')">{{tr('adev_sponsors_report_title')}}</div>
+                                    </li>
+                                </ul>
+                            </ui-collapsible>
+                        </li>
+
+                        <li class="sidebar_menu_item" v-if="userCan('event-edit')"
+                            :class="{'active': selectedMenu.value == 'announcement'}"
+                            @click="selectTab('announcement')">
+                            <div class="sidebar_menu_item_title">{{ tr('adev_announcement_label') }}</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <div class="main" v-if="selectedMenu.value == 'customize' && userCan('event-edit')">
+                <BasicInformation v-on:custom-name-change="checkCustomName" :customNameAvaliable="customNameAvaliable"
+                                  :categoriesList="categoriesList" :timeZoneList="timeZoneList"
+                                  :eventObj="eventObj"></BasicInformation>
+
+                <Customize :featuredState="eventObj.featured" :imagePlaceholders="imagePlaceholders" :dayList="dayList"
+                           :eventBranding="eventBranding" :timeZoneList="timeZoneList" :eventObj="eventObj"
+                           @update="changeDayList"></Customize>
+                <MainPage objectType="event" :imagePlaceholders="imagePlaceholders" :langList=langList
+                          :mainBranding="eventBranding" :mainObj="eventObj" v-if="langList.length"></MainPage>
+                <CustomizeTabs :eventObj="eventObj"></CustomizeTabs>
+                <ContactInfo :eventObj="eventObj"></ContactInfo>
+            </div>
+
+            <PrivacySettings v-if="selectedMenu.value == 'privacy_settings' && userCan('event-edit')"></PrivacySettings>
+            <Tickets :tickets.sync="tickets" @show_ticket_message="showErrorMessage" :eventObj="eventObj"
+                     v-if="selectedMenu.value == 'tickets' && userCan('event-manage-money')"></Tickets>
+
+            <Downloadables
+                    type="event"
+                    :downloadables="evtDownloadables"
+                    :category="eventObj.category.value"
+                    v-if="selectedMenu.value == 'downloadables' && userCan('event-edit') && eventObj.category.value"
+                    :pricingTags="pricingTags"/>
+            <Personnel :type="'event'" :mainObj="eventObj"
+                       v-if="selectedMenu.value == 'personnel' && userCan('event-manage-staff')" ></Personnel>
+            <Visitors :customFields="customFields" :eventObj="eventObj" :id="eventObj.id" :type="'event'"
+                      v-if="customFields.length && selectedMenu.value == 'visitors' && userCan('event-view-report')"></Visitors>
+            <CustomUserFields :customFields="customFields"
+                              v-if="customFields.length && selectedMenu.value == 'custom_user_fields' && userCan('event-edit')"></CustomUserFields>
+
+            <Invitations :event_id="eventObj.id"
+                         v-if="selectedMenu.value == 'invitations' && userCan('event-invite-stand')"></Invitations>
+            <Articles :eventObj="eventObj" :articleData="articleData" :event_id="eventObj.id"
+                      v-if="selectedMenu.value == 'articles' && userCan('event-manage-news')"></Articles>
+
+            <ArticlesList :key="'al1'" :articleData="articleData" :type="'all'" :event_id="eventObj.id"
+                          v-if="selectedMenu.value == 'articleslist_all' && userCan('event-manage-news')"></ArticlesList>
+            <ArticlesList :key="'al2'" :articleData="articleData" :type="'draft'" :event_id="eventObj.id"
+                          v-if="selectedMenu.value == 'articleslist_draft' && userCan('event-manage-news')"></ArticlesList>
+            <ArticlesList :key="'al3'" :articleData="articleData" :type="'published'" :event_id="eventObj.id"
+                          v-if="selectedMenu.value == 'articleslist_published' && userCan('event-manage-news')"></ArticlesList>
+
+            <Stands :eventObj="eventObj" :langList=langList
+                    v-if="selectedMenu.value == 'stands_list' && userCan('event-invite-stand') && eventObj.id"></Stands>
+
+            <Agenda
+                    :dayList="dayList"
+                    :agenda="agenda"
+                    :mainObj="eventObj"
+                    :eventObj="eventObj"
+                    objectType="event"
+                    :pricingTags="pricingTags"
+                    v-if="agenda && dayList && selectedMenu.value == 'agenda' && userCan('event-edit') && eventObj.id" />
+
+            <Tiers :eventObj="eventObj" v-if="selectedMenu.value == 'tiers' && features.sponsors && userCan('event-manage-sponsorship')"></Tiers>
+            <SponsorsCustom
+                             v-if="selectedMenu.value == 'sponsors_custom' && features.sponsors && userCan('event-manage-sponsorship')"
+                             type="event"
+                             :downloadables="evtDownloadables"
+                             :sponsor="true"
+                             :pricingTags="pricingTags"
+                             @sponsors-updated="productsUpdated"></SponsorsCustom>
+            <SponsorsReport :eventObj="eventObj" v-if="selectedMenu.value == 'sponsors_report' && features.sponsors && userCan('event-manage-sponsorship')"></SponsorsReport>
+            <Collections
+                    :eventObj="eventObj"
+                    :agenda="agenda.sessions"
+                    :downloadables="downloadablesArray"
+                    :pricingTags="pricingTags"
+                    @collections-updated="collectionsUpdated"
+                    v-if="selectedMenu.value === 'collections' && userCan('event-edit')"/>
+
+
+                <Downloadables
+                        type="event"
+                        :category="eventObj.category.value"
+                        :downloadables="evtDownloadables"
+                        :product="true"
+                        :pricingTags="pricingTags"
+                        @products-updated="productsUpdated"
+                        v-if="selectedMenu.value == 'products' && userCan('event-edit') && eventObj.category.value"/>
+
+
+            <Announcement :eventObj="eventObj" :langList=langList
+                          v-if="selectedMenu.value == 'announcement' && userCan('event-edit')"></Announcement>
+        </div>
+
+    </div>
+</div>

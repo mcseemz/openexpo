@@ -1,0 +1,40 @@
+
+
+describe("Signup validation", () => {
+
+const email = Cypress.env('TEST_USER');
+const password = Cypress.env('TEST_PASSWORD');
+
+  it("allows signup with fixed login and username", () => {
+    cy.visit("/");
+
+    cy.get('.container > .header_wrapper > .header_right > .header_account > #header_signin').click()
+    cy.get('.sign_in_box > .sign_in_sidebar > .sign_in_sidebar_content > .sign_in_form > #signin_email').type(email)
+    cy.get('.sign_in_sidebar > .sign_in_sidebar_content > .sign_in_form > .textinput_wrapper > #signin_pwd').type(password);
+    cy.get('.sign_in_box > .sign_in_sidebar > .sign_in_sidebar_content > .sign_in_form > #sb_login').click()
+ 
+//page refreshes
+    cy.wait(5000);
+    cy.get('.header_account > .header_profile > .dropdown_wrapper').invoke('show');
+
+    cy.get('.header_account > .header_profile > .dropdown_wrapper > .header_profile_dropdown > #my_account').click()
+    cy.get('.form_input_hr > .is-active > .ui-textbox__content > .ui-textbox__label > .ui-textbox__input').click()
+    cy.get('.form_input_hr > .is-active > .ui-textbox__content > .ui-textbox__label > .ui-textbox__input').type('address')
+ 
+    cy.get('.content_sidebar_left > .sidebar > .sidebar_menu > .sidebar_menu_item > .sidebar_menu_item_title').click()
+    cy.get('.ui-select > .ui-select__content > .ui-select__label > .ui-select__display > .ui-select__display-value').click()
+    cy.get('.ui-focus-container > .ui-focus-container__content > .ui-select__dropdown-content > .ui-select__options > .is-highlighted').click()
+//save 
+    cy.get('.page_add_event > .content_wrapper > .container > .title_box > .btn').click()
+
+//page refreshes
+
+//logout 
+    cy.get('.header_account > .header_profile > .dropdown_wrapper > .header_profile_dropdown > #logout').click()
+ 
+//page refreshes
+
+    cy.get('.content_wrapper > .container > .form_wrapper > .form_section > .title').should('exist');
+
+  });
+});

@@ -1,0 +1,127 @@
+<div class="page_wrapper page_my_meetings">
+
+	<div class="modal_meeting_zoom">
+
+		<div class="mmz_header" v-if="activity">
+			<div class="container flex">
+				<div class="left flex">
+
+					<a href="/" class="logo">
+                        <h2>Openexpo</h2>
+					</a>
+					<div class="info" v-if="false">
+						<div class="event_block flex" v-if="eventLoaded">
+
+							<div class="image_box">
+								<router-link :to="'/'+routes.event+'/'+eventObj.id">
+									<img :src="eventBranding.templateCover.url" alt="">
+								</router-link>
+							</div>
+							<!-- <a href="#" class="event_title">{{eventObj.name}}</a> -->
+							<router-link :to="'/'+routes.event+'/'+eventObj.id" class="event_title">{{eventObj.name}}</router-link>
+						</div>
+
+					</div>
+
+					<div class="info" v-if="false">
+						<div class="event_block flex" v-if="standLoaded">
+
+							<div class="image_box">
+								<router-link :to="'/'+routes.stand+'/'+standObj.id">
+									<img :src="standBranding.templateCover.url" alt="">
+								</router-link>
+							</div>
+							<!-- <a href="#" class="event_title">{{eventObj.name}}</a> -->
+							<router-link :to="'/'+routes.stand+'/'+standObj.id" class="event_title">{{standObj.name}}</router-link>
+						</div>
+					</div>
+				</div>
+				<p class="mmz_header_activity_name" v-if="activity && zoomUrl">{{activity.headerName}}</p>
+				<div class="countdown" v-if="activity && showTimer">
+		            <div class="countdown_title">{{tr('meeting_ends_after')}}: </div>
+
+		            <Countdown :deadline="deadlineDate"></Countdown>
+		        </div>
+		        <div class="button_block">
+					<a :href="'/'+routes.event+'/'+eventObj.id+'/agenda'" v-if="!activity.stand"><span class="close"><img src="./img/close_icon.svg" alt=""></span></a>
+					<a :href="'/'+routes.stand+'/'+standObj.id" v-if="activity.stand"><span class="close"><img src="./img/close_icon.svg" alt=""></span></a>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="preloader_overlay fixed preload_overlay_white" v-show="!dataLoaded"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+		<template v-if="dataLoaded && eventObj.letmein">
+			<div class="container">
+				<div class="breadcrumbs flex">
+					<a :href="'/'">{{tr('home')}}</a>
+					<span class="delimeter">/</span>
+					<a :href="'/'+routes.event+'/'+eventObj.id" v-if="eventObj.name">{{eventObj.name}}</a>
+					<span class="delimeter" v-if="eventObj.name">/</span>
+					<a :href="'/'+routes.stand+'/'+standObj.id" v-if="standObj.name">{{standObj.name}}</a>
+					<span class="delimeter" v-if="standObj.name">/</span>
+					<span class="current">{{activity.headerName}}</span>
+				</div>
+				<!-- <div class="breadcrumb_line"></div> -->
+			</div>
+			<Zoom v-if="activity && zoomUrl" :zoomUrl="zoomUrl" :activity="activity" :zoom-credentials="meeting ? meeting['zoom-credentials'] : {}"></Zoom>
+			<div class="mmz_iframe_box" v-if="activity && twitchUrl">
+				<div class="iframe_wrapper">
+					<iframe
+					    :src="twitchUrl"
+					    height="300px"
+					    width="400px"
+
+					    scrolling="no"
+					    allowfullscreen="true">
+					</iframe>
+				</div>
+
+				<span v-if="eventObj.videoLogo" class="promo_video_img_link" @click="logoClick">
+	                <!-- <img src="@/img/howitworks/steps_bg_start.png" alt="" class="promo_video_img"> -->
+	                <img :src="eventObj.videoLogo" alt="" class="promo_video_img">
+	            </span>
+			</div>
+
+			<div class="mmz_iframe_box jcc aic" :class="{flex: !vimeoUrl || !is_live}" v-if="activity && activity.value.meetingType == 'youtube'">
+
+				<div v-if="youtubeUrl && is_live" class="iframe_wrapper"  style="overflow: hidden; padding-top: 56.25%;">
+					<iframe :src="'https://www.youtube.com/embed/'+youtubeUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				</div>
+
+				<span v-if="eventObj.videoLogo && youtubeUrl && is_live" class="promo_video_img_link" @click="logoClick">
+	                <!-- <img src="@/img/howitworks/steps_bg_start.png" alt="" class="promo_video_img"> -->
+	                <img :src="eventObj.videoLogo" alt="" class="promo_video_img">
+	            </span>
+
+				<p class="big_text" v-if="!youtubeUrl">{{tr('invalid_youtube_link')}}</p>
+				<p class="big_text" v-if="!is_live">{{tr('meeting_not_started')}}</p>
+
+			</div>
+
+			<div class="mmz_iframe_box jcc aic" :class="{flex: !vimeoUrl}" v-if="activity && activity.value.meetingType == 'vimeo'">
+
+				<div v-if="vimeoUrl" class="iframe_wrapper"  style="overflow: hidden; padding-top: 56.25%;">
+					<iframe :src="vimeoUrl" frameborder="0" allow="autoplay; fullscreen" allowfullscreen :class="{'chat-enabled': vimeoChatLink}"></iframe>
+					<iframe :src="vimeoChatLink" frameborder="0" allow="autoplay; fullscreen" allowfullscreen v-if="vimeoChatLink" class="vimeo-chat"></iframe>
+				</div>
+
+				<span v-if="eventObj.videoLogo && vimeoUrl" class="promo_video_img_link" @click="logoClick">
+	                <!-- <img src="@/img/howitworks/steps_bg_start.png" alt="" class="promo_video_img"> -->
+	                <img :src="eventObj.videoLogo" alt="" class="promo_video_img">
+	            </span>
+
+				<p class="big_text" v-if="!vimeoUrl">{{tr('invalid_vimeo_link')}}</p>
+
+			</div>
+
+			<VideoMeeting ref="videoMeeting" v-if="features.video && activity && activity.meetingUrl && (activity.value.meetingType == 'webinar' || activity.value.meetingType == 'team_meeting')" :tiersList="[]" :mainObj="mainObj" :activity="activity"></VideoMeeting>
+		</template>
+
+		<NotPermitted v-else-if="dataLoaded" :isUserAuth="userLoggedIn" />
+
+        <NotFound v-if="notFounded"></NotFound>
+	</div>
+
+</div>

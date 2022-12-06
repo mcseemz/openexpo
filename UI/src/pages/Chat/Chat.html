@@ -1,0 +1,343 @@
+<div class="page_wrapper checkout_page" v-if="localesLoaded">
+	<section class="chat_main_section">
+		<div class="container flex">
+			<aside class="chat_channels" v-if="isOwner">
+				<div class="chat_content_header white">
+					<div class="search_input_block">
+						<input type="search" class="search_input" v-model="searchInput" @input="filterChat" :placeholder="tr('search')">
+						<a href="#" class="search_btn"><img src="./img/search_icon.svg" alt=""></a>
+					</div>
+				</div>
+				<div class="back-block flex aic" @click="$router.push('/chats')">
+					<img src="./img/whiteArrow.svg" />
+					<div class="logo-wrapper ml-16">
+					<img :src="mainInstance.cover" v-if="mainInstance.cover" />
+				</div>
+				<div class="info ml-8">
+					<div class="text-small">{{mainInstance.title}}</div>
+					<div class="text-tiny">{{mainInstance.role}}</div>
+				</div>
+				</div>
+				<div class="chat_channels_list">
+
+					<div @click="changeChannel(chat)" class="chat_channel_item flex" :class="chat.sid == sid ? 'active' : ''" v-if="filteredChats.length" v-for="chat in filteredChats">
+						<div class="left flex">
+							<div class="img_box" v-if="getChatAvatar(chat)"><img :src="getChatAvatar(chat)" alt=""></div>
+							<div class="img_box" v-if="!getChatAvatar(chat)"><img src="@/img/default_avatar.svg" alt=""></div>
+							<div class="text_box">
+								<p class="small_text flex">
+									<span>{{chat.eventUser ? chat.standUser.name : chat.user.name}} {{chat.eventUser ? chat.standUser.surname : chat.user.surname}}</span>
+									<span class="color-grey text-10">{{getTimeAgo(chat)}}</span>
+								</p>
+								<p class="xsmall_text" v-if="chat.stand && chat.stand.name">{{chat.stand.name}}</p>
+							</div>
+						</div>
+						<div class="right flex">
+							<div class="new_messages" v-if="chat.unreadCount">{{chat.unreadCount}}</div>
+						</div>
+					</div>
+
+					<div :key="index" class="chat_channel_item flex" v-if="pendingChatList.length" v-for="chat, index in pendingChatList">
+						<div class="left flex">
+							<div class="img_box" v-if="getChatAvatar(chat)"><img :src="getChatAvatar(chat)" alt=""></div>
+							<div class="img_box" v-if="!getChatAvatar(chat)"><img src="@/img/default_avatar.svg" alt=""></div>
+							<div class="text_box">
+								<p class="small_text">{{chat.eventUser ? chat.standUser.name : chat.user.name}} {{chat.eventUser ? chat.standUser.surname : chat.user.surname}}</p>
+							</div>
+						</div>
+						<div class="right flex">
+							<button class="btn btn_xs btn_orange" v-if="!chat.assigning" @click="assignChat(chat, index)">{{tr('chat_asssign')}}</button>
+						</div>
+					</div>
+
+					<p class="chats_not_found_text" v-if="!chatList.length && !pendingChatList.length">{{chatListErr}}</p>
+
+				</div>
+			</aside>
+
+			<main class="chat_main" :class="isOwner ? '' : 'chat_fullwidth'">
+				<div class="chat_content_header flex">
+					<router-link :to="'/'+routes.event+'/'+eventObj.id" class="chat_header_item flex" v-if="eventObj">
+						<div class="img_box" v-if="eventBranding && eventBranding.templateCover.url"><img :src="eventBranding.templateCover.url" alt=""></div>
+						<p class="small_text" v-if="eventObj.name">{{eventObj.name}}</p>
+					</router-link>
+					<router-link :to="'/'+routes.stand+'/'+standObj.id" class="chat_header_item flex" v-if="standObj">
+						<div class="img_box" v-if="standBranding && standBranding.templateCover.url"><img :src="standBranding.templateCover.url" alt=""></div>
+						<p class="small_text" v-if="standObj.name">{{standObj.name}}</p>
+					</router-link>
+					<div class="chat_header_item flex" v-if="presenterData">
+						<div class="img_box">
+							<img :src="url64(presenterData.branding[0].url)" v-if="presenterData.branding && presenterData.branding.length" />
+            	<img src="@/img/default_avatar.svg" v-if="!presenterData.branding || !presenterData.branding.length" />
+						</div>
+						<p class="small_text">{{presenterData.name}} {{presenterData.surname}}</p>
+					</div>
+				</div>
+
+				<Messages
+					@new-message="addMessage"
+					@deactivate-chat="deactivateChat"
+					@unassign-chat="unassignChat"
+					@add-meeting="openMeetingModal"
+					@open-personnel="openPersonnelModal"
+					@open-block="blockModalOpen"
+					@open-report="reportModalOpen"
+					:messages="messages"
+					:userData="userData"
+					:preload="preload"
+					:isOwner="isOwner"
+					:active_channel="active_channel"
+					:anotherOwnerMsg="anotherOwnerMsg"
+					:showInitializeMessage="showInitializeMessage" />
+			</main>
+
+		</div>
+	</section>
+
+<!-- FOOTER -->
+	<Footer></Footer>
+
+	<ui-modal ref="meetingModal" class="status_modal form_modal_big preloader_wrapper" removeHeader size="auto">
+		<div class="preloader_overlay preload_overlay_white" v-show="meetingPreload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('chat_new_meeting')}}</p>
+                <div class="modal_form">
+                	<div class="form_input_row">
+	                    <ui-select
+	                        :label="tr('chat_timezone_label')"
+	                        :placeholder="tr('chat_timezone_ph')"
+	                        :options="timeZoneList"
+	                        v-model="timezone"
+							iconPosition="right"
+							disabled
+	                    >
+	                        <img slot="icon" src="../../img/hsb_dropdown.svg" alt="">
+	                    </ui-select>
+	                </div>
+
+                	<div class="form_input_row flex">
+
+		                <div class="form_input_hr">
+		                    <ui-datepicker
+		                        :placeholder="tr('select_a_date')"
+		                        iconPosition="right"
+		                        v-model="date.dateStart"
+		                        :lang="datepicker_lang"
+		                        :minDate="new Date()"
+		                    >
+		                        <img slot="icon" src="../../img/calendar.svg" alt="">
+		                        {{tr('chat_session_start')}}
+		                    </ui-datepicker>
+		                </div>
+
+		                 <div class="form_input_hr">
+		                    <ui-select
+		                        :label="tr('chat_start_time')"
+		                        :placeholder="tr('chat_time_ph')"
+		                        :options="timeList"
+		                        v-model="date.timeStart"
+		                        iconPosition="right"
+		                    >
+		                        <img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+		                    </ui-select>
+		                </div>
+
+		            </div>
+
+		            <div class="form_input_row">
+	                    <ui-select
+	                        :label="tr('chat_duration_label')"
+	                        :placeholder="tr('chat_duration_ph')"
+	                        :options="durationList"
+	                        v-model="duration"
+	                        iconPosition="right"
+	                    >
+	                        <img slot="icon" src="../../img/hsb_dropdown.svg" alt="">
+	                    </ui-select>
+	                </div>
+
+		            <div class="form_input_row flex">
+
+		                <div class="form_input_hr">
+		                    <ui-select
+		                        :label="tr('chat_zoom_or_twitch_label')"
+		                        :options="meetingTypeList"
+		                        v-model="meetingType"
+		                        iconPosition="right"
+		                    >
+		                        <img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+		                    </ui-select>
+		                </div>
+
+		            </div>
+
+		            <div class="form_input_row flex" v-if="meetingType.value == 'zoom'">
+		                <div class="form_input_hr">
+		                    <ui-textbox
+		                        :label="tr('chat_meeting_id_label')"
+		                        :placeholder="tr('chat_meeting_id_ph')"
+		                        v-model="zoomMeeting"
+		                        type="number"
+		                        @input="setZoomLink(false)"
+		                        :invalid="!!+zoomMeeting && zoomMeeting.length && (!!(zoomMeeting % 1) || zoomMeeting.indexOf('.') != -1 || zoomMeeting.length > 15)"
+		                    >
+		                    </ui-textbox>
+		                </div>
+		                <div class="form_input_hr">
+		                    <ui-textbox
+		                        :label="tr('chat_meeting_pwd_label')"
+		                        :placeholder="tr('chat_meeting_pwd_ph')"
+		                        v-model="zoomPassword"
+		                        @input="setZoomLink(false)"
+		                        :invalid="zoomPassword.length > 21"
+		                    >
+		                    </ui-textbox>
+		                </div>
+		            </div>
+
+					<div class="form_input_row flex">
+
+		                <div class="form_input_hr">
+		                    <ui-select
+		                        :label="tr('chat_agenda_presenter_label')"
+		                        :options="formUserList"
+		                        v-model="presenter"
+		                        iconPosition="right"
+		                    >
+		                        <img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+		                    </ui-select>
+		                </div>
+
+		            </div>
+
+		            <div class="flex form_checkbox_row form_checkbox_m_row" v-if="meetingType.value == 'webinar'">
+		                <ui-checkbox v-model="enableChat" color="accent" disabled>{{tr('chat_agenda_enable_chat')}}</ui-checkbox>
+		            </div>
+
+                </div>
+                <div class="form_input_row">
+                    <ui-textbox
+                        :label="tr('chat_note_label')"
+                        :placeholder="tr('chat_note_ph')"
+                        v-model="note"
+                        :maxlength="120"
+                        :multi-line="true"
+                    >
+                    </ui-textbox>
+                </div>
+
+                <div class="button_box"><button class="btn" :class="{disabled: !checkFields}" @click="addMeeting">{{tr('chat_add_meeting')}}</button></div>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="meetingModalClose"><img src="../../img/close_medium.svg" alt=""></span>
+  </ui-modal>
+
+  <ui-modal ref="personnelModal" class="status_modal personnel_modal preloader_wrapper" removeHeader size="auto" @close="personnelModalClose()">
+		<div class="preloader_overlay preload_overlay_white" v-show="meetingPreload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+    <div class="status_modal_wrapper">
+      <div class="content" v-if="modalPersonnelFirstStep">
+        <p class="text-huge">{{tr('chat_assign_personnel_title')}}</p>
+				<div class="search-wrapper">
+					<input type="text" class="search-personnel" :placeholder="tr('chat_search_personnel')" v-model="personnelSearch" />
+					<img src="./img/searchNew.svg" />
+				</div>
+        <div class="user_list assign_personnel_modal_list">
+	        <div class="user_list_item flex" v-for="item, index in filteredUserList" @click="selectPersonnel(item)">
+            <div class="left flex">
+              <div class="image_box">
+                <img :src="item.userBranding.logo.url" alt="" v-if="item.userBranding && item.userBranding.logo.url">
+                <img src="@/img/default_avatar.svg" alt="" v-if="!item.userBranding || !item.userBranding.logo.url">
+              </div>
+              <div class="text flex">
+                <p class="name text-small text-bold mb-4">{{item.name}} {{item.surname}}</p>
+                <p class="role">{{getRoleById(item.role)}}</p>
+              </div>
+            </div>
+	        </div>
+      	</div>
+      </div>
+			<div class="content second-step" v-else>
+				<div class="back color-grey" @click="backOnFirstStep()">
+					<img src="./img/arrowLeft.svg" /> <span>{{tr('back')}}</span>
+				</div>
+				<div class="mb-28 mt-24">
+					{{tr('chat_assigning_first')}}
+					{{selectedPersonnel.name}} {{selectedPersonnel.surname}} {{tr('chat_assigning_second')}}
+				</div>
+				<textarea :placeholder="tr('chat_person_info')" v-model="personInfo"></textarea>
+				<div class="assign-button mt-20">
+					<button class="btn btn_orange" @click="assignPersonnel()">{{tr('chat_asssign')}}</button>
+				</div>
+			</div>
+    </div>
+
+    <span class="status_modal_close" @click="personnelModalClose"><img src="../../img/close_medium.svg" alt=""></span>
+	</ui-modal>
+
+	<ui-modal ref="successModal" class="staff_success_modal status_modal" removeHeader size="auto">
+    <div class="status_modal_wrapper">
+      <div class="content">
+        <p class="modal_title">{{tr('chat_meeting_congrats')}}</p>
+        <p class="modal_text">{{congratulationsText}}</p>
+        <div class="image_box"><img src="@/img/illustration_done.svg" alt=""></div>
+        <button class="btn btn_orange" @click="successModalClose">{{tr('chat_meeting_continue')}}</button>
+      </div>
+    </div>
+  </ui-modal>
+
+  <ui-modal ref="errorModal" class="status_modal" removeHeader size="auto">
+    <div class="status_modal_wrapper">
+      <div class="content">
+        <p class="modal_title">{{tr('chat_meeting_error')}}</p>
+        <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+      </div>
+    </div>
+
+    <span class="status_modal_close" @click="errorModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+  </ui-modal>
+
+	<ui-modal ref="blockModal" class="status_modal" removeHeader size="auto">
+    <div class="status_modal_wrapper">
+      <div class="content">
+        <p class="text-huge">{{tr('chat_block_contact')}}</p>
+				<div class="mb-32 mt-24">{{tr('chat_block_info')}}</div>
+				<div class="footer-buttons">
+					<button class="btn btn_inner_orange" @click="blockModalClose">{{tr('cancel')}}</button>
+					<button class="btn btn_orange">{{tr('chat_block_contact')}}</button>
+				</div>
+      </div>
+    </div>
+
+    <span class="status_modal_close" @click="blockModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+  </ui-modal>
+
+	<ui-modal ref="reportModal" class="status_modal" removeHeader size="auto">
+		<div class="status_modal_wrapper">
+			<div class="content">
+        <p class="text-huge">{{tr('chat_report_contact')}}</p>
+				<div class="mb-24 mt-24">{{tr('chat_report_info')}}</div>
+				<div class="form_input_row flex">
+					<div class="form_input_hr">
+						<ui-select
+								:label="tr('chat_agenda_presenter_label')"
+								:options="formUserList"
+								v-model="presenter"
+								iconPosition="right"
+						>
+								<img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+						</ui-select>
+					</div>
+				</div>
+				<div class="footer-buttons">
+					<button class="btn btn_inner_orange" @click="reportModalClose">{{tr('cancel')}}</button>
+					<button class="btn btn_orange">{{tr('chat_report_contact')}}</button>
+				</div>
+			</div>
+		</div>
+
+		<span class="status_modal_close" @click="reportModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+	</ui-modal>
+
+</div>

@@ -1,0 +1,145 @@
+<div class="page_add_event preloader_wrapper" id="edit_event_page" v-if="localesLoaded" :key="this.$store.getters.getEventDataKey">
+
+    <div class="preloader_overlay" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+    <ui-modal ref="statusModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper" v-if="status_modal_step == 1">
+            <div class="content">
+                <p class="modal_title">{{tr('adev_statusmodal_title')}}</p>
+                <p class="modal_text" v-html="tr('adev_statusmodal_text')"></p>
+                <div class="flex form_checkbox_row ">
+                    <ui-checkbox v-model="status_policy" color="accent">
+                        <span class="small_text" v-html="tr('adev_statusmodal_policy')"></span>
+                    </ui-checkbox>
+                </div>
+                <div class="button_box flex">
+                    <button @click="publishClick" class="btn btn_orange" v-if="status_policy">{{tr('adev_statusmodal_publish_text')}}</button>
+                    <button class="btn btn_orange disabled" disabled v-if="!status_policy">{{tr('adev_statusmodal_publish_text')}}</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="status_modal_wrapper flex congrats" v-if="status_modal_step == 2">
+            <img class="congrats_img" src="./img/illustration_done.svg" alt="">
+            <p class="modal_title">{{tr('adev_statusmodal_success_title')}}</p>
+            <p class="modal_text">{{tr('adev_moderation_success_message')}}</p>
+            <div class="button_box">
+                <router-link :to="'/'+routes.event+'/'+eventObj.customName" class="btn btn_orange">{{tr('adev_statusmodal_success_button')}}</router-link>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="statusModalClose"><img src="./img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="leavePageModal" class="status_modal leave_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_text big_text">{{tr('adev_leave_page_msg')}}</p>
+                <div class="button_box flex">
+                    <button class="btn btn_orange" @click="leavePageAction">{{tr('yes')}}</button>
+                    <button class="btn btn_owhite" @click="leavePageModalClose">{{tr('no')}}</button>
+                </div>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="leavePageModalClose"><img src="./img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+
+    <header class="add_event_header">
+        <div class="container flex">
+
+            <a @click="backClick" :to="'/'+routes.myevents" class="back_link flex"><img src="./img/arrow_bold_left.svg" alt="">{{tr('back')}}</a>
+
+            <div class="button_box">
+                <span>
+                  <a
+                    v-if="!disable_preview && userCan('event-edit')"
+                    class="btn btn_white"
+                    :href="'/'+routes.event+'/'+eventObj.customName+'?guestPreview=1'"
+                    :class="disable_preview ? 'disabled' : ''"
+                    target="_blank">{{tr('adev_preview_event_like_guest')}}
+                  </a>
+                  <ui-tooltip>{{ tr('adev_guestpreview_tooltip') }}</ui-tooltip>
+                </span>
+                <span>
+                  <button class="btn btn_white disabled" v-if="disable_preview && userCan('event-edit')" disabled>{{tr('adev_preview_event_like_guest')}}</button>
+                  <ui-tooltip>{{ tr('adev_preview_disabled_tooltip') }}</ui-tooltip>
+                </span>
+
+                <span class="margin-left">
+                  <a
+                    v-if="!disable_preview && userCan('event-edit')"
+                    :href="'/'+routes.event+'/'+eventObj.customName+'?preview=1'"
+                    class="btn btn_white" :class="disable_preview ? 'disabled' : ''"
+                    target="_blank">{{tr('adev_visitor_preview')}}
+                  </a>
+                  <ui-tooltip>{{ tr('adev_visitorpreview_tooltip') }}</ui-tooltip>
+                </span>
+                <span>
+                  <button class="btn btn_white disabled" v-if="disable_preview && userCan('event-edit')" disabled>
+                    {{tr('adev_preview_event')}}
+                  </button>
+                  <ui-tooltip>{{ tr('adev_preview_disabled_tooltip') }}</ui-tooltip>
+                </span>
+                <button v-if="userCan('event-edit')" class="btn btn_owhite" @click="statusToggleChange">
+                    {{eventObj.status == 'draft' ? tr('publish') : tr('unpublish')}}
+                </button>
+
+                <button v-if="userCan('event-edit')" class="btn btn_orange" :class="{disabled: dateLeft == 'Past'}"
+                        @click="saveEventClick(false)">{{tr('adev_save_event')}}
+                    <div class="changed_event_hinter">
+                        <img src="./img/add-icon-plus.png" alt="" height="16px" width="24px" v-if="countAdded > 0">
+                        <span class="mr_3" v-if="countAdded > 0">{{countAdded}}</span>
+
+                        <img src="./img/edit-icon.png" alt="" height="16px" width="24px" v-if="countEdited > 0">
+                        <span class="mr_3" v-if="countEdited > 0">{{countEdited}}</span>
+
+                        <img src="./img/trash-icon.png" alt="" height="16px" width="24px" v-if="countDeleted > 0">
+                        <span class="mr_3" v-if="countDeleted > 0">{{ countDeleted }}</span>
+                    </div>
+
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <SetupEvent
+        v-if="userAccessToEditPage && catsLoaded"
+        :selectedMenu="selectedMenu"
+        :eventObj="eventObj"
+        :evtDownloadables="evtDownloadables"
+        :categoriesList="categoriesList"
+        :timeZoneList="timeZoneList"
+        :eventBranding="eventBranding"
+        :dayList="evtDayList"
+        :langList="langList"
+        :agenda="agenda"
+        :customFields="customFields"
+        :tickets="tickets"
+        :imagePlaceholders="imagePlaceholders"
+        @custom-name-change="checkCustomName"
+        @show_error_message="showErrorMessage"
+        @collections-updated="collectionsUpdated"
+        @products-updated="productsUpdated"
+        :customNameAvaliable="customNameAvaliable"
+        :articleData="articleData"
+    >
+    </SetupEvent>
+
+    <div class="personnel_empty flex noimage" v-if="eventObj && eventObj.id && !userAccessToEditPage && !preload">
+        <p class="big_text">{{tr('adev_you_have_not_access')}}</p>
+    </div>
+
+    <ui-modal ref="messageModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('validation_error')}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose()"><img src="./img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+</div>

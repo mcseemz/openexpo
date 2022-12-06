@@ -1,0 +1,328 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+Conditions:
+  CreateProdResources: !Equals
+    - !Ref 'Environment'
+    - prod
+  CreateDevResources: !Equals
+    - !Ref 'Environment'
+    - dev
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:DescribeTable
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:GetItem
+                Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/texorigins'
+              - Effect: Allow
+                Action:
+                  - lambda:GetLayerVersion
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  lambdaPostConfirmation:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'cognitoPostConfirmation-${Environment}'
+      Handler: PostConfirmation.handler
+      Code: ../lambdas/Cognito
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !GetAtt 'LambdaExecutionRole.Arn'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCustomMessage:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'customMessage-${Environment}'
+      Handler: CustomMessage.handler
+      Code: ../lambdas/Cognito
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !GetAtt 'LambdaExecutionRole.Arn'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaAuthChallengeDefine:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'authChallengeDefine-${Environment}'
+      Handler: AuthChallengeDefine.handler
+      Code: ../lambdas/Cognito
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !GetAtt 'LambdaExecutionRole.Arn'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaAuthChallengeCreate:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'authChallengeCreate-${Environment}'
+      Handler: AuthChallengeCreate.handler
+      Code: ../lambdas/Cognito
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role:
+        Fn::ImportValue:
+          Fn::Sub: ses-lambda-role-arn-${Environment}
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaAuthChallengeVerify:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'authChallengeVerify-${Environment}'
+      Handler: AuthChallengeVerify.handler
+      Code: ../lambdas/Cognito
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !GetAtt 'LambdaExecutionRole.Arn'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+
+  CognitoUP:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      EmailConfiguration:
+        EmailSendingAccount: COGNITO_DEFAULT
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      UserPoolAddOns:
+        AdvancedSecurityMode: AUDIT
+      UsernameConfiguration:
+        CaseSensitive: false
+      UserPoolName: !Sub 'tex-user-pool-${Environment}'
+      UserPoolTags: {}
+      VerificationMessageTemplate:
+        DefaultEmailOption: CONFIRM_WITH_CODE
+        EmailMessage: Your verification code is {####}.
+        EmailSubject: Your verification code
+      LambdaConfig:
+        PostConfirmation: !GetAtt 'lambdaPostConfirmation.Arn'
+        CustomMessage: !GetAtt 'lambdaCustomMessage.Arn'
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+          RequireUppercase: true
+      Schema:
+        - AttributeDataType: String
+          Mutable: true
+          Name: 'invitationId'
+          Required: false
+          StringAttributeConstraints:
+            MaxLength: 200
+            MinLength: 1
+        - AttributeDataType: String
+          Mutable: true
+          Name: 'invitationType'
+          Required: false
+          StringAttributeConstraints:
+            MaxLength: 200
+            MinLength: 1
+
+  UserPoolPostConfirmationLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: cognito-idp.amazonaws.com
+      FunctionName: !Ref 'lambdaPostConfirmation'
+      SourceArn: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
+  UserPoolCustomMessageLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: cognito-idp.amazonaws.com
+      FunctionName: !Ref 'lambdaCustomMessage'
+      SourceArn: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
+  UserPoolResource:
+    Type: AWS::Cognito::UserPoolResourceServer
+    Properties:
+      Identifier: tex-api
+      Name: tex-api
+      Scopes:
+        - ScopeName: get
+          ScopeDescription: get operations
+        - ScopeName: create
+          ScopeDescription: create entity operations
+        - ScopeName: delete
+          ScopeDescription: delete entity operations
+        - ScopeName: report
+          ScopeDescription: reports operations
+        - ScopeName: lowlevel
+          ScopeDescription: lowlevel operations
+        - ScopeName: admin
+          ScopeDescription: platform level operations
+      UserPoolId: !Ref 'CognitoUP'
+  UserPoolClientLowlevel:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AllowedOAuthFlows:
+        - client_credentials
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - tex-api/lowlevel
+      ClientName: tex-app-lowlevel
+      GenerateSecret: true
+      UserPoolId: !Ref 'CognitoUP'
+    DependsOn: UserPoolResource
+  UserPoolClientRegular:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AllowedOAuthFlows:
+        - client_credentials
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - tex-api/get
+        - tex-api/create
+        - tex-api/delete
+      ClientName: tex-app-regular
+      GenerateSecret: true
+      UserPoolId: !Ref 'CognitoUP'
+    DependsOn: UserPoolResource
+
+  UserPoolClientFrontend:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AllowedOAuthFlows: ['code', 'implicit']
+      AllowedOAuthFlowsUserPoolClient: yes
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+        - tex-api/get
+        - tex-api/create
+        - tex-api/delete
+      CallbackURLs:
+        - 'https://enter_your.domain/callback'
+        - 'https://dev.enter_your.domain/callback'
+      LogoutURLs:
+        - 'https://enter_your.domain'
+        - 'https://dev.enter_your.domain'
+      ClientName: tex-app-frontend
+      GenerateSecret: false
+      UserPoolId: !Ref 'CognitoUP'
+    DependsOn: UserPoolResource
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub 'tex-api-${Environment}'
+      UserPoolId: !Ref 'CognitoUP'
+Outputs:
+  CognitoUserPool:
+    Description: UserPool for API Gateway validation
+    Value: !GetAtt 'CognitoUP.Arn'
+    Export:
+      Name: !Sub 'CognitoUserPoolArn-${Environment}'
+  CognitoUserPoolId:
+    Description: UserPool for API Gateway validation
+    Value: !Ref 'CognitoUP'
+    Export:
+      Name: !Sub 'CognitoUserPoolId-${Environment}'
+  CognitoDomain:
+    Description: Domain for Cognito OAuth flow
+    Value: !Ref 'UserPoolDomain'
+    Export:
+      Name: !Sub 'UserPoolDomain-${Environment}'
+  ClientLowlevel:
+    Description: Client authorized for lowlevel operations
+    Value: !Ref 'UserPoolClientLowlevel'
+    Export:
+      Name: !Sub 'ClientLowlevel-${Environment}'
+  ClientRegular:
+    Description: Client authorized for regular operations
+    Value: !Ref 'UserPoolClientRegular'
+    Export:
+      Name: !Sub 'ClientRegular-${Environment}'
+  ClientFrontend:
+    Description: Client authorized for user-password login
+    Value: !Ref 'UserPoolClientFrontend'
+    Export:
+      Name: !Sub 'ClientFrontend-${Environment}'
+  LambdaPostConfirmation:
+    Description: Lambda for moving uers to db after confirmation
+    Value: !GetAtt 'lambdaPostConfirmation.Arn'
+    Export:
+      Name: !Sub 'LambdaPostConfirmation-${Environment}'
+  LambdaCustomMessage:
+    Description: Lambda for sending an email for custom messages (such as user to confirm the registration or reset the password)
+    Value: !GetAtt 'lambdaCustomMessage.Arn'
+    Export:
+      Name: !Sub 'LambdaCustomMessage-${Environment}'

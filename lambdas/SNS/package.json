@@ -1,0 +1,61 @@
+{
+  "name": "tex-api-lambdas",
+  "private": true,
+  "version": "6.13.20",
+  "description": "Lambdas related to Postgres calls.",
+  "repository": {
+    "type": "git",
+    "serverType": "stash",
+    "url": "https://tbd.com"
+  },
+  "author": {
+    "name": "mcseemz+github@gmail.com"
+  },
+  "bugs": {
+    "type": "jira",
+    "url": "https://tbd.com",
+    "project": "Openexpo",
+    "component": "sns-lambdas"
+  },
+  "engines": {
+    "node": ">= 4.2.3",
+    "npm": ">= 2.14"
+  },
+  "scripts": {
+    "quick": "npm run compile:server && npm run debug",
+    "build:windows": "npm run clean:windows && npm run build:scripts-windows && npm run compile && npm run build:lang",
+    "build": "npm run clean && npm run build:scripts && npm run compile && npm run build:lang",
+    "build:lang": "buildMessagesForLocales",
+    "build:scripts-windows": "copy src/libs/ dist",
+    "build:scripts": "cp -r src/libs/ dist",
+    "build:mapper": "npm run build && buildIntlMapperForLocales",
+    "clean:windows": "RMDIR /S /Q dist",
+    "clean": "rm -rf ./dist/*",
+    "compile": "npm run compile:client && npm run compile:server",
+    "compile:client": "webpack --progress --display-error-details",
+    "compile:server": "babel --ignore 'specs/*' -D -d bin/ src/",
+    "cover": "nyc mocha --opts ./mocha.opts \"src/**/specs/*-test.js\"",
+    "debug": "node --inspect bin/server.js",
+    "debug:break": "node --inspect --debug-brk bin/server.js",
+    "deploy": "npm run build; npm run start",
+    "integration-test": "npm run test:integration",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "powerwash": "rm -rf ./node_modules ./node_cache ; npm install ; npm run build",
+    "production": "NODE_ENV=production npm run build && NODE_ENV=production node bin/server.js",
+    "start": "node bin/server.js",
+    "test": "jenkins-mocha --opts ./mocha.opts \"src/**/specs/*-test.js\" --exit",
+    "test:watch": "mocha -w --compilers js:babel-core/register,css:./fixtures/cssNullCompiler -R min",
+    "test:integration": "mocha --compilers js:babel/register 'integrationTest.js'",
+    "watch": "npm run watch:src | npm run watch:server",
+    "watch:src": "webpack --watch --progress",
+    "watch:server": "babel-watch --watch src src/server.js"
+  },
+  "publishConfig": {
+    "registry": "https://tbd.com"
+  },
+  "dependencies": {
+    "mime-types": "2.1.27",
+    "slugify": "1.4.5"
+  }
+}

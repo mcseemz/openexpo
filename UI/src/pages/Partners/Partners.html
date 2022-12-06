@@ -1,0 +1,130 @@
+<div class="page_wrapper static_nik_page" v-if="localesLoaded">
+    <div class="page-hero_wrapper">
+        <div class="page-hero content-wrapper">
+            <div class="breadcrumbs">
+                <ul class="breadcrumbs_list">
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('home')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <span class="breadcrumbs_link breadcrumbs_link--gray breadcrumbs_link--active">{{tr('affiliate_program')}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-main_wrapper content-wrapper">
+      <div class="section first">
+        <div class="info">
+          <div class="hero_subtitle hero_subtitle--gray">{{tr('affiliate_program')}}</div>
+          <div class="hero_title hero_title--gray" v-html="tr('become_our_partner_today')"></div>
+          <div class="hero_subtitle hero_subtitle--gray" v-html="tr('affiliate_program_take_advantage')"></div>
+          <div class="hero_text hero_text--gray">{{tr('affiliate_program_when_you_send')}}</div>
+        </div>
+      </div>
+
+      <div class="section revenue-share">
+        <div class="info">
+          <div class="title-normal hero_title--gray" v-html="tr('affiliate_program_share')"></div>
+          <div class="hero_text hero_text--gray">{{tr('affiliate_program_share_text_top')}}</div>
+          <div class="hero_text hero_text--gray">{{tr('affiliate_program_share_text_bot')}}</div>
+        </div>
+      </div>
+
+      <div class="section fair-rewards">
+        <div class="info">
+          <div class="title-normal hero_title--gray" v-html="tr('fair_rewards')"></div>
+          <div class="rewards-table">
+            <div class="table-row orange">
+              <div class="left">{{tr('net_revenue')}}</div>
+              <div class="right">{{tr('rev_share_comission')}}</div>
+            </div>
+            <div class="table-row">
+              <div class="left">0.5k</div>
+              <div class="right">15%</div>
+            </div>
+            <div class="table-row">
+              <div class="left">5k - 15k</div>
+              <div class="right">20%</div>
+            </div>
+            <div class="table-row">
+              <div class="left">15k +</div>
+              <div class="right">25%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section how-it-works">
+        <div class="title-bold">{{tr('affiliate_program_how_it_works')}}</div>
+        <div class="steps-wrapper">
+          <div class="step-card flex-item">
+            <div class="title">{{tr('affiliate_program_get_to_know')}}</div>
+            <div class="text">{{tr('affiliate_program_we_give_you')}}</div>
+            <div class="circle">1</div>
+          </div>
+          <div class="flex-item line"><div class="inside-line"></div></div>
+          <div class="step-card flex-item">
+            <div class="title">{{tr('affiliate_program_join_us')}}</div>
+            <div class="text">{{tr('affiliate_program_fill_the_form')}}</div>
+            <div class="circle">2</div>
+          </div>
+          <div class="step-card flex-item last">
+            <div class="title">{{tr('affiliate_program_earn_with_us')}}</div>
+            <div class="text">{{tr('affiliate_program_team_game')}}</div>
+            <div class="circle negative">3</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form-wrapper">
+        <div class="contact-form">
+          <div class="title">{{tr('rd_modal_contact_us')}}</div>
+          <div class="text" v-html="tr('affiliate_program_start_earning')"></div>
+          <div class="register_form">
+            <div class="reg_form_row">
+        			<ui-textbox
+                  :label="tr('name')"
+                  :placeholder="tr('affiliate_program_name_placeholder')"
+                  :invalid="formSent && !!errors.name"
+                  :error="errors.name"
+                  type="text"
+                  v-model="form.name"
+                  @keydown-enter="contact"
+                  @focus="clearError('name')"
+              >
+              </ui-textbox>
+        		</div>
+            <div class="reg_form_row">
+        			<ui-textbox
+                  :label="tr('email')"
+                  :placeholder="tr('auth_email_placeholder2')"
+                  :invalid="formSent && !!errors.email"
+                  :error="errors.email"
+                  type="text"
+                  v-model="form.email"
+                  @keydown-enter="contact"
+                  @focus="clearError('email')"
+              >
+              </ui-textbox>
+        		</div>
+            <div class="button-row">
+              <button class="btn btn_orange" @click="contact">{{tr('rd_modal_contact_us')}}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ui-modal ref="messageModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{modalTitle}}</p>
+                <p class="modal_text">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

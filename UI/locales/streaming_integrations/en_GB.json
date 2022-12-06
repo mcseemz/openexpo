@@ -1,0 +1,15 @@
+{
+  "page_streaming_integrations_title": "Streaming integrations",
+  "streaming_integrations_subtitle": "Streaming integrations",
+  "streaming_integrations_title": "Streaming integrations at Openexpo!",
+  "streaming_integrations_text": "At times it is benefitial to use a third party video provider like Zoom or Twitch. We have heard our customers and made this possible! ",
+  "display_video_title": "Display a <span class=\"orange\">Vimeo or Youtube demo video</span> on the event's registration page!",
+  "display_video_text": "To add interaction for potential leads, one of the best choices would be to present them with a demonstrational video.",
+  "display_video_tab1": "Add a video preview before buying a ticket!",
+  "display_video_tab2": "Supports vimeo and youtube!",
+  "display_video_tab3": "Go anywhere on the event and keep the demo running.",
+  "use_zoom_twitch_title": "Use <span class=\"orange\">Zoom or Twitch</span> for your agenda",
+  "use_zoom_twitch_text": "In some cases if event organiser wants to stream the video through zoom or twitch, this is possible to do. Just choose the correct source and voila!",
+  "zoom_one_on_one": "Connect with stand's staff members with <span class=\"orange\">Zoom 1 on 1 calls</span>!",
+  "zoom_one_on_one_text": "Certain times customers requested having a one on one meetings at the stands with Zoom integration. We have made this possible and now anyone could hook up Zoom to their stand."
+}

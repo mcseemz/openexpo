@@ -1,0 +1,618 @@
+openapi: 3.0.3
+info:
+  title: internal API
+  description: internal API
+  version: 1.0.0
+servers:
+  - url: 'https'
+
+tags:
+  - name: wcs
+    description: Web Call Server webhooks
+    externalDocs:
+      description: API
+      url: 'https://docs.flashphoner.com/pages/viewpage.action?pageId=9241782'
+
+paths:
+  /wcs/hook/connect:
+    post:
+      tags:
+        - wcs
+      summary: search for a string in event name
+      description: ''
+      operationId: connect
+      requestBody:
+        required: true
+        description: Event parameters object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Connect'
+      x-amazon-apigateway-integration:
+        credentials:
+          'Fn::Sub': '${ApiGatewayInternalAccessRole.Arn}'
+        requestTemplates:
+          application/json: >
+            {
+                "event": $input.json('$'),
+                "origin": "$util.escapeJavaScript($input.params().header.get('origin'))",
+                "context": {
+                    "sub": "$context.authorizer.claims.sub",
+                    "username": "$context.authorizer.claims['cognito:username']",
+                    "email": "$context.authorizer.claims.email",
+                    "userId": "$context.authorizer.claims['custom:userId']"
+                }
+            }
+        uri:
+          'Fn::Sub': 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaWCSConnect.Arn}/invocations'
+        responses:
+          '.*\[InternalServerError\].*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: $input.json('$')
+          '.*\[Forbidden\].*':
+            statusCode: '403'
+            responseTemplates:
+              application/json: >
+                #set ($errorMessageObj = $util.parseJson($input.path('$.errorMessage')))
+                {
+                 "status":403,
+                 "reason": "$errorMessageObj.errorMessage"
+                }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: >
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.body
+        httpMethod: POST
+        type: aws
+      responses:
+        '200':
+          description: Auth successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connect'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /wcs/hook/publishStream:
+    post:
+      tags:
+        - wcs
+      summary: publishStream webhook
+      description: ''
+      operationId: publishStream
+      requestBody:
+        required: true
+        description: Event parameters object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StreamStatusEvent'
+      x-amazon-apigateway-integration:
+        credentials:
+          'Fn::Sub': '${ApiGatewayInternalAccessRole.Arn}'
+        requestTemplates:
+          application/json: >
+            {
+                "event": $input.json('$'),
+                "origin": "$util.escapeJavaScript($input.params().header.get('origin'))",
+                "context": {
+                    "sub": "$context.authorizer.claims.sub",
+                    "username": "$context.authorizer.claims['cognito:username']",
+                    "email": "$context.authorizer.claims.email",
+                    "userId": "$context.authorizer.claims['custom:userId']"
+                }
+            }
+        uri:
+          'Fn::Sub': 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaWCSPublish.Arn}/invocations'
+        responses:
+          '.*\[InternalServerError\].*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: $input.json('$')
+          '.*\[Forbidden\].*':
+            statusCode: '403'
+            responseTemplates:
+              application/json: >
+                { errorMessage: "$input.path('$.errorMessage')" }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: >
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.body
+        httpMethod: POST
+        type: aws
+      responses:
+        '200':
+          description: Auth successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamStatusEvent'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /wcs/hook/unPublishStream:
+    post:
+      tags:
+        - wcs
+      summary: unPublishStream webhook
+      description: ''
+      operationId: unpublishStream
+      requestBody:
+        required: true
+        description: Event parameters object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StreamStatusEvent'
+      x-amazon-apigateway-integration:
+        credentials:
+          'Fn::Sub': '${ApiGatewayInternalAccessRole.Arn}'
+        requestTemplates:
+          application/json: >
+            {
+                "event": $input.json('$'),
+                "origin": "$util.escapeJavaScript($input.params().header.get('origin'))",
+                "context": {
+                    "sub": "$context.authorizer.claims.sub",
+                    "username": "$context.authorizer.claims['cognito:username']",
+                    "email": "$context.authorizer.claims.email",
+                    "userId": "$context.authorizer.claims['custom:userId']"
+                }
+            }
+        uri:
+          'Fn::Sub': 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaWCSUnpublish.Arn}/invocations'
+        responses:
+          '.*\[InternalServerError\].*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: $input.json('$')
+          '.*\[Forbidden\].*':
+            statusCode: '403'
+            responseTemplates:
+              application/json: >
+                { errorMessage: "$input.path('$.errorMessage')" }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: >
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.body
+        httpMethod: POST
+        type: aws
+      responses:
+        '200':
+          description: Auth successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamStatusEvent'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /wcs/hook/StreamStatusEvent:
+    post:
+      tags:
+        - wcs
+      summary: StreamStatusEvent webhook
+      description: ''
+      operationId: StreamStatusEvent
+      requestBody:
+        required: true
+        description: Event parameters object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StreamStatusEvent'
+      x-amazon-apigateway-integration:
+        credentials:
+          'Fn::Sub': '${ApiGatewayInternalAccessRole.Arn}'
+        requestTemplates:
+          application/json: >
+            {
+                "event": $input.json('$'),
+                "origin": "$util.escapeJavaScript($input.params().header.get('origin'))",
+                "context": {
+                    "sub": "$context.authorizer.claims.sub",
+                    "username": "$context.authorizer.claims['cognito:username']",
+                    "email": "$context.authorizer.claims.email",
+                    "userId": "$context.authorizer.claims['custom:userId']"
+                }
+            }
+        uri:
+          'Fn::Sub': 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaWCSStreamStatusEvent.Arn}/invocations'
+        responses:
+          '.*\[InternalServerError\].*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: $input.json('$')
+          '.*\[Forbidden\].*':
+            statusCode: '403'
+            responseTemplates:
+              application/json: >
+                { errorMessage: "$input.path('$.errorMessage')" }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: >
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.body
+        httpMethod: POST
+        type: aws
+      responses:
+        '200':
+          description: Auth successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamStatusEvent'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /wcs/hook/StreamKeepAliveEvent:
+    post:
+      tags:
+        - wcs
+      summary: StreamKeepAliveEvent webhook
+      description: ''
+      operationId: StreamKeepAliveEvent
+      requestBody:
+        required: true
+        description: Event parameters object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StreamStatusEvent'
+      x-amazon-apigateway-integration:
+        credentials:
+          'Fn::Sub': '${ApiGatewayInternalAccessRole.Arn}'
+        requestTemplates:
+          application/json: >
+            {
+                "event": $input.json('$'),
+                "origin": "$util.escapeJavaScript($input.params().header.get('origin'))",
+                "context": {
+                    "sub": "$context.authorizer.claims.sub",
+                    "username": "$context.authorizer.claims['cognito:username']",
+                    "email": "$context.authorizer.claims.email",
+                    "userId": "$context.authorizer.claims['custom:userId']"
+                }
+            }
+        uri:
+          'Fn::Sub': 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaWCSStreamKeepAlive.Arn}/invocations'
+        responses:
+          '.*\[InternalServerError\].*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: $input.json('$')
+          '.*\[Forbidden\].*':
+            statusCode: '403'
+            responseTemplates:
+              application/json: >
+                { errorMessage: "$input.path('$.errorMessage')" }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: >
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.body
+        httpMethod: POST
+        type: aws
+      responses:
+        '200':
+          description: Auth successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamStatusEvent'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /wcs/hook/ConnectionStatusEvent:
+    post:
+      tags:
+        - wcs
+      summary: StreamKeepAliveEvent webhook
+      description: ''
+      operationId: StreamKeepAliveEvent
+      requestBody:
+        required: true
+        description: Event parameters object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StreamStatusEvent'
+      x-amazon-apigateway-integration:
+        credentials:
+          'Fn::Sub': '${ApiGatewayInternalAccessRole.Arn}'
+        requestTemplates:
+          application/json: >
+            {
+                "event": $input.json('$'),
+                "origin": "$util.escapeJavaScript($input.params().header.get('origin'))",
+                "context": {
+                    "sub": "$context.authorizer.claims.sub",
+                    "username": "$context.authorizer.claims['cognito:username']",
+                    "email": "$context.authorizer.claims.email",
+                    "userId": "$context.authorizer.claims['custom:userId']"
+                }
+            }
+        uri:
+          'Fn::Sub': 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaWCSConnectionStatusEvent.Arn}/invocations'
+        responses:
+          '.*\[InternalServerError\].*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: $input.json('$')
+          '.*\[Forbidden\].*':
+            statusCode: '403'
+            responseTemplates:
+              application/json: >
+                { errorMessage: "$input.path('$.errorMessage')" }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: >
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.body
+        httpMethod: POST
+        type: aws
+      responses:
+        '200':
+          description: Auth successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamStatusEvent'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /wcs/hook/OnDataEvent:
+    post:
+      tags:
+        - wcs
+      summary: OnDataEvent webhook
+      description: ''
+      operationId: OnDataEvent
+      requestBody:
+        required: true
+        description: Event parameters object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StreamStatusEvent'
+      x-amazon-apigateway-integration:
+        credentials:
+          'Fn::Sub': '${ApiGatewayInternalAccessRole.Arn}'
+        requestTemplates:
+          application/json: >
+            {
+                "event": $input.json('$'),
+                "origin": "$util.escapeJavaScript($input.params().header.get('origin'))",
+                "context": {
+                    "sub": "$context.authorizer.claims.sub",
+                    "username": "$context.authorizer.claims['cognito:username']",
+                    "email": "$context.authorizer.claims.email",
+                    "userId": "$context.authorizer.claims['custom:userId']"
+                }
+            }
+        uri:
+          'Fn::Sub': 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaWCSOnDataEvent.Arn}/invocations'
+        responses:
+          '.*\[InternalServerError\].*':
+            statusCode: '500'
+            responseTemplates:
+              application/json: $input.json('$')
+          '.*\[Forbidden\].*':
+            statusCode: '403'
+            responseTemplates:
+              application/json: >
+                { errorMessage: "$input.path('$.errorMessage')" }
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: >
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.body
+        httpMethod: POST
+        type: aws
+      responses:
+        '200':
+          description: Auth successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamStatusEvent'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+#--------------------------------------------------------------------
+components:
+  securitySchemes:
+    user-pool-cognito:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: cognito_user_pools
+      x-amazon-apigateway-authorizer:
+        type: cognito_user_pools
+        providerARNs:
+          - Fn::ImportValue:
+              Fn::Sub: "CognitoUserPoolArn-${Environment}"
+
+  responses:
+    Success:
+      description: OK
+      headers:
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+
+    Forbidden:
+      description: You are not entitled to update events
+      headers:
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+    InternalServerError:
+      description: You are not entitled to update events
+      headers:
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+  #----------------------------------------------------------
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        type:
+          type: string
+        message:
+          type: string
+
+    Connect:
+      type: object
+      properties:
+        nodeId:
+          type: string
+        appKey:
+          type: string
+        sessionId:
+          type: string
+        useWsTunnel:
+          type: boolean
+        useWsTunnelPacketization2:
+          type: boolean
+        useBase64BinaryEncoding:
+          type: boolean
+        mediaProviders:
+          type: array
+          items:
+            type: string
+            enum:
+              - WebRTC
+              - WSPlayer
+        clientVersion:
+          type: string
+        clientOSVersion:
+          type: string
+        clientBrowserVersion:
+          type: string
+
+    StreamStatusEvent:
+      type: object
+      properties:
+        nodeId:
+          type: string
+        appKey:
+          type: string
+        sessionId:
+          type: string
+        mediaSessionId:
+          type: string
+        name:
+          type: string
+        published:
+          type: boolean
+        hasVideo:
+          type: boolean
+        hasAudio:
+          type: boolean
+        status:
+          type: string
+          enum:
+            - PENDING
+            - ESTABLISHED
+            - FAILED
+            - DISCONNECTED
+        record:
+          type: boolean
+        width:
+          type: integer
+        height:
+          type: integer
+        bitrate:
+          type: integer
+        quality:
+          type: integer
+        mediaProvider:
+          type: string
+          enum:
+            - WebRTC
+            - Flash

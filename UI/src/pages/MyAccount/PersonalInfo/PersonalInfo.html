@@ -1,0 +1,509 @@
+<div class="main">
+
+
+    <div class="main_section ">
+
+        <div class="form_input_row flex avatar_preview_row">
+
+            <div class="image_preview avatar_preview avatar_droparea">
+                <VueUploadComponent
+                    input-id="logoInpt"
+                    ref="company_logo"
+                    v-model="userBranding.logo.new"
+                    drop=".avatar_droparea"
+                    :multiple="false"
+                    @input-file="inputLogoFile"
+                    class="upload_avatar"
+                    :drop-directory="false"
+                    >
+
+                    <div class="avatar_content flex">
+                        <div class="image_box">
+                            <img v-if="!logoUrl" src="../img/default_avatar.svg" alt="" class="default_avatar avatar_image">
+                            <img v-if="logoUrl" :src="logoUrl" alt="" class="avatar_image">
+                        </div>
+                        <p class="avatar_text">{{tr('myacc_update_picture')}}</p>
+                    </div>
+
+                </VueUploadComponent>
+
+            </div>
+            <div class="avatar_remove" v-if="logoUrl" @click="removeLogo">{{tr('myacc_remove_picture')}}</div>
+
+        </div>
+
+        <div class="form_input_row flex">
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_first_name_label')"
+                    :placeholder="tr('myacc_first_name_ph')"
+                    v-model="userObj.name"
+                    @input="forceUpdate"
+                    :maxlength="50"
+                    :invalid="userObj.name && !!userObj.name.length && ( userObj.name.length > 50 ||
+                    /[<>$;.,'\\\/\(\)\{\}]/.test(userObj.name) )"
+                >
+                </ui-textbox>
+            </div>
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_last_name_label')"
+                    :placeholder="tr('myacc_last_name_ph')"
+                    v-model="userObj.surname"
+                    @input="forceUpdate"
+                    :maxlength="50"
+                    :invalid="userObj.surname && !!userObj.surname.length && ( userObj.surname.length > 30 ||
+                    /[<>$;.,'\\\/\(\)\{\}]/.test(userObj.surname) )"
+                >
+                </ui-textbox>
+            </div>
+        </div>
+
+        <div class="form_input_row flex">
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_email_label')"
+                    :placeholder="tr('myacc_email_ph')"
+                    type="email"
+                    :disabled="forbidChanges"
+                    v-model="userObj.email"
+                    @input="forceUpdate"
+                    :invalid="!!userObj.email && !validateEmail(userObj.email)"
+                >
+                </ui-textbox>
+            </div>
+            <div class="form_row_qr_pref">
+                <ui-textbox
+                    :label="tr('myacc_prefix_label')"
+                    :placeholder="tr('myacc_prefix_ph')"
+                    v-model="userObj.addressesObj.prefix"
+                    @input="forceUpdate"
+                    :invalid="!!userObj.addressesObj.prefix && (userObj.addressesObj.prefix.length > 5 || !(/^[\d+]*$/.test(userObj.addressesObj.prefix)) )"
+                >
+                </ui-textbox>
+
+            </div>
+            <div class="form_row_qr_phone">
+                <ui-textbox
+                    :label="tr('myacc_phone_label')"
+                    :placeholder="tr('myacc_phone_ph')"
+                    type="tel"
+                    v-model="userObj.addressesObj.phone"
+                    @input="forceUpdate"
+                    :invalid="!!userObj.addressesObj.phone && ( userObj.addressesObj.phone.length > 20 || !(/^[\d()\-#+\s]*$/.test(userObj.addressesObj.phone)) )"
+                >
+                </ui-textbox>
+            </div>
+        </div>
+
+        <!-- <div class="form_input_row flex">
+            <a href="#" class="change_password flex">
+                <img src="../img/lock_opened.svg" alt="">
+                Change password
+            </a>
+        </div> -->
+
+    </div>
+
+    <div class="main_section">
+
+        <p class="main_section_title big_text">
+            {{tr('myacc_address_title')}}
+        </p>
+
+
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_address1_label')"
+                    type="text"
+                    :placeholder="tr('myacc_address1_ph')"
+                    v-model="userObj.addressesObj.address1"
+                    @input="forceUpdate"
+                    :maxlength="40"
+                    :invalid="userObj.addressesObj.address1 && userObj.addressesObj.address1.length && ( userObj.addressesObj.address1.length > 40 ||
+                    /[<>;$]/.test(userObj.addressesObj.address1) )"
+                >
+                </ui-textbox>
+            </div>
+
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_address2_label')"
+                    type="tel"
+                    :placeholder="tr('myacc_address2_ph')"
+                    v-model="userObj.addressesObj.address2"
+                    @input="forceUpdate"
+                    :maxlength="40"
+                    :invalid="userObj.addressesObj.address2 && userObj.addressesObj.address2.length && ( userObj.addressesObj.address2.length > 40 ||
+                    /[<>;$]/.test(userObj.addressesObj.address2) )"
+                >
+                </ui-textbox>
+            </div>
+
+        </div>
+
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_city_label')"
+                    type="text"
+                    :placeholder="tr('myacc_city_ph')"
+                    v-model="userObj.addressesObj.city"
+                    @input="forceUpdate"
+                    :maxlength="20"
+                    :invalid="userObj.addressesObj.city && userObj.addressesObj.city.length && ( userObj.addressesObj.city.length > 20 ||
+                    /[<>;$()]/.test(userObj.addressesObj.city) )"
+                >
+                </ui-textbox>
+            </div>
+
+            <div class="form_input_qr">
+                <ui-textbox
+                    :label="tr('myacc_state_label')"
+                    type="text"
+                    :placeholder="tr('myacc_state_ph')"
+                    v-model="userObj.addressesObj.state"
+                    @input="forceUpdate"
+                    :maxlength="20"
+                    :invalid="userObj.addressesObj.state && userObj.addressesObj.state.length && ( userObj.addressesObj.state.length > 20 ||
+                    /[<>;$()]/.test(userObj.addressesObj.state) )"
+                >
+                </ui-textbox>
+            </div>
+
+            <div class="form_input_qr">
+                <ui-textbox
+                    :label="tr('myacc_postcode_label')"
+                    type="text"
+                    :placeholder="tr('myacc_postcode_ph')"
+                    v-model="userObj.addressesObj.postcode"
+                    @input="forceUpdate"
+                    :maxlength="10"
+                    :invalid="userObj.addressesObj.postcode && userObj.addressesObj.postcode.length && ( userObj.addressesObj.postcode.length > 10 ||
+                    !(/^[\d]*$/.test(userObj.addressesObj.postcode)) )"
+                >
+                </ui-textbox>
+            </div>
+
+        </div>
+
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr">
+                <ui-select
+                    :label="tr('myacc_country_label')"
+                    :placeholder="tr('myacc_country_ph')"
+                    :options="countryList"
+                    v-model="userObj.selectedCountry"
+                    iconPosition="right"
+                    @input="forceUpdate"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+
+        </div>
+
+        <div class="form_checkbox_row">
+            <ui-checkbox v-model="userObj.addressesObj.use_as_billing" color="accent" @input="forceUpdate">
+                {{tr('myacc_use_billing_label')}}
+            </ui-checkbox>
+        </div>
+
+    </div>
+
+    <div class="main_section contact_info_main_section">
+
+        <p class="main_section_title big_text">
+            {{tr('myacc_contact_social_network')}}
+        </p>
+
+
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_contact_fb_label')"
+                    type="text"
+                    :placeholder="tr('myacc_contact_fb_ph')"
+                    v-model="userObj.addressesObj.facebook"
+                    :invalid="!!(userObj.addressesObj.facebook && userObj.addressesObj.facebook.length && !(/^(https?:\/\/)?((w{3}\.)?)facebook.com\/.*/i.test(userObj.addressesObj.facebook)))"
+                    @input="forceUpdate"
+                >
+                </ui-textbox>
+            </div>
+
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_contact_linkedin_label')"
+                    type="text"
+                    :placeholder="tr('myacc_contact_linkedin_ph')"
+                    v-model="userObj.addressesObj.linkedin"
+                    :invalid="!!(userObj.addressesObj.linkedin && userObj.addressesObj.linkedin.length && !(/^(https?:\/\/)?((w{3}\.)?)linkedin.com\/.*/i.test(userObj.addressesObj.linkedin)))"
+                    @input="forceUpdate"
+                >
+                </ui-textbox>
+            </div>
+
+        </div>
+
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_contact_twitter_label')"
+                    type="text"
+                    :placeholder="tr('myacc_contact_twitter_ph')"
+                    v-model="userObj.addressesObj.twitter"
+                    :invalid="!!(userObj.addressesObj.twitter && userObj.addressesObj.twitter.length && ( !/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g.test(userObj.addressesObj.twitter) && !/^(@)[-a-zA-Z0-9@:%._\+~#=]*/g.test(userObj.addressesObj.twitter) ))"
+                    @input="forceUpdate"
+
+                >
+                </ui-textbox>
+            </div>
+
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_contact_instagram_label')"
+                    type="text"
+                    :placeholder="tr('myacc_contact_instagram_ph')"
+                    v-model="userObj.addressesObj.instagram"
+                    :invalid="!!(userObj.addressesObj.instagram && userObj.addressesObj.instagram.length && !(/^(https?:\/\/)?((w{3}\.)?)instagram.com\/.*/i.test(userObj.addressesObj.instagram)))"
+                    @input="forceUpdate"
+                >
+                </ui-textbox>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="main_section contact_info_main_section">
+
+        <p class="main_section_title big_text">
+            {{tr('myacc_contact_communication_channels')}}
+        </p>
+
+
+        <div class="form_input_row flex">
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_contact_telegram_label')"
+                    type="text"
+                    :placeholder="tr('myacc_contact_telegram_ph')"
+                    v-model="telegramAddress"
+                    :invalid="!!telegramAddress && !isValidTelegramAddress"
+                    @input="()=>{this.userObj.addressesObj.telegram = telegramAddress; forceUpdate()}"
+                />
+            </div>
+            <div class="form_input_hr flex form_input_left">
+                <ui-button :class="['myacc-contact-telegram-icon', 'btn', 'btn_md', {'myacc-contact-telegram-btn--conn': needTelegramConnection, 'myacc-contact-telegram-btn--conn--pr': !isTelegramConnected } ]"
+                    :disabled="!telegramAddress || !isValidTelegramAddress"
+                 @click="telegramConnectOnClickHandler" >
+                    {{ isTelegramConnected ?  tr('myacc_contact_telegram_btn_connected')  :  tr('myacc_contact_telegram_btn_connect')}}
+                    <ui-icon v-if="needTelegramSave" slot="icon">
+                        <svg class="myacc-contact-telegram-icon--svg" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#22C3E6">
+                            <path d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                        </svg>
+                    </ui-icon>
+                    <ui-icon v-else slot="icon">
+                        <svg class="myacc-contact-telegram-icon--svg" fill="#22C3E6" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 50 50" width="36px" height="36px">
+                            <path d="M 44.376953 5.9863281 C 43.889905 6.0076957 43.415817 6.1432497 42.988281 6.3144531 C 42.565113 6.4845113 40.128883 7.5243408 36.53125 9.0625 C 32.933617 10.600659 28.256963 12.603668 23.621094 14.589844 C 14.349356 18.562196 5.2382813 22.470703 5.2382812 22.470703 L 5.3046875 22.445312 C 5.3046875 22.445312 4.7547875 22.629122 4.1972656 23.017578 C 3.9185047 23.211806 3.6186028 23.462555 3.3730469 23.828125 C 3.127491 24.193695 2.9479735 24.711788 3.015625 25.259766 C 3.2532479 27.184511 5.2480469 27.730469 5.2480469 27.730469 L 5.2558594 27.734375 L 14.158203 30.78125 C 14.385177 31.538434 16.858319 39.792923 17.402344 41.541016 C 17.702797 42.507484 17.984013 43.064995 18.277344 43.445312 C 18.424133 43.635633 18.577962 43.782915 18.748047 43.890625 C 18.815627 43.933415 18.8867 43.965525 18.957031 43.994141 C 18.958531 43.994806 18.959437 43.99348 18.960938 43.994141 C 18.969579 43.997952 18.977708 43.998295 18.986328 44.001953 L 18.962891 43.996094 C 18.979231 44.002694 18.995359 44.013801 19.011719 44.019531 C 19.043456 44.030655 19.062905 44.030268 19.103516 44.039062 C 20.123059 44.395042 20.966797 43.734375 20.966797 43.734375 L 21.001953 43.707031 L 26.470703 38.634766 L 35.345703 45.554688 L 35.457031 45.605469 C 37.010484 46.295216 38.415349 45.910403 39.193359 45.277344 C 39.97137 44.644284 40.277344 43.828125 40.277344 43.828125 L 40.310547 43.742188 L 46.832031 9.7519531 C 46.998903 8.9915162 47.022612 8.334202 46.865234 7.7402344 C 46.707857 7.1462668 46.325492 6.6299361 45.845703 6.34375 C 45.365914 6.0575639 44.864001 5.9649605 44.376953 5.9863281 z M 44.429688 8.0195312 C 44.627491 8.0103707 44.774102 8.032983 44.820312 8.0605469 C 44.866523 8.0881109 44.887272 8.0844829 44.931641 8.2519531 C 44.976011 8.419423 45.000036 8.7721605 44.878906 9.3242188 L 44.875 9.3359375 L 38.390625 43.128906 C 38.375275 43.162926 38.240151 43.475531 37.931641 43.726562 C 37.616914 43.982653 37.266874 44.182554 36.337891 43.792969 L 26.632812 36.224609 L 26.359375 36.009766 L 26.353516 36.015625 L 23.451172 33.837891 L 39.761719 14.648438 A 1.0001 1.0001 0 0 0 38.974609 13 A 1.0001 1.0001 0 0 0 38.445312 13.167969 L 14.84375 28.902344 L 5.9277344 25.849609 C 5.9277344 25.849609 5.0423771 25.356927 5 25.013672 C 4.99765 24.994652 4.9871961 25.011869 5.0332031 24.943359 C 5.0792101 24.874869 5.1948546 24.759225 5.3398438 24.658203 C 5.6298218 24.456159 5.9609375 24.333984 5.9609375 24.333984 L 5.9941406 24.322266 L 6.0273438 24.308594 C 6.0273438 24.308594 15.138894 20.399882 24.410156 16.427734 C 29.045787 14.44166 33.721617 12.440122 37.318359 10.902344 C 40.914175 9.3649615 43.512419 8.2583658 43.732422 8.1699219 C 43.982886 8.0696253 44.231884 8.0286918 44.429688 8.0195312 z M 33.613281 18.792969 L 21.244141 33.345703 L 21.238281 33.351562 A 1.0001 1.0001 0 0 0 21.183594 33.423828 A 1.0001 1.0001 0 0 0 21.128906 33.507812 A 1.0001 1.0001 0 0 0 20.998047 33.892578 A 1.0001 1.0001 0 0 0 20.998047 33.900391 L 19.386719 41.146484 C 19.35993 41.068197 19.341173 41.039555 19.3125 40.947266 L 19.3125 40.945312 C 18.800713 39.30085 16.467362 31.5161 16.144531 30.439453 L 33.613281 18.792969 z M 22.640625 35.730469 L 24.863281 37.398438 L 21.597656 40.425781 L 22.640625 35.730469 z"/>
+                        </svg>
+                    </ui-icon>
+                </ui-button>
+            </div>
+        </div>
+        <div class="form_input_row flex">
+            <div class="form_input_hr">
+                <ui-textbox
+                    :label="tr('myacc_contact_whatsapp_label')"
+                    type="text"
+                    :placeholder="tr('myacc_contact_whatsapp_ph')"
+                    disabled
+                    readonly
+                    v-model="userObj.addressesObj.whatsapp"
+                    :invalid="!!(userObj.addressesObj.whatsapp && userObj.addressesObj.whatsapp.length && ( !/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g.test(userObj.addressesObj.whatsapp) && !/^(@)[-a-zA-Z0-9@:%._\+~#=]*/g.test(userObj.addressesObj.whatsapp) ))"
+                    @input="forceUpdate"
+                >
+                </ui-textbox>
+            </div>
+            <div class="form_input_hr flex form_input_left">
+                <ui-button :class="['myacc-contact-telegram-icon', 'btn', 'btn_md', 'myacc-contact-telegram-btn--conn--pr' ]" :raised="false" :disabled="true" :disableRipple="true">
+                    {{tr('myacc_contact_telegram_btn_connect')}}
+                    <ui-icon slot="icon">
+                        <svg class="myacc-contact-telegram-icon--svg" fill="#22C3E6" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 308 308" style="enable-background:new 0 0 308 308;" xml:space="preserve">
+                            <g id="XMLID_468_">
+                                <path id="XMLID_469_" d="M227.904,176.981c-0.6-0.288-23.054-11.345-27.044-12.781c-1.629-0.585-3.374-1.156-5.23-1.156
+                                    c-3.032,0-5.579,1.511-7.563,4.479c-2.243,3.334-9.033,11.271-11.131,13.642c-0.274,0.313-0.648,0.687-0.872,0.687
+                                    c-0.201,0-3.676-1.431-4.728-1.888c-24.087-10.463-42.37-35.624-44.877-39.867c-0.358-0.61-0.373-0.887-0.376-0.887
+                                    c0.088-0.323,0.898-1.135,1.316-1.554c1.223-1.21,2.548-2.805,3.83-4.348c0.607-0.731,1.215-1.463,1.812-2.153
+                                    c1.86-2.164,2.688-3.844,3.648-5.79l0.503-1.011c2.344-4.657,0.342-8.587-0.305-9.856c-0.531-1.062-10.012-23.944-11.02-26.348
+                                    c-2.424-5.801-5.627-8.502-10.078-8.502c-0.413,0,0,0-1.732,0.073c-2.109,0.089-13.594,1.601-18.672,4.802
+                                    c-5.385,3.395-14.495,14.217-14.495,33.249c0,17.129,10.87,33.302,15.537,39.453c0.116,0.155,0.329,0.47,0.638,0.922
+                                    c17.873,26.102,40.154,45.446,62.741,54.469c21.745,8.686,32.042,9.69,37.896,9.69c0.001,0,0.001,0,0.001,0
+                                    c2.46,0,4.429-0.193,6.166-0.364l1.102-0.105c7.512-0.666,24.02-9.22,27.775-19.655c2.958-8.219,3.738-17.199,1.77-20.458
+                                    C233.168,179.508,230.845,178.393,227.904,176.981z"/>
+                                <path id="XMLID_470_" d="M156.734,0C73.318,0,5.454,67.354,5.454,150.143c0,26.777,7.166,52.988,20.741,75.928L0.212,302.716
+                                    c-0.484,1.429-0.124,3.009,0.933,4.085C1.908,307.58,2.943,308,4,308c0.405,0,0.813-0.061,1.211-0.188l79.92-25.396
+                                    c21.87,11.685,46.588,17.853,71.604,17.853C240.143,300.27,308,232.923,308,150.143C308,67.354,240.143,0,156.734,0z
+                                        M156.734,268.994c-23.539,0-46.338-6.797-65.936-19.657c-0.659-0.433-1.424-0.655-2.194-0.655c-0.407,0-0.815,0.062-1.212,0.188
+                                    l-40.035,12.726l12.924-38.129c0.418-1.234,0.209-2.595-0.561-3.647c-14.924-20.392-22.813-44.485-22.813-69.677
+                                    c0-65.543,53.754-118.867,119.826-118.867c66.064,0,119.812,53.324,119.812,118.867
+                                    C276.546,215.678,222.799,268.994,156.734,268.994z"/>
+                            </g>
+                        </svg>
+                    </ui-icon>
+                </ui-button>
+            </div>
+        </div>
+    </div>
+<!-- CUSTOM FIELDS -->
+
+    <div class="main_section" v-if="customFields.length">
+
+        <p class="main_section_title big_text">
+            {{tr('myacc_custom_fields_title')}}
+        </p>
+
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr form_custom_fields_hr" v-for="field in customFields">
+                <ui-textbox
+                    v-if="field.type == 'text'"
+                    :label="field.name"
+                    :placeholder="field.name"
+                    type="text"
+                    v-model="userObj.customFields[field.fieldname]"
+                    @input="forceUpdate"
+                >
+                </ui-textbox>
+
+                <ui-select
+                    v-if="field.type == 'select'"
+                    :label="field.name"
+                    :options="field.options"
+                    placeholder="Select..."
+                    v-model="userObj.customFields[field.fieldname]"
+                    iconPosition="right"
+                    @input="forceUpdate"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+                <ui-select
+                    v-if="field.type == 'multiselect'"
+                    :label="field.name"
+                    :multiple="true"
+                    :options="field.options"
+                    placeholder="Select..."
+                    v-model="userObj.customFields[field.fieldname]"
+                    iconPosition="right"
+                    @input="forceUpdate"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+        </div>
+
+    </div>
+
+<!-- /CUSTOM FIELDS -->
+    <div class="main_section">
+
+        <p class="main_section_title big_text">
+            {{tr('myacc_delete_acc_title')}}
+        </p>
+
+        <p class="text">
+            {{tr('myacc_delete_acc_text1')}}
+        </p>
+        <p class="text">
+            {{tr('myacc_delete_acc_text2')}}
+        </p>
+
+        <div class="button_box flex">
+            <!-- <button class="btn btn_md btn_white">Deactivate instead</button> -->
+            <button class="btn btn_md btn_dark" @click="openDeleteModal">{{tr('myacc_delete_acc_button')}}</button>
+        </div>
+
+    </div>
+
+    <ui-modal ref="deleteModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('myacc_delete_acc_button')}}</p>
+                <p class="modal_text">{{tr('myacc_delete_acc_msg')}} <a :href="'mailto:'+tr('myacc_delete_acc_email')">{{tr('myacc_delete_acc_email')}}</a></p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="closeDeleteModal"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="croppModal" dismissOn="close-button" class="status_modal cropp_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <clipper-fixed
+                    ref="croppBox"
+                    :src="logoUrlForCropp"
+                    :ratio="1"
+                    v-if="logoUrlForCropp"
+                    :round="true"
+                ></clipper-fixed>
+                <p class="text">
+                    {{tr('myacc_scale_message')}}
+                </p>
+                <div class="button_box flex">
+                    <button class="btn btn_owhite" @click="backCropp">{{tr('back')}}</button>
+                    <button class="btn btn_orange" @click="saveCropp">{{tr('save')}}</button>
+                </div>
+            </div>
+        </div>
+    </ui-modal>
+
+    <ui-modal ref="msg_telegram_modal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <div class="modal_text">
+                    <div style="display: flex; flex-direction: column; margin: 0 auto; padding: 9px; border-radius: 12px;">
+                        <p :v-if="telegramBotLink" style="font-size: 15px;">{{tr('myacc_telegram_modal_notification_text')}} <a :href="telegramBotLink" target="_blank">{{ telegramBotCaption }}</a> {{tr('myacc_telegram_modal_in_telegram_text')}}</p>
+                        <div style="margin: 0;padding: 0;align-self: center;">
+                            <svg width="100.000000pt" height="100.000000pt" viewBox="0 0 100.000000 100.000000" xmlns="http://www.w3.org/2000/svg">
+                                <g class="dot-color"><rect x="5" y="95" width="10" height="10" transform="rotate(0,10,100)"/><rect x="5" y="115" width="10" height="10" transform="rotate(0,10,120)"/><rect x="5" y="135" width="10" height="10" transform="rotate(0,10,140)"/><rect x="5" y="165" width="10" height="10" transform="rotate(0,10,170)"/><rect x="5" y="175" width="10" height="10" transform="rotate(0,10,180)"/><rect x="5" y="195" width="10" height="10" transform="rotate(0,10,200)"/><rect x="5" y="205" width="10" height="10" transform="rotate(0,10,210)"/><rect x="15" y="95" width="10" height="10" transform="rotate(0,20,100)"/><rect x="15" y="105" width="10" height="10" transform="rotate(0,20,110)"/><rect x="15" y="115" width="10" height="10" transform="rotate(0,20,120)"/><rect x="15" y="125" width="10" height="10" transform="rotate(0,20,130)"/><rect x="15" y="135" width="10" height="10" transform="rotate(0,20,140)"/><rect x="15" y="145" width="10" height="10" transform="rotate(0,20,150)"/><rect x="15" y="165" width="10" height="10" transform="rotate(0,20,170)"/><rect x="15" y="195" width="10" height="10" transform="rotate(0,20,200)"/><rect x="25" y="85" width="10" height="10" transform="rotate(0,30,90)"/><rect x="25" y="105" width="10" height="10" transform="rotate(0,30,110)"/><rect x="25" y="115" width="10" height="10" transform="rotate(0,30,120)"/><rect x="25" y="125" width="10" height="10" transform="rotate(0,30,130)"/><rect x="25" y="145" width="10" height="10" transform="rotate(0,30,150)"/><rect x="25" y="155" width="10" height="10" transform="rotate(0,30,160)"/><rect x="25" y="175" width="10" height="10" transform="rotate(0,30,180)"/><rect x="25" y="185" width="10" height="10" transform="rotate(0,30,190)"/><rect x="35" y="105" width="10" height="10" transform="rotate(0,40,110)"/><rect x="35" y="125" width="10" height="10" transform="rotate(0,40,130)"/><rect x="35" y="145" width="10" height="10" transform="rotate(0,40,150)"/><rect x="35" y="185" width="10" height="10" transform="rotate(0,40,190)"/><rect x="45" y="85" width="10" height="10" transform="rotate(0,50,90)"/><rect x="45" y="105" width="10" height="10" transform="rotate(0,50,110)"/><rect x="45" y="125" width="10" height="10" transform="rotate(0,50,130)"/><rect x="45" y="135" width="10" height="10" transform="rotate(0,50,140)"/><rect x="45" y="145" width="10" height="10" transform="rotate(0,50,150)"/><rect x="45" y="165" width="10" height="10" transform="rotate(0,50,170)"/><rect x="45" y="175" width="10" height="10" transform="rotate(0,50,180)"/><rect x="45" y="205" width="10" height="10" transform="rotate(0,50,210)"/><rect x="55" y="85" width="10" height="10" transform="rotate(0,60,90)"/><rect x="55" y="115" width="10" height="10" transform="rotate(0,60,120)"/><rect x="55" y="175" width="10" height="10" transform="rotate(0,60,180)"/><rect x="55" y="195" width="10" height="10" transform="rotate(0,60,200)"/><rect x="65" y="85" width="10" height="10" transform="rotate(0,70,90)"/><rect x="65" y="105" width="10" height="10" transform="rotate(0,70,110)"/><rect x="65" y="125" width="10" height="10" transform="rotate(0,70,130)"/><rect x="65" y="145" width="10" height="10" transform="rotate(0,70,150)"/><rect x="65" y="165" width="10" height="10" transform="rotate(0,70,170)"/><rect x="65" y="185" width="10" height="10" transform="rotate(0,70,190)"/><rect x="65" y="205" width="10" height="10" transform="rotate(0,70,210)"/><rect x="75" y="115" width="10" height="10" transform="rotate(0,80,120)"/><rect x="75" y="135" width="10" height="10" transform="rotate(0,80,140)"/><rect x="75" y="145" width="10" height="10" transform="rotate(0,80,150)"/><rect x="75" y="205" width="10" height="10" transform="rotate(0,80,210)"/><rect x="85" y="15" width="10" height="10" transform="rotate(0,90,20)"/><rect x="85" y="45" width="10" height="10" transform="rotate(0,90,50)"/><rect x="85" y="65" width="10" height="10" transform="rotate(0,90,70)"/><rect x="85" y="85" width="10" height="10" transform="rotate(0,90,90)"/><rect x="85" y="95" width="10" height="10" transform="rotate(0,90,100)"/><rect x="85" y="105" width="10" height="10" transform="rotate(0,90,110)"/><rect x="85" y="165" width="10" height="10" transform="rotate(0,90,170)"/><rect x="85" y="195" width="10" height="10" transform="rotate(0,90,200)"/><rect x="85" y="205" width="10" height="10" transform="rotate(0,90,210)"/><rect x="85" y="215" width="10" height="10" transform="rotate(0,90,220)"/><rect x="85" y="235" width="10" height="10" transform="rotate(0,90,240)"/><rect x="85" y="245" width="10" height="10" transform="rotate(0,90,250)"/><rect x="85" y="265" width="10" height="10" transform="rotate(0,90,270)"/><rect x="95" y="15" width="10" height="10" transform="rotate(0,100,20)"/><rect x="95" y="25" width="10" height="10" transform="rotate(0,100,30)"/><rect x="95" y="45" width="10" height="10" transform="rotate(0,100,50)"/><rect x="95" y="55" width="10" height="10" transform="rotate(0,100,60)"/><rect x="95" y="85" width="10" height="10" transform="rotate(0,100,90)"/><rect x="95" y="135" width="10" height="10" transform="rotate(0,100,140)"/><rect x="95" y="145" width="10" height="10" transform="rotate(0,100,150)"/><rect x="95" y="165" width="10" height="10" transform="rotate(0,100,170)"/><rect x="95" y="185" width="10" height="10" transform="rotate(0,100,190)"/><rect x="95" y="195" width="10" height="10" transform="rotate(0,100,200)"/><rect x="95" y="215" width="10" height="10" transform="rotate(0,100,220)"/><rect x="95" y="225" width="10" height="10" transform="rotate(0,100,230)"/><rect x="95" y="235" width="10" height="10" transform="rotate(0,100,240)"/><rect x="95" y="245" width="10" height="10" transform="rotate(0,100,250)"/><rect x="95" y="275" width="10" height="10" transform="rotate(0,100,280)"/><rect x="95" y="285" width="10" height="10" transform="rotate(0,100,290)"/><rect x="105" y="15" width="10" height="10" transform="rotate(0,110,20)"/><rect x="105" y="65" width="10" height="10" transform="rotate(0,110,70)"/><rect x="105" y="75" width="10" height="10" transform="rotate(0,110,80)"/><rect x="105" y="85" width="10" height="10" transform="rotate(0,110,90)"/><rect x="105" y="115" width="10" height="10" transform="rotate(0,110,120)"/><rect x="105" y="125" width="10" height="10" transform="rotate(0,110,130)"/><rect x="105" y="135" width="10" height="10" transform="rotate(0,110,140)"/><rect x="105" y="175" width="10" height="10" transform="rotate(0,110,180)"/><rect x="105" y="195" width="10" height="10" transform="rotate(0,110,200)"/><rect x="105" y="215" width="10" height="10" transform="rotate(0,110,220)"/><rect x="105" y="245" width="10" height="10" transform="rotate(0,110,250)"/><rect x="105" y="255" width="10" height="10" transform="rotate(0,110,260)"/><rect x="105" y="265" width="10" height="10" transform="rotate(0,110,270)"/><rect x="105" y="285" width="10" height="10" transform="rotate(0,110,290)"/><rect x="115" y="5" width="10" height="10" transform="rotate(0,120,10)"/><rect x="115" y="25" width="10" height="10" transform="rotate(0,120,30)"/><rect x="115" y="35" width="10" height="10" transform="rotate(0,120,40)"/><rect x="115" y="45" width="10" height="10" transform="rotate(0,120,50)"/><rect x="115" y="55" width="10" height="10" transform="rotate(0,120,60)"/><rect x="115" y="85" width="10" height="10" transform="rotate(0,120,90)"/><rect x="115" y="95" width="10" height="10" transform="rotate(0,120,100)"/><rect x="115" y="105" width="10" height="10" transform="rotate(0,120,110)"/><rect x="115" y="115" width="10" height="10" transform="rotate(0,120,120)"/><rect x="115" y="165" width="10" height="10" transform="rotate(0,120,170)"/><rect x="115" y="175" width="10" height="10" transform="rotate(0,120,180)"/><rect x="115" y="185" width="10" height="10" transform="rotate(0,120,190)"/><rect x="115" y="195" width="10" height="10" transform="rotate(0,120,200)"/><rect x="115" y="205" width="10" height="10" transform="rotate(0,120,210)"/><rect x="115" y="215" width="10" height="10" transform="rotate(0,120,220)"/><rect x="115" y="235" width="10" height="10" transform="rotate(0,120,240)"/><rect x="115" y="255" width="10" height="10" transform="rotate(0,120,260)"/><rect x="115" y="275" width="10" height="10" transform="rotate(0,120,280)"/><rect x="115" y="285" width="10" height="10" transform="rotate(0,120,290)"/><rect x="125" y="5" width="10" height="10" transform="rotate(0,130,10)"/><rect x="125" y="15" width="10" height="10" transform="rotate(0,130,20)"/><rect x="125" y="35" width="10" height="10" transform="rotate(0,130,40)"/><rect x="125" y="55" width="10" height="10" transform="rotate(0,130,60)"/><rect x="125" y="65" width="10" height="10" transform="rotate(0,130,70)"/><rect x="125" y="75" width="10" height="10" transform="rotate(0,130,80)"/><rect x="125" y="85" width="10" height="10" transform="rotate(0,130,90)"/><rect x="125" y="125" width="10" height="10" transform="rotate(0,130,130)"/><rect x="125" y="135" width="10" height="10" transform="rotate(0,130,140)"/><rect x="125" y="155" width="10" height="10" transform="rotate(0,130,160)"/><rect x="125" y="175" width="10" height="10" transform="rotate(0,130,180)"/><rect x="125" y="205" width="10" height="10" transform="rotate(0,130,210)"/><rect x="125" y="235" width="10" height="10" transform="rotate(0,130,240)"/><rect x="125" y="265" width="10" height="10" transform="rotate(0,130,270)"/><rect x="125" y="285" width="10" height="10" transform="rotate(0,130,290)"/><rect x="135" y="25" width="10" height="10" transform="rotate(0,140,30)"/><rect x="135" y="45" width="10" height="10" transform="rotate(0,140,50)"/><rect x="135" y="55" width="10" height="10" transform="rotate(0,140,60)"/><rect x="135" y="75" width="10" height="10" transform="rotate(0,140,80)"/><rect x="135" y="95" width="10" height="10" transform="rotate(0,140,100)"/><rect x="135" y="115" width="10" height="10" transform="rotate(0,140,120)"/><rect x="135" y="145" width="10" height="10" transform="rotate(0,140,150)"/><rect x="135" y="165" width="10" height="10" transform="rotate(0,140,170)"/><rect x="135" y="225" width="10" height="10" transform="rotate(0,140,230)"/><rect x="135" y="245" width="10" height="10" transform="rotate(0,140,250)"/><rect x="135" y="265" width="10" height="10" transform="rotate(0,140,270)"/><rect x="135" y="285" width="10" height="10" transform="rotate(0,140,290)"/><rect x="145" y="5" width="10" height="10" transform="rotate(0,150,10)"/><rect x="145" y="15" width="10" height="10" transform="rotate(0,150,20)"/><rect x="145" y="35" width="10" height="10" transform="rotate(0,150,40)"/><rect x="145" y="65" width="10" height="10" transform="rotate(0,150,70)"/><rect x="145" y="75" width="10" height="10" transform="rotate(0,150,80)"/><rect x="145" y="95" width="10" height="10" transform="rotate(0,150,100)"/><rect x="145" y="105" width="10" height="10" transform="rotate(0,150,110)"/><rect x="145" y="115" width="10" height="10" transform="rotate(0,150,120)"/><rect x="145" y="125" width="10" height="10" transform="rotate(0,150,130)"/><rect x="145" y="145" width="10" height="10" transform="rotate(0,150,150)"/><rect x="145" y="155" width="10" height="10" transform="rotate(0,150,160)"/><rect x="145" y="165" width="10" height="10" transform="rotate(0,150,170)"/><rect x="145" y="175" width="10" height="10" transform="rotate(0,150,180)"/><rect x="145" y="205" width="10" height="10" transform="rotate(0,150,210)"/><rect x="145" y="225" width="10" height="10" transform="rotate(0,150,230)"/><rect x="145" y="245" width="10" height="10" transform="rotate(0,150,250)"/><rect x="145" y="275" width="10" height="10" transform="rotate(0,150,280)"/><rect x="145" y="285" width="10" height="10" transform="rotate(0,150,290)"/><rect x="155" y="5" width="10" height="10" transform="rotate(0,160,10)"/><rect x="155" y="25" width="10" height="10" transform="rotate(0,160,30)"/><rect x="155" y="35" width="10" height="10" transform="rotate(0,160,40)"/><rect x="155" y="95" width="10" height="10" transform="rotate(0,160,100)"/><rect x="155" y="105" width="10" height="10" transform="rotate(0,160,110)"/><rect x="155" y="115" width="10" height="10" transform="rotate(0,160,120)"/><rect x="155" y="155" width="10" height="10" transform="rotate(0,160,160)"/><rect x="155" y="165" width="10" height="10" transform="rotate(0,160,170)"/><rect x="155" y="175" width="10" height="10" transform="rotate(0,160,180)"/><rect x="155" y="185" width="10" height="10" transform="rotate(0,160,190)"/><rect x="155" y="205" width="10" height="10" transform="rotate(0,160,210)"/><rect x="155" y="215" width="10" height="10" transform="rotate(0,160,220)"/><rect x="155" y="235" width="10" height="10" transform="rotate(0,160,240)"/><rect x="155" y="255" width="10" height="10" transform="rotate(0,160,260)"/><rect x="155" y="285" width="10" height="10" transform="rotate(0,160,290)"/><rect x="165" y="5" width="10" height="10" transform="rotate(0,170,10)"/><rect x="165" y="15" width="10" height="10" transform="rotate(0,170,20)"/><rect x="165" y="25" width="10" height="10" transform="rotate(0,170,30)"/><rect x="165" y="45" width="10" height="10" transform="rotate(0,170,50)"/><rect x="165" y="55" width="10" height="10" transform="rotate(0,170,60)"/><rect x="165" y="65" width="10" height="10" transform="rotate(0,170,70)"/><rect x="165" y="85" width="10" height="10" transform="rotate(0,170,90)"/><rect x="165" y="105" width="10" height="10" transform="rotate(0,170,110)"/><rect x="165" y="145" width="10" height="10" transform="rotate(0,170,150)"/><rect x="165" y="155" width="10" height="10" transform="rotate(0,170,160)"/><rect x="165" y="185" width="10" height="10" transform="rotate(0,170,190)"/><rect x="165" y="205" width="10" height="10" transform="rotate(0,170,210)"/><rect x="165" y="215" width="10" height="10" transform="rotate(0,170,220)"/><rect x="165" y="275" width="10" height="10" transform="rotate(0,170,280)"/><rect x="165" y="285" width="10" height="10" transform="rotate(0,170,290)"/><rect x="175" y="5" width="10" height="10" transform="rotate(0,180,10)"/><rect x="175" y="45" width="10" height="10" transform="rotate(0,180,50)"/><rect x="175" y="75" width="10" height="10" transform="rotate(0,180,80)"/><rect x="175" y="85" width="10" height="10" transform="rotate(0,180,90)"/><rect x="175" y="95" width="10" height="10" transform="rotate(0,180,100)"/><rect x="175" y="165" width="10" height="10" transform="rotate(0,180,170)"/><rect x="175" y="195" width="10" height="10" transform="rotate(0,180,200)"/><rect x="175" y="205" width="10" height="10" transform="rotate(0,180,210)"/><rect x="175" y="235" width="10" height="10" transform="rotate(0,180,240)"/><rect x="175" y="245" width="10" height="10" transform="rotate(0,180,250)"/><rect x="175" y="265" width="10" height="10" transform="rotate(0,180,270)"/><rect x="175" y="285" width="10" height="10" transform="rotate(0,180,290)"/><rect x="185" y="35" width="10" height="10" transform="rotate(0,190,40)"/><rect x="185" y="45" width="10" height="10" transform="rotate(0,190,50)"/><rect x="185" y="65" width="10" height="10" transform="rotate(0,190,70)"/><rect x="185" y="85" width="10" height="10" transform="rotate(0,190,90)"/><rect x="185" y="95" width="10" height="10" transform="rotate(0,190,100)"/><rect x="185" y="105" width="10" height="10" transform="rotate(0,190,110)"/><rect x="185" y="135" width="10" height="10" transform="rotate(0,190,140)"/><rect x="185" y="165" width="10" height="10" transform="rotate(0,190,170)"/><rect x="185" y="205" width="10" height="10" transform="rotate(0,190,210)"/><rect x="185" y="235" width="10" height="10" transform="rotate(0,190,240)"/><rect x="185" y="245" width="10" height="10" transform="rotate(0,190,250)"/><rect x="185" y="255" width="10" height="10" transform="rotate(0,190,260)"/><rect x="185" y="265" width="10" height="10" transform="rotate(0,190,270)"/><rect x="185" y="285" width="10" height="10" transform="rotate(0,190,290)"/><rect x="195" y="55" width="10" height="10" transform="rotate(0,200,60)"/><rect x="195" y="75" width="10" height="10" transform="rotate(0,200,80)"/><rect x="195" y="95" width="10" height="10" transform="rotate(0,200,100)"/><rect x="195" y="105" width="10" height="10" transform="rotate(0,200,110)"/><rect x="195" y="115" width="10" height="10" transform="rotate(0,200,120)"/><rect x="195" y="125" width="10" height="10" transform="rotate(0,200,130)"/><rect x="195" y="145" width="10" height="10" transform="rotate(0,200,150)"/><rect x="195" y="175" width="10" height="10" transform="rotate(0,200,180)"/><rect x="195" y="195" width="10" height="10" transform="rotate(0,200,200)"/><rect x="195" y="205" width="10" height="10" transform="rotate(0,200,210)"/><rect x="195" y="255" width="10" height="10" transform="rotate(0,200,260)"/><rect x="195" y="285" width="10" height="10" transform="rotate(0,200,290)"/><rect x="205" y="5" width="10" height="10" transform="rotate(0,210,10)"/><rect x="205" y="15" width="10" height="10" transform="rotate(0,210,20)"/><rect x="205" y="25" width="10" height="10" transform="rotate(0,210,30)"/><rect x="205" y="45" width="10" height="10" transform="rotate(0,210,50)"/><rect x="205" y="55" width="10" height="10" transform="rotate(0,210,60)"/><rect x="205" y="65" width="10" height="10" transform="rotate(0,210,70)"/><rect x="205" y="75" width="10" height="10" transform="rotate(0,210,80)"/><rect x="205" y="105" width="10" height="10" transform="rotate(0,210,110)"/><rect x="205" y="115" width="10" height="10" transform="rotate(0,210,120)"/><rect x="205" y="125" width="10" height="10" transform="rotate(0,210,130)"/><rect x="205" y="135" width="10" height="10" transform="rotate(0,210,140)"/><rect x="205" y="155" width="10" height="10" transform="rotate(0,210,160)"/><rect x="205" y="175" width="10" height="10" transform="rotate(0,210,180)"/><rect x="205" y="185" width="10" height="10" transform="rotate(0,210,190)"/><rect x="205" y="205" width="10" height="10" transform="rotate(0,210,210)"/><rect x="205" y="215" width="10" height="10" transform="rotate(0,210,220)"/><rect x="205" y="225" width="10" height="10" transform="rotate(0,210,230)"/><rect x="205" y="235" width="10" height="10" transform="rotate(0,210,240)"/><rect x="205" y="245" width="10" height="10" transform="rotate(0,210,250)"/><rect x="205" y="285" width="10" height="10" transform="rotate(0,210,290)"/><rect x="215" y="85" width="10" height="10" transform="rotate(0,220,90)"/><rect x="215" y="95" width="10" height="10" transform="rotate(0,220,100)"/><rect x="215" y="155" width="10" height="10" transform="rotate(0,220,160)"/><rect x="215" y="165" width="10" height="10" transform="rotate(0,220,170)"/><rect x="215" y="175" width="10" height="10" transform="rotate(0,220,180)"/><rect x="215" y="185" width="10" height="10" transform="rotate(0,220,190)"/><rect x="215" y="195" width="10" height="10" transform="rotate(0,220,200)"/><rect x="215" y="205" width="10" height="10" transform="rotate(0,220,210)"/><rect x="215" y="245" width="10" height="10" transform="rotate(0,220,250)"/><rect x="215" y="265" width="10" height="10" transform="rotate(0,220,270)"/><rect x="215" y="285" width="10" height="10" transform="rotate(0,220,290)"/><rect x="225" y="105" width="10" height="10" transform="rotate(0,230,110)"/><rect x="225" y="115" width="10" height="10" transform="rotate(0,230,120)"/><rect x="225" y="145" width="10" height="10" transform="rotate(0,230,150)"/><rect x="225" y="155" width="10" height="10" transform="rotate(0,230,160)"/><rect x="225" y="185" width="10" height="10" transform="rotate(0,230,190)"/><rect x="225" y="195" width="10" height="10" transform="rotate(0,230,200)"/><rect x="225" y="205" width="10" height="10" transform="rotate(0,230,210)"/><rect x="225" y="225" width="10" height="10" transform="rotate(0,230,230)"/><rect x="225" y="245" width="10" height="10" transform="rotate(0,230,250)"/><rect x="225" y="285" width="10" height="10" transform="rotate(0,230,290)"/><rect x="235" y="95" width="10" height="10" transform="rotate(0,240,100)"/><rect x="235" y="115" width="10" height="10" transform="rotate(0,240,120)"/><rect x="235" y="125" width="10" height="10" transform="rotate(0,240,130)"/><rect x="235" y="145" width="10" height="10" transform="rotate(0,240,150)"/><rect x="235" y="165" width="10" height="10" transform="rotate(0,240,170)"/><rect x="235" y="195" width="10" height="10" transform="rotate(0,240,200)"/><rect x="235" y="205" width="10" height="10" transform="rotate(0,240,210)"/><rect x="235" y="245" width="10" height="10" transform="rotate(0,240,250)"/><rect x="235" y="255" width="10" height="10" transform="rotate(0,240,260)"/><rect x="245" y="85" width="10" height="10" transform="rotate(0,250,90)"/><rect x="245" y="95" width="10" height="10" transform="rotate(0,250,100)"/><rect x="245" y="125" width="10" height="10" transform="rotate(0,250,130)"/><rect x="245" y="165" width="10" height="10" transform="rotate(0,250,170)"/><rect x="245" y="195" width="10" height="10" transform="rotate(0,250,200)"/><rect x="245" y="205" width="10" height="10" transform="rotate(0,250,210)"/><rect x="245" y="215" width="10" height="10" transform="rotate(0,250,220)"/><rect x="245" y="225" width="10" height="10" transform="rotate(0,250,230)"/><rect x="245" y="235" width="10" height="10" transform="rotate(0,250,240)"/><rect x="245" y="245" width="10" height="10" transform="rotate(0,250,250)"/><rect x="245" y="275" width="10" height="10" transform="rotate(0,250,280)"/><rect x="245" y="285" width="10" height="10" transform="rotate(0,250,290)"/><rect x="255" y="105" width="10" height="10" transform="rotate(0,260,110)"/><rect x="255" y="115" width="10" height="10" transform="rotate(0,260,120)"/><rect x="255" y="125" width="10" height="10" transform="rotate(0,260,130)"/><rect x="255" y="135" width="10" height="10" transform="rotate(0,260,140)"/><rect x="255" y="145" width="10" height="10" transform="rotate(0,260,150)"/><rect x="255" y="175" width="10" height="10" transform="rotate(0,260,180)"/><rect x="255" y="185" width="10" height="10" transform="rotate(0,260,190)"/><rect x="255" y="235" width="10" height="10" transform="rotate(0,260,240)"/><rect x="255" y="265" width="10" height="10" transform="rotate(0,260,270)"/><rect x="255" y="275" width="10" height="10" transform="rotate(0,260,280)"/><rect x="265" y="95" width="10" height="10" transform="rotate(0,270,100)"/><rect x="265" y="105" width="10" height="10" transform="rotate(0,270,110)"/><rect x="265" y="115" width="10" height="10" transform="rotate(0,270,120)"/><rect x="265" y="125" width="10" height="10" transform="rotate(0,270,130)"/><rect x="265" y="155" width="10" height="10" transform="rotate(0,270,160)"/><rect x="265" y="185" width="10" height="10" transform="rotate(0,270,190)"/><rect x="265" y="195" width="10" height="10" transform="rotate(0,270,200)"/><rect x="265" y="205" width="10" height="10" transform="rotate(0,270,210)"/><rect x="265" y="215" width="10" height="10" transform="rotate(0,270,220)"/><rect x="265" y="255" width="10" height="10" transform="rotate(0,270,260)"/><rect x="265" y="265" width="10" height="10" transform="rotate(0,270,270)"/><rect x="265" y="275" width="10" height="10" transform="rotate(0,270,280)"/><rect x="265" y="285" width="10" height="10" transform="rotate(0,270,290)"/><rect x="275" y="85" width="10" height="10" transform="rotate(0,280,90)"/><rect x="275" y="105" width="10" height="10" transform="rotate(0,280,110)"/><rect x="275" y="115" width="10" height="10" transform="rotate(0,280,120)"/><rect x="275" y="145" width="10" height="10" transform="rotate(0,280,150)"/><rect x="275" y="155" width="10" height="10" transform="rotate(0,280,160)"/><rect x="275" y="165" width="10" height="10" transform="rotate(0,280,170)"/><rect x="275" y="175" width="10" height="10" transform="rotate(0,280,180)"/><rect x="275" y="215" width="10" height="10" transform="rotate(0,280,220)"/><rect x="275" y="225" width="10" height="10" transform="rotate(0,280,230)"/><rect x="275" y="235" width="10" height="10" transform="rotate(0,280,240)"/><rect x="275" y="255" width="10" height="10" transform="rotate(0,280,260)"/><rect x="275" y="275" width="10" height="10" transform="rotate(0,280,280)"/><rect x="275" y="285" width="10" height="10" transform="rotate(0,280,290)"/><rect x="285" y="95" width="10" height="10" transform="rotate(0,290,100)"/><rect x="285" y="105" width="10" height="10" transform="rotate(0,290,110)"/><rect x="285" y="115" width="10" height="10" transform="rotate(0,290,120)"/><rect x="285" y="125" width="10" height="10" transform="rotate(0,290,130)"/><rect x="285" y="135" width="10" height="10" transform="rotate(0,290,140)"/><rect x="285" y="175" width="10" height="10" transform="rotate(0,290,180)"/><rect x="285" y="205" width="10" height="10" transform="rotate(0,290,210)"/><rect x="285" y="225" width="10" height="10" transform="rotate(0,290,230)"/><rect x="285" y="245" width="10" height="10" transform="rotate(0,290,250)"/><rect x="285" y="255" width="10" height="10" transform="rotate(0,290,260)"/><rect x="285" y="275" width="10" height="10" transform="rotate(0,290,280)"/></g><g class="corners-square-color-0-0"><rect x="5" y="5" width="10" height="10" transform="rotate(0,10,10)"/><rect x="5" y="15" width="10" height="10" transform="rotate(0,10,20)"/><rect x="5" y="25" width="10" height="10" transform="rotate(0,10,30)"/><rect x="5" y="35" width="10" height="10" transform="rotate(0,10,40)"/><rect x="5" y="45" width="10" height="10" transform="rotate(0,10,50)"/><rect x="5" y="55" width="10" height="10" transform="rotate(0,10,60)"/><rect x="5" y="65" width="10" height="10" transform="rotate(0,10,70)"/><rect x="15" y="5" width="10" height="10" transform="rotate(0,20,10)"/><rect x="15" y="65" width="10" height="10" transform="rotate(0,20,70)"/><rect x="25" y="5" width="10" height="10" transform="rotate(0,30,10)"/><rect x="25" y="65" width="10" height="10" transform="rotate(0,30,70)"/><rect x="35" y="5" width="10" height="10" transform="rotate(0,40,10)"/><rect x="35" y="65" width="10" height="10" transform="rotate(0,40,70)"/><rect x="45" y="5" width="10" height="10" transform="rotate(0,50,10)"/><rect x="45" y="65" width="10" height="10" transform="rotate(0,50,70)"/><rect x="55" y="5" width="10" height="10" transform="rotate(0,60,10)"/><rect x="55" y="65" width="10" height="10" transform="rotate(0,60,70)"/><rect x="65" y="5" width="10" height="10" transform="rotate(0,70,10)"/><rect x="65" y="15" width="10" height="10" transform="rotate(0,70,20)"/><rect x="65" y="25" width="10" height="10" transform="rotate(0,70,30)"/><rect x="65" y="35" width="10" height="10" transform="rotate(0,70,40)"/><rect x="65" y="45" width="10" height="10" transform="rotate(0,70,50)"/><rect x="65" y="55" width="10" height="10" transform="rotate(0,70,60)"/><rect x="65" y="65" width="10" height="10" transform="rotate(0,70,70)"/></g><g class="corners-dot-color-0-0"><rect x="25" y="25" width="10" height="10" transform="rotate(0,30,30)"/><rect x="25" y="35" width="10" height="10" transform="rotate(0,30,40)"/><rect x="25" y="45" width="10" height="10" transform="rotate(0,30,50)"/><rect x="35" y="25" width="10" height="10" transform="rotate(0,40,30)"/><rect x="35" y="35" width="10" height="10" transform="rotate(0,40,40)"/><rect x="35" y="45" width="10" height="10" transform="rotate(0,40,50)"/><rect x="45" y="25" width="10" height="10" transform="rotate(0,50,30)"/><rect x="45" y="35" width="10" height="10" transform="rotate(0,50,40)"/><rect x="45" y="45" width="10" height="10" transform="rotate(0,50,50)"/></g><g class="corners-square-color-1-0"><rect x="225" y="5" width="10" height="10" transform="rotate(0,230,10)"/><rect x="225" y="15" width="10" height="10" transform="rotate(0,230,20)"/><rect x="225" y="25" width="10" height="10" transform="rotate(0,230,30)"/><rect x="225" y="35" width="10" height="10" transform="rotate(0,230,40)"/><rect x="225" y="45" width="10" height="10" transform="rotate(0,230,50)"/><rect x="225" y="55" width="10" height="10" transform="rotate(0,230,60)"/><rect x="225" y="65" width="10" height="10" transform="rotate(0,230,70)"/><rect x="235" y="5" width="10" height="10" transform="rotate(0,240,10)"/><rect x="235" y="65" width="10" height="10" transform="rotate(0,240,70)"/><rect x="245" y="5" width="10" height="10" transform="rotate(0,250,10)"/><rect x="245" y="65" width="10" height="10" transform="rotate(0,250,70)"/><rect x="255" y="5" width="10" height="10" transform="rotate(0,260,10)"/><rect x="255" y="65" width="10" height="10" transform="rotate(0,260,70)"/><rect x="265" y="5" width="10" height="10" transform="rotate(0,270,10)"/><rect x="265" y="65" width="10" height="10" transform="rotate(0,270,70)"/><rect x="275" y="5" width="10" height="10" transform="rotate(0,280,10)"/><rect x="275" y="65" width="10" height="10" transform="rotate(0,280,70)"/><rect x="285" y="5" width="10" height="10" transform="rotate(0,290,10)"/><rect x="285" y="15" width="10" height="10" transform="rotate(0,290,20)"/><rect x="285" y="25" width="10" height="10" transform="rotate(0,290,30)"/><rect x="285" y="35" width="10" height="10" transform="rotate(0,290,40)"/><rect x="285" y="45" width="10" height="10" transform="rotate(0,290,50)"/><rect x="285" y="55" width="10" height="10" transform="rotate(0,290,60)"/><rect x="285" y="65" width="10" height="10" transform="rotate(0,290,70)"/></g><g class="corners-dot-color-1-0"><rect x="245" y="25" width="10" height="10" transform="rotate(0,250,30)"/><rect x="245" y="35" width="10" height="10" transform="rotate(0,250,40)"/><rect x="245" y="45" width="10" height="10" transform="rotate(0,250,50)"/><rect x="255" y="25" width="10" height="10" transform="rotate(0,260,30)"/><rect x="255" y="35" width="10" height="10" transform="rotate(0,260,40)"/><rect x="255" y="45" width="10" height="10" transform="rotate(0,260,50)"/><rect x="265" y="25" width="10" height="10" transform="rotate(0,270,30)"/><rect x="265" y="35" width="10" height="10" transform="rotate(0,270,40)"/><rect x="265" y="45" width="10" height="10" transform="rotate(0,270,50)"/></g><g class="corners-square-color-0-1"><rect x="5" y="225" width="10" height="10" transform="rotate(0,10,230)"/><rect x="5" y="235" width="10" height="10" transform="rotate(0,10,240)"/><rect x="5" y="245" width="10" height="10" transform="rotate(0,10,250)"/><rect x="5" y="255" width="10" height="10" transform="rotate(0,10,260)"/><rect x="5" y="265" width="10" height="10" transform="rotate(0,10,270)"/><rect x="5" y="275" width="10" height="10" transform="rotate(0,10,280)"/><rect x="5" y="285" width="10" height="10" transform="rotate(0,10,290)"/><rect x="15" y="225" width="10" height="10" transform="rotate(0,20,230)"/><rect x="15" y="285" width="10" height="10" transform="rotate(0,20,290)"/><rect x="25" y="225" width="10" height="10" transform="rotate(0,30,230)"/><rect x="25" y="285" width="10" height="10" transform="rotate(0,30,290)"/><rect x="35" y="225" width="10" height="10" transform="rotate(0,40,230)"/><rect x="35" y="285" width="10" height="10" transform="rotate(0,40,290)"/><rect x="45" y="225" width="10" height="10" transform="rotate(0,50,230)"/><rect x="45" y="285" width="10" height="10" transform="rotate(0,50,290)"/><rect x="55" y="225" width="10" height="10" transform="rotate(0,60,230)"/><rect x="55" y="285" width="10" height="10" transform="rotate(0,60,290)"/><rect x="65" y="225" width="10" height="10" transform="rotate(0,70,230)"/><rect x="65" y="235" width="10" height="10" transform="rotate(0,70,240)"/><rect x="65" y="245" width="10" height="10" transform="rotate(0,70,250)"/><rect x="65" y="255" width="10" height="10" transform="rotate(0,70,260)"/><rect x="65" y="265" width="10" height="10" transform="rotate(0,70,270)"/><rect x="65" y="275" width="10" height="10" transform="rotate(0,70,280)"/><rect x="65" y="285" width="10" height="10" transform="rotate(0,70,290)"/></g><g class="corners-dot-color-0-1"><rect x="25" y="245" width="10" height="10" transform="rotate(0,30,250)"/><rect x="25" y="255" width="10" height="10" transform="rotate(0,30,260)"/><rect x="25" y="265" width="10" height="10" transform="rotate(0,30,270)"/><rect x="35" y="245" width="10" height="10" transform="rotate(0,40,250)"/><rect x="35" y="255" width="10" height="10" transform="rotate(0,40,260)"/><rect x="35" y="265" width="10" height="10" transform="rotate(0,40,270)"/><rect x="45" y="245" width="10" height="10" transform="rotate(0,50,250)"/><rect x="45" y="255" width="10" height="10" transform="rotate(0,50,260)"/><rect x="45" y="265" width="10" height="10" transform="rotate(0,50,270)"/></g></svg>
+                            </div>
+                            <p style="margin: 0 0 25px 0;align-self: center;">({{tr('myacc_telegram_modal_use_qr_text')}})</p>
+                            <p>{{tr('myacc_telegram_modal_use_send_start_text')}}</p>
+                            <p>{{tr('myacc_telegram_modal_username_match_text')}}</p>
+                            <hr/>
+                            <h5 v-if="isTelegramConnected" style="margin-bottom: 0;">{{tr('myacc_telegram_modal_delete_text')}}</h5>
+                            <div v-if="isTelegramConnected" class="button_box flex">
+                              <ui-button ref="sv_telegram_modal_delete_btn" class="btn btn_sm btn_dark" style="font-size: 13px;color: #fff; background-color: #386D7D;" @click="telegramDeleteOnClickHandler">{{tr('myacc_telegram_modal_delete_btn_label')}}</ui-button>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="$refs.msg_telegram_modal.close()"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="sv_telegram_modal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content" style="margin-top:24px">
+                <p class="modal_text">
+                    {{tr('myacc_telegram_modal_save_text')}}
+                </p>
+                <div class="button_box flex">
+                    <ui-button ref="sv_telegram_modal_btn" color="orange" class="btn btn_orange" @click="telegramSaveOnClickHandler">{{tr('save')}}</ui-button>
+                </div>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="$refs.sv_telegram_modal.close()"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

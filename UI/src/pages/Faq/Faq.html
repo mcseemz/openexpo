@@ -1,0 +1,55 @@
+<div class="page_wrapper faq_page" v-if="localesLoaded">
+
+	<section class="faq_banner">
+		<div class="container">
+			<h1 class="title">{{tr('faq_title')}}</h1>
+			<div class="search_input_block">
+				<input type="search" class="search_input" v-model="searchInput" @input="filterFaq" :placeholder="tr('faq_search_placeholder')">
+				<a href="#" class="search_btn"><img src="./img/search_icon_light.svg" alt=""></a>
+			</div>
+			<p>{{tr('faq_description')}}</p>
+		</div>
+	</section>
+
+	<section class="faq_section">
+		<div class="container">
+			<div class="faq_tabs_nav flex">
+				<div 
+					class="faq_tab_header" 
+					v-bind:class="{ active: activeTab == 'dt'+index }" 
+					v-for="tab, index in faqTabs"
+					@click="selectTab('dt'+index)">
+
+					<div class="image_box" v-html="tab.svg_icon"></div>
+
+					<p>{{tab.tab_title}}</p>
+				</div>
+				
+			</div>
+		</div>
+		<div class="container faq_accordeon_container">
+			<ui-tabs ref="faq_tabs">
+	            <ui-tab :id="'dt'+index" :key="'dt'+index" v-for="tab, index in faqTabs">
+	                <div slot="header" class="faq-tab-header">
+	                </div>
+					
+	            	<div class="faq_tab_content">
+	            		<div class="accordeon">
+							<ui-collapsible removeIcon disableRipple v-for="faq in tab.tab_items">
+				                <div class="accordeon_header" slot="header">
+				                    <div class="icon_block"></div>
+				                    <div class="accordeon_title">{{faq.item_title}}</div>
+				                </div>
+
+				                <div class="accordeon_text" v-html="faq.item_text">{{faq.item_text}}</div>
+				            </ui-collapsible>
+						</div>
+	            	</div>
+
+	            </ui-tab>
+	            
+	        </ui-tabs>
+		</div>
+	</section>	
+
+</div>

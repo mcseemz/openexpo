@@ -1,0 +1,1 @@
+ALTER TABLE "event" ADD COLUMN is_public boolean default true;

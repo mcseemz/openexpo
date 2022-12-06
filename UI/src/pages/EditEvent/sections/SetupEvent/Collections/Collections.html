@@ -1,0 +1,323 @@
+<div class="main">
+  <div class="text-middle text-bold">{{tr('collections')}}</div>
+
+  <div class="preloader_overlay preload_overlay_white" v-if="loading"><ui-progress-circular color="primary"></ui-progress-circular></div>
+  <div class="main-wrapper mt-12" v-else>
+    <template v-if="!selectedTopic">
+      <div v-if="agenda.length || articles.length || downloadables.length || stands.length">{{tr('collections_topic')}}</div>
+      <div v-else>{{tr('collections_no_topic')}}</div>
+      <div class="topics flex mt-4">
+        <div class="topic" :class="!agenda.length ? 'disabled_block' : ''" @click="!agenda.length ? '' : selectTopic('agenda')">
+            {{tr('agenda')}}
+            <ui-tooltip position="top" v-if="!agenda.length">{{ tr('disabled_collection_type') }}</ui-tooltip>
+        </div>
+        <div class="topic" :class="!articles.length ? 'disabled_block' : ''"  @click="!articles.length ? '' : selectTopic('articles')">
+            {{tr('articles')}}
+            <ui-tooltip position="top" v-if="!articles.length">{{ tr('disabled_collection_type') }}</ui-tooltip>
+        </div>
+        <div class="topic" :class="!downloadables.length ? 'disabled_block' : ''"  @click="!downloadables.length ? '' : selectTopic('downloadables')">
+            {{tr('_products')}}
+            <ui-tooltip position="top" v-if="!downloadables.length">{{ tr('disabled_collection_type') }}</ui-tooltip>
+        </div>
+        <div class="topic" :class="!stands.length ? 'disabled_block' : ''"  @click="!stands.length ? '' : selectTopic('stands')">
+            {{tr('_stands')}}
+            <ui-tooltip position="top" v-if="!stands.length">{{ tr('disabled_collection_type') }}</ui-tooltip>
+        </div>
+      </div>
+    </template>
+<!--custom-->
+    <template v-if="selectedTopic">
+      <div>{{tr('collections_items')}}</div>
+      <div class="mt-8">
+        <div class="form_input_hr mt-8">
+          <ui-textbox
+            v-model="title"
+            :label="tr('collection_title')"
+            :placeholder="tr('collection_title_ph')"
+            @input="forceUpdateEvent"
+            :invalid="ValidName(title,customNameWanted) && title.length > 1"
+             />
+        </div>
+
+        <div class="form_input_row mt-16 mb-8">
+          <ui-checkbox v-model="customNameWanted" color="accent" @change="forceUpdateEvent">{{tr('i_want_custom_url_name')}}</ui-checkbox>
+        </div>
+
+        <div class="form_input_hr mt-8" v-if="customNameWanted">
+          <ui-textbox
+            v-model="customName"
+            :label="tr('collection_custom_name')"
+            :placeholder="tr('collection_custom_name_ph')"
+            @input="customNameInput"
+            :invalid="ValidName(customName,customNameWanted) && customName.length > 1"
+          />
+        </div>
+
+        <div class="form_input_row mt-16">
+          <ui-textbox
+            v-model="description"
+            :label="tr('collection_description')"
+            :placeholder="tr('collection_description_ph')"
+            :multi-line="true"
+            :rows="5"
+            :maxlength="4000"
+            :invalid="description.length > 4000"
+             />
+        </div>
+
+        <div class="form_input_row collection_hero_droparea mt-20">
+          <VueUploadComponent
+            input-id="heroInput"
+            ref="event_hero_upload"
+            v-model="hero"
+            drop=".collection_hero_droparea"
+            :multiple="false"
+            @input-file="inputHeroFile"
+            class="upload_image_iconstyle ngl"
+            :drop-directory="false"
+            >
+              <div v-if="heroPlaceholder" class="preview_image_box">
+                <img :src="heroPlaceholder">
+              </div>
+              <div v-if="!heroPlaceholder" class="placeholder_text">
+                <img src="../img/image_placeholder_img.svg" class="file_upload_icon">
+                <p class="file_upload_title">{{tr('event_collection_hero_ph')}}</p>
+                <p class="file_upload_desc">{{tr('event_hero_ph_desc')}}</p>
+              </div>
+
+              <div class="icons_box" v-if="heroPlaceholder">
+                <span @click="removeHero"><img src="../img/remove_icon.svg" alt=""></span>
+                <span @click="editHero"><img src="../img/edit_icon.svg" alt=""></span>
+              </div>
+          </VueUploadComponent>
+        </div>
+
+        <div class="form_input_row collection_banner_droparea mt-20">
+          <VueUploadComponent
+            input-id="bannerInput"
+            ref="event_banner_upload"
+            v-model="image"
+            drop=".collection_banner_droparea"
+            :multiple="false"
+            @input-file="inputBannerFile"
+            class="upload_image_iconstyle ngl"
+            :drop-directory="false"
+            >
+              <div v-if="placeholder" class="preview_image_box">
+                <img :src="placeholder">
+              </div>
+              <div v-if="!placeholder" class="placeholder_text">
+                <img src="../img/image_placeholder_img.svg" class="file_upload_icon">
+                <p class="file_upload_title">{{tr('event_collection_ph')}}</p>
+                <p class="file_upload_desc">{{tr('event_cover_ph_desc')}}</p>
+              </div>
+
+              <div class="icons_box" v-if="placeholder">
+                <span @click="removeImage"><img src="../img/remove_icon.svg" alt=""></span>
+                <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+              </div>
+          </VueUploadComponent>
+        </div>
+
+          <div  class="height_80">
+              <div>
+                  <label class="typo__label">Custom option template</label>
+                  <multiselect   :options="value" :custom-label="customLabel" :show-labels="false" @open="getTags(selectedTopic)"
+                                 :value="tagsList" :multiple="true" :searchable="true"   :max-height="150"   @select="onSelect($event,'create')"
+                               :taggable="true"  @remove="onTouch($event,'create',null)" tagPlaceholder=""
+                  >
+                      <template slot="option" slot-scope="props">
+                          <div class="option__desc">
+                              <span class="option__title">{{ props.option.text }}</span>
+                          </div>
+                      </template>
+                  </multiselect>
+              </div>
+          </div>
+
+        <div class="form_input_row" v-if="priceTags && priceTags.length">
+          <div class="text-middle text-bold mb-16">{{tr('pricing_tags')}}:</div>
+          <div class="pricings" style="display: inline-block">
+            <ui-checkbox v-model="tag.selected" v-for="tag in priceTags" >{{tag.text}}</ui-checkbox>
+          </div>
+        </div>
+      </div>
+      <div class="mt-16 flex">
+        <button class="btn btn_owhite" @click="topicReset()">{{tr('cancel')}}</button>
+        <button class="btn btn_orange ml-12" @click="addCollection()">{{tr('btn_add')}}</button>
+      </div>
+    </template>
+
+    <div class="saved-collections mt-32" v-if="collections.length">
+      <div class="mb-8 text-bold text-20">{{tr('existing_collections')}}</div>
+      <div class="mt-12 flex collections-wrapper">
+        <div v-for="(item, index) in collections" :key="index" class="mb-16">
+          <div v-if="!item.edit" class="collection-item flex">
+            <img :src="item.thumbnail" v-if="item.thumbnail" />
+            <img src="@/img/image_placeholder_img.svg" v-else />
+            <div class="collection-content ml-8">
+              <div class="font-bold">{{item.name}} <span class="color-grey">({{tr(getNameByRef(item.ref))}})</span></div>
+              <div class="color-grey" v-if="!item.new">{{getItemsText(item)}}</div>
+            </div>
+            <div class="buttons">
+              <img src="@/img/trash_sec_bold.svg" @click="deleteCollection(index)" />
+              <img class="ml-8" src="@/img/edit_sec.svg" @click="item.edit = true" />
+                 <span v-if="$store.getters.getEditedItem.length && $store.getters.getEditedItem.includes(item.id) || item.new">
+                     <ui-tooltip>{{tr('dont_forget_save')}}</ui-tooltip><img src="../img/edited_dot.svg"/>
+                 </span>
+            </div>
+          </div>
+          <div class="collection-edit" v-if="item.edit">
+            <div class="mt-8">
+              <div class="form_input_hr mt-8">
+                <ui-textbox
+                  v-model="item.name"
+                  :label="tr('collection_title')"
+                  :placeholder="tr('collection_title_ph')"
+                  @change="touchSession(item)"
+                  @input="touchSession(item)"
+                  :invalid="ValidName(item.name,item.customNameWanted) && item.name.length()"
+                />
+
+              </div>
+
+              <div class="form_input_row mt-16 mb-8">
+                <ui-checkbox v-model="item.customNameWanted" color="accent" @change="touchSession(item)">{{tr('i_want_custom_url_name')}}</ui-checkbox>
+              </div>
+
+              <div class="form_input_hr mt-8" v-if="item.customNameWanted">
+                <ui-textbox
+                  v-model="item.customName"
+                  :label="tr('collection_custom_name')"
+                  :placeholder="tr('collection_custom_name_ph')"
+                  :invalid="!item.customName || ValidName(item.customName,item.customNameWanted)" />
+              </div>
+
+              <div class="form_input_row mt-8">
+                <ui-textbox
+                  v-model="item.description"
+                  :label="tr('collection_description')"
+                  :placeholder="tr('collection_description_ph')"
+                  :multi-line="true"
+                  :rows="5" />
+              </div>
+
+              <div class="form_input_row mt-20" :class="[`collection_hero_droparea${index}`]">
+                <div class="thumbnail_title">{{tr('hero_banner')}}</div>
+                <VueUploadComponent
+                  :input-id="'heroInput'+index"
+                  :ref="'event_hero_upload'+index"
+                  v-model="item.heroNew"
+                  :drop="'.collection_hero_droparea'+index"
+                  :multiple="false"
+                  @input-file="existedHero($event, index)"
+                  class="upload_image_iconstyle ngl"
+                  :drop-directory="false"
+                  >
+                    <div v-if="item.hero" class="preview_image_box">
+                      <img :src="item.hero">
+                    </div>
+                    <div v-if="!item.hero" class="placeholder_text">
+                      <img src="../img/image_placeholder_img.svg" class="file_upload_icon">
+                      <p class="file_upload_title">{{tr('event_collection_hero_ph')}}</p>
+                      <p class="file_upload_desc">{{tr('event_hero_ph_desc')}}</p>
+                    </div>
+
+                    <div class="icons_box" v-if="item.hero">
+
+                      <span @click="removeHero($event, item)"><img src="../img/remove_icon.svg" alt=""></span>
+                      <span @click="editHero($event, index)"><img src="../img/edit_icon.svg" alt=""></span>
+                    </div>
+                </VueUploadComponent>
+              </div>
+
+              <div class="form_input_row mt-20" :class="[`collection_banner_droparea${index}`]">
+                <div class="thumbnail_title">{{tr('thumbnail')}}</div>
+                <VueUploadComponent
+                  :input-id="'bannerInput'+index"
+                  :ref="'event_banner_upload'+index"
+                  v-model="item.image"
+                  :drop="'.collection_banner_droparea'+index"
+                  :multiple="false"
+                  @input-file="existedFile($event, index)"
+                  class="upload_image_iconstyle ngl"
+                  :drop-directory="false"
+                  >
+                    <div v-if="item.thumbnail" class="preview_image_box">
+                      <img :src="item.thumbnail">
+                    </div>
+                    <div v-if="!item.thumbnail" class="placeholder_text">
+                      <img src="../img/image_placeholder_img.svg" class="file_upload_icon">
+                      <p class="file_upload_title">{{tr('event_collection_ph')}}</p>
+                      <p class="file_upload_desc">{{tr('event_cover_ph_desc')}}</p>
+                    </div>
+
+                    <div class="icons_box" v-if="item.thumbnail">
+                      <span @click="removeImage($event, item)"><img src="../img/remove_icon.svg" alt=""></span>
+                      <span @click="editImage($event, index)"><img src="../img/edit_icon.svg" alt=""></span>
+                    </div>
+                </VueUploadComponent>
+              </div>
+
+                <div class="height_80">
+                    <label class="typo__label">Custom option template</label>
+                    <multiselect  :placeholder="tr('tags_collection_list')" :options="value" :custom-label="customLabel" :show-labels="false"
+                                  :value="item.tagsList" :multiple="true" :searchable="true"  :max-height="150"   @select="onSelect($event,'edit',index)"
+                                  :taggable="true" @remove="onTouch($event,'edit',index)" tagPlaceholder="" @open="getTags(tr(getNameByRef(item.ref)))"
+                    >
+                        <template slot="option" slot-scope="props">
+                            <div class="option__desc">
+                                <span class="option__title">{{ props.option.text }}</span>
+                            </div>
+                        </template>
+                    </multiselect>
+                </div>
+
+              <div class="form_input_row" v-if="item.priceTags && item.priceTags.length">
+                <div class="text-middle text-bold mb-16">{{tr('pricing_tags')}}:</div>
+                <div class="pricings">
+                  <ui-checkbox v-model="tag.selected" v-for="tag in item.priceTags" >{{tag.text}}</ui-checkbox>
+                </div>
+              </div>
+            </div>
+            <div class="mt-16 flex">
+              <button class="btn btn_owhite" @click="resetCollection(index, item)">{{tr('cancel')}}</button>
+              <button class="btn btn_orange ml-12" @click="updateCollection(index, item)">{{tr('btn_update')}}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ui-modal ref="croppModal" dismissOn="close-button" class="status_modal cropp_modal" removeHeader size="auto">
+    <div class="status_modal_wrapper">
+      <div class="content">
+        <clipper-fixed
+          ref="croppBox"
+          :src="urlForCropp"
+          :ratio="croppRatio"
+          v-if="urlForCropp"
+        ></clipper-fixed>
+        <p class="text">
+          {{tr('scale_message')}}
+        </p>
+        <div class="button_box flex">
+          <button class="btn btn_owhite" @click="backCropp">{{tr('back')}}</button>
+          <button class="btn btn_orange" @click="saveCropp">{{tr('save')}}</button>
+        </div>
+      </div>
+    </div>
+  </ui-modal>
+
+  <ui-modal ref="errorsModal" class="status_modal" removeHeader size="auto">
+    <div class="status_modal_wrapper">
+      <div class="content">
+        <p class="modal_title">{{tr('validation_error')}}</p>
+        <p class="modal_text" v-html="errors">{{errors}}</p>
+      </div>
+    </div>
+
+    <span class="status_modal_close" @click="closeErrorsModal"><img src="@/img/close_medium.svg" alt=""></span>
+  </ui-modal>
+</div>

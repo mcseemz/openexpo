@@ -1,0 +1,24 @@
+{
+    "home_page_title": "Bienvenue chez Openexpo",
+    "home_banner_get_started": "Commencer",
+    "home_banner_create_event": "<span>Créer</span><br>un événement",
+    "home_banner_discover": "<span>Découvrir</span><br>un événement",
+    "home_banner_exhibit": "<span>Exposer</span><br>dans un événement",
+    "home_banner_request_demo": "<span>Demander</span><br>une démo",
+    "home_trending_events": "Événements tendance",
+    "home_trending_title": "Trouvez l'événement que vous recherchez",
+    "home_faqs_title": "Comment pouvons-nous vous aider?",
+    "home_tell_us_title": "Dites-nous ce que vous aimez",
+    "home_tell_us_text": "Nous vous ferons les meilleures recommandations lorsque nous saurons ce que vous aimez",
+    "home_tell_us_button_text_lets_go": "Allons-y",
+    "home_request_demo": "Demander une démo",
+
+    "home_valid_terms_req": "Veuillez confirmer les termes et conditions",
+    "home_steps_1": "Créer un événement",
+    "home_steps_2": "Inviter des exposants",
+    "home_steps_3": "Promouvoir l'événement",
+    "home_steps_4": "Vendre des billets",
+    "home_steps_5": "Présenter l'événement",
+    "home_steps_title": "Présenter un événement en <span>5 étapes</span>",
+    "home_steps_button": "Commencer"
+}

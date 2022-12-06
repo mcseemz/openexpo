@@ -1,0 +1,105 @@
+<div class="page_wrapper static_nik_page" v-if="localesLoaded">
+
+	<!-- Hero -->
+    <div class="page-hero_wrapper">
+        <div class="page-hero content-wrapper">
+            <div class="breadcrumbs">
+                <ul class="breadcrumbs_list">
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('home')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'+routes.all_features" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('openexpo_features')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray ">
+                        <span class="breadcrumbs_link breadcrumbs_link--gray breadcrumbs_link--active">{{tr('page_event_permissions_management_title')}}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="hero_content">
+                <div class="hero_content_inner">
+                    <div class="hero_content_text hero_content_text--mr">
+                        <p class="hero_subtitle hero_subtitle--gray">{{tr('event_permission_subtitle')}}</p>
+                        <h1 class="hero_title hero_title--gray">{{tr('event_permission_title')}}</h1>
+                        <p class="hero_text hero_text--gray">{{tr('event_permission_text')}}</p>
+                        <div class="hero--btns">
+                            <router-link :to="'/'+routes.addevent" class="primary-btn">{{tr('create_event_btn')}}</router-link>
+                            <button @click="requestDemoClick" class="primary-btn primary-btn--reverse">{{tr('request_a_demo_btn')}}</button>
+                        </div>
+                    </div>
+                    <div class="hero_content_img">
+                        <img class="hero_img--people" src="@/img/static-pages/event-permission-management/hero.png" alt="Event permission management">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="page-main_wrapper">
+        <main class="page-main">
+            <!-- 1 -->
+            <article class="article-block article-block--m100 article-block--blue">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/event-permission-management/1.png" alt="Invite personnel and assign their roles">
+                    </div>
+                    <div class="article_header_content article_header_content-ml">
+                        <h2 class="article-title article-title-m0" v-html="tr('invite_personnel_title')"></h2>
+                        <p class="article_text">{{tr('invite_personnel_text')}}</p>
+                        <ul class="unordered_list">
+                            <li class="unordered_item">{{tr('invite_personnel_tab1')}}</li>
+                            <li class="unordered_item">{{tr('invite_personnel_tab2')}}</li>
+                            <li class="unordered_item">{{tr('invite_personnel_tab3')}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 2 -->
+            <article class="article-block article-block--m100 article-block--white">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_header_content article_header_content-mr">
+                        <h2 class="article-title article-title-m0" v-html="tr('see_all_personnel_title')"></h2>
+                        <p class="article_text">{{tr('see_all_personnel_text')}}</p>
+                        <ul class="unordered_list">
+                            <li class="unordered_item">{{tr('see_all_personnel_tab1')}}</li>
+                            <li class="unordered_item">{{tr('see_all_personnel_tab2')}}</li>
+                            <li class="unordered_item">{{tr('see_all_personnel_tab3')}}</li>
+                        </ul>
+                    </div>
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/event-permission-management/2.png" alt="See a full list of personnel, their roles and positions!">
+                    </div>
+                </div>
+            </article>
+
+            <!-- 3 -->
+            <article class="article-block article-block--m100 article-block--blue">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/event-permission-management/3.png" alt="Different persmissions for different roles!">
+                    </div>
+                    <div class="article_header_content article_header_content-ml">
+                        <h2 class="article-title article-title-m0" v-html="tr('different_permissions_title')"></h2>
+                        <p class="article_text">{{tr('different_permissions_text')}}</p>
+                        <ul class="unordered_list">
+                            <li class="unordered_item">{{tr('different_permissions_tab1')}}</li>
+                            <li class="unordered_item">{{tr('different_permissions_tab2')}}</li>
+                            <li class="unordered_item">{{tr('different_permissions_tab3')}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+
+            <!-- 5 -->
+            <OtherFeatures></OtherFeatures>
+
+            <!-- 6 -->
+            <StaticBottomSection></StaticBottomSection>
+        </main>
+    </div>
+
+    <RequestDemo ref="request_demo"></RequestDemo>
+</div>

@@ -1,0 +1,80 @@
+<div class="main">
+    <div class="main_form_box">
+
+        <div class="main_section downloadables_main_section">
+
+            <VueUploadComponent
+                    ref="upload"
+                    v-model="fileInput"
+                    :custom-action="customAction"
+                    :drop="true"
+                    :multiple="false"
+            >
+                <img src="./img/file_input_icon.svg" alt="" class="file_upload_icon">
+                <p class="file_upload_title">{{ fileTitle }}</p>
+                <p class="file_upload_desc">{{ fileSubtitle }}</p>
+            </VueUploadComponent>
+
+            <div class="form_input_row">
+                <ui-textbox
+                        :label="tr('mycomp_dwnl_title_label')"
+                        :placeholder="tr('mycomp_dwnl_title_ph')"
+                        v-model="fileNameInpt"
+                >
+                </ui-textbox>
+            </div>
+
+            <div class="form_input_row">
+                <ui-textbox
+                        :label="tr('mycomp_dwnl_descr_label')"
+                        :placeholder="tr('mycomp_dwnl_descr_ph')"
+                        v-model="fileDescInpt"
+                        :multi-line="true"
+                        :rows="5"
+                >
+                </ui-textbox>
+            </div>
+            <div class="form_input_row">
+                <button class="btn btn_orange" @click="addFile">{{ tr('mycomp_dwnl_add_file') }}</button>
+            </div>
+
+            <p class="main_section_title big_text">{{ tr('mycomp_dwnl_downloadables_added') }}</p>
+
+            <ul class="file_uploaded_list" v-if="existChanger">
+                <li v-for="file in downloadables.exist" :key="file.id" class="file_uploaded_list_item">
+                    <a class="file_uploaded_list_item_url" :href="file.url">
+                        <div class="info">
+                            <img src="./img/uploaded_file_icon.svg" alt="">
+                            <div class="text">
+                                <p class="file_uploaded_list_item_title">{{ file.name }}</p>
+                                <p class="file_uploaded_list_item_meta">{{ file.fileType }} - {{ file.size }} KB</p>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="controls">
+                        <span class="controls_item" @click="removeExistFile(file.id)"><img src="./img/trash_dark.svg"
+                                                                                           alt=""></span>
+                    </div>
+                </li>
+
+                <!-- NEW FILES -->
+                <li v-for="file, index in downloadables.new" class="file_uploaded_list_item">
+                    <div class="info">
+                        <img src="./img/uploaded_file_icon.svg" alt="">
+                        <div class="text">
+                            <p class="file_uploaded_list_item_title">{{ file.fileName ? file.fileName : file.name }}</p>
+                            <p class="file_uploaded_list_item_meta">{{ getFileType(file.name) }} -
+                                {{ Math.round((file.size / 1024)) }} KB</p>
+                        </div>
+                    </div>
+                    <div class="controls">
+
+                        <span class="controls_item" @click="removeFile(index)"><img src="./img/trash_dark.svg"
+                                                                                    alt=""></span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="page_wrapper myevents_page" v-if="localesLoaded">
+
+	<div class="subheader">
+		<div class="container flex">
+			<h2 class="title">{{tr('mychats_title')}}</h2>
+			<div class="left flex">
+
+				<div class="subnavigation">
+					<router-link :to="routes.mychats_visitor" class="subnav_buttons" :class="{ active: $route.path === '/'+routes.mychats+'/'+routes.mychats_visitor }"><span>{{tr('mychats_visitor')}}</span></router-link>
+					<router-link :to="routes.mychats_owner" class="subnav_buttons" :class="{ active: $route.path === '/'+routes.mychats+'/'+routes.mychats_owner }"><span>{{tr('mychats_event_organizer')}}</span></router-link>
+					<router-link :to="routes.mychats_standowner" class="subnav_buttons" :class="{ active: $route.path === '/'+routes.mychats+'/'+routes.mychats_standowner }"><span>{{tr('mychats_standowner')}}</span></router-link>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<router-view></router-view>
+</div>

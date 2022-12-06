@@ -1,0 +1,71 @@
+<div class="page_wrapper page_header_sh2 preloader_wrapper" v-if="localesLoaded"> 
+
+    <div class="preloader_overlay preload_overlay_white" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+    
+    <div class="content_wrapper accept_invitation_section" v-if="(type == 'accept_company_personnel' || type == 'accept_event_personnel' || type == 'accept_stand_personnel') && !errorMessage">
+        <div class="container">
+            <img src="./img/illustration_done.svg" alt="">
+            <h2 class="section_title">{{tr('ai_personnel_accept_title')}}</h2>
+
+            <p class="text" v-if="type == 'accept_company_personnel'">{{tr('ai_personnel_accept_text')}}</p>
+            <p class="text" v-if="type == 'accept_event_personnel'">{{tr('ai_event_personnel_accept_text')}}</p>
+            <p class="text" v-if="type == 'accept_stand_personnel'">{{tr('ai_stand_personnel_accept_text')}}</p>
+            <div class="button_box flex" v-if="type == 'accept_company_personnel'"><router-link class="btn btn_orange" :to="'/'+routes.mycompany" >{{tr('ai_gocompany_button_text')}}</router-link></div>
+            <div class="button_box flex" v-if="type == 'accept_event_personnel'"><router-link class="btn btn_orange" :to="'/'+routes.myevents+'/'+routes.myevents_organizer" >{{tr('ai_goevent_button_text')}}</router-link></div>
+            <div class="button_box flex" v-if="type == 'accept_stand_personnel'"><router-link class="btn btn_orange" :to="'/'+routes.mystands" >{{tr('ai_gostand_button_text')}}</router-link></div>
+        </div>
+    </div>
+    
+    <div class="content_wrapper accept_invitation_section" v-if="type == 'reject_activity' && !errorMessage">
+        <div class="container">
+            <img src="./img/illustration_done.svg" alt="">
+            <h2 class="section_title">{{tr('ai_personnel_reject_title')}}</h2>
+
+            <p class="text">{{tr('ai_personnel_reject_text')}}</p>
+            <div class="button_box flex"><router-link class="btn btn_orange" to="/" >{{tr('ai_gohome_button_text')}}</router-link></div>
+        </div>
+    </div>
+
+    <div class="content_wrapper accept_invitation_section" v-if="statusCode == '200' && type != 'accept_company_personnel' && type != 'accept_event_personnel' && type != 'accept_stand_personnel' && !errorMessage">
+        <div class="container">
+            <img src="./img/illustration_done.svg" alt="">
+            <h2 class="section_title">{{tr('ai_accept_title')}}</h2>
+
+            <p class="text">{{tr('ai_accept_text')}}</p>
+            <div v-if="standId" class="button_box flex"><router-link class="btn btn_orange" :to="'/'+routes.editstand+'/'+standId" >{{tr('ai_accept_button_text')}}</router-link></div>
+        </div>
+    </div>
+
+    <div class="content_wrapper accept_invitation_section" v-if="statusCode == '404'">
+        <div class="container">
+            <img src="./img/illustration_done.svg" alt="">
+            <h2 class="section_title">{{tr('ai_invalid_title')}}</h2>
+
+            <p class="text">{{tr('ai_404_invalid_text')}}</p>
+            <div class="button_box flex"><router-link class="btn btn_orange" :to="'/'" >{{tr('close')}}</router-link></div>
+        </div>
+    </div>
+
+    <div class="content_wrapper accept_invitation_section" v-if="statusCode == '405'">
+        <div class="container">
+            <img src="./img/illustration_done.svg" alt="">
+            <h2 class="section_title">{{tr('ai_invalid_title')}}</h2>
+
+            <p class="text">{{errorMessage}}</p>
+            
+        </div>
+    </div>
+
+    <ui-modal ref="errorModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('ai_invalid_title')}}</p>
+                <p class="modal_text" v-html="errorMessage" v-if="statusCode != '404'">{{errorMessage}}</p>
+                <p class="modal_text" v-if="statusCode == '404'">{{tr('ai_404_invalid_text')}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="errorModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+</div>    

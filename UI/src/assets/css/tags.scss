@@ -1,0 +1,99 @@
+$grey80: #254854;
+$grey60: #386D7D;
+$grey40: #7096A1;
+$grey20: #AFC5CB;
+$grey10: #EBF0F2;
+$orange: #E5843D;
+$black: #1A323B;
+$secondary: #70B9C3;
+
+.page_wrapper, .page_add_event {
+
+
+	.vue-tags-input {
+		max-width: 100%;
+		color: $black;
+		background: transparent;
+
+		&.novalid {
+			.ti-input {
+				border-color: #E42526;
+		    color: #E42526;
+		    background-color: #FCE9E9;
+			}
+		}
+
+		.ti-input {
+			border: 1px solid $grey20;
+			box-sizing: border-box;
+			border-radius: 8px;
+			background-color: #fff;
+			padding: 4px;
+			font-size: 16px;
+			line-height: 1.5em;
+			height: auto;
+		}
+		.ti-tags {
+
+		}
+		&.ti-focus {
+			.ti-input {
+
+			}
+		}
+		.ti-autocomplete {
+
+		}
+		.ti-item.ti-selected-item {
+
+		}
+
+		::-webkit-input-placeholder {
+			color: $grey20;
+		}
+
+		::-moz-placeholder {
+			color: $grey20;
+		}
+
+		:-ms-input-placeholder {
+			color: $grey20;
+		}
+
+		:-moz-placeholder {
+			color: $grey20;
+		}
+
+		.ti-tag {
+			margin: 4px 4px;
+			padding: 4px 16px;
+			background-color: $grey10;
+			border-radius: 40px;
+			// box-sizing: border-box;
+			font-size: 12px;
+			line-height: 1.3em;
+			color: $black;
+
+			&.ti-invalid {
+
+			}
+			&:after {
+
+			}
+		}
+		.ti-new-tag-input {
+			font-size: 16px;
+    		line-height: 1.5em;
+
+			&.ti-invalid {
+
+			}
+		}
+		.ti-deletion-mark {
+			&:after {
+
+			}
+		}
+	}
+
+}

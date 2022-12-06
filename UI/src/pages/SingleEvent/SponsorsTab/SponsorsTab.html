@@ -1,0 +1,72 @@
+<div class="tabs_sponsors_section preloader_wrapper">
+    <div class="preloader_overlay preloader_white" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+    <div class="container">
+        <h2 class="title">{{tr('se_sponsors_tab_title')}}</h2>
+        
+        <div class="tickets_section">
+
+            <div class="ticket_fw flex" v-if="tiersList.length" v-for="item in tiersList">
+                <div class="ticket_fw_left flex">
+                    <img src="@/img/medal3.jpg" alt="" v-if="item.default_id && item.default_id == 1 || !item.default_id && item.id == 1">  
+                    <img src="@/img/medal2.jpg" alt="" v-if="item.default_id && item.default_id == 2 || !item.default_id && item.id == 2">
+                    <img src="@/img/medal1.jpg" alt="" v-if="item.default_id && item.default_id == 3 || !item.default_id && item.id == 3">
+                </div>
+                <div class="ticket_fw_center flex">
+                    <div class="ticket_title big_text">
+                        {{item.title ? item.title : tr('tier')+' '+item.id}}
+                    </div>
+                    <p class="descr" v-if="item.price.ticket_descr">{{item.price.ticket_descr}}</p>
+                    <p class="checked_item" v-for="sw in item.showSwitches">{{sw}}</p>
+                    
+                </div>
+                <div class="ticket_fw_right flex">
+                    <div class="ticket_price big_text">{{formattedPrice(item.price.ticket_price, item.price.currency)}}</div>
+                    <!-- <router-link :to="'#'" class="btn btn_orange btn_md">{{tr('buy')}}</router-link> -->
+                    <router-link :to="'/'+routes.checkout+'/'+eventObj.id+'/tier/'+item.id" class="ttu btn btn_orange btn_md" v-if="!eventObj.isUserSponsor">{{tr('buy')}}</router-link>
+                    <button @click="openModal" class="ttu btn btn_orange btn_md" v-if="eventObj.isUserSponsor">{{tr('buy')}}</button>
+
+                </div>
+            </div>
+
+            <!-- <div class="ticket_fw flex">
+                <div class="ticket_fw_left flex">
+                    <div class="ticket_title big_text">
+                        Offline Pass
+                    </div>
+                    <div class="ticket_title">
+                        The event in - person
+                    </div>
+
+                    <div class="ticket_cutline">
+                        <span class="big_dot"></span>
+                        <span class="dot" v-for="n in 7"></span>
+                        <span class="big_dot"></span>
+                    </div>
+                </div>
+                <div class="ticket_fw_center flex">
+                    <p class="checked_item">12 Lorem ipsum dolor sit</p>
+                    <p class="checked_item">Lorem ipsum dolor sit</p>
+                    <p class="checked_item">50 Lorem ipsum dolor</p>
+                    <p class="checked_item">24/7 Lorem ipsum</p>
+                </div>
+                <div class="ticket_fw_right flex">
+                    <div class="ticket_price big_text">€40.00</div>
+                    <a href="#" class="btn btn_orange btn_md">Join the Event</a>
+                </div>
+            </div> -->
+
+        </div>
+
+    </div>
+
+    <ui-modal ref="sponsorModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <!-- <p class="modal_title">{{tr('validation_error')}}</p> -->
+                <p class="modal_text">{{tr('se_already_sponsor_message')}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="closeModal"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

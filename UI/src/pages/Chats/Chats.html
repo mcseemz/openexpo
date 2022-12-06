@@ -1,0 +1,47 @@
+<div class="page_wrapper">
+  <div class="container flex">
+    <div class="sidebar">
+      <div class="search_input_block mt-24 mb-20">
+        <input type="search" class="search_input" v-model="searchInput" :placeholder="tr('search_event_or_stand')">
+        <div href="#" class="search_btn"><img src="./img/searchNew.svg" alt=""></div>
+      </div>
+
+      <div class="preloader_overlay preload_overlay_white" v-if="loading"><ui-progress-circular color="primary"></ui-progress-circular></div>
+      <template v-else>
+        <div class="event-wrapper current mb-28" v-if="currentActivities.length">
+          <div class="text-small mb-8">{{tr('current')}} ({{currentActivities.length}})</div>
+          <div class="event flex" v-for="item in currentActivities" @click="goToChat(item)">
+            <div class="logo-wrapper">
+              <img :src="eventImage(item)" v-if="eventImage(item)" />
+            </div>
+            <div class="info ml-8">
+              <div class="color-s-accent">{{item.title}}</div>
+              <div class="color-grey text-tiny">{{item.role}}</div>
+            </div>
+            <div class="unread-count text-10" v-if="item.unreadCount">{{item.unreadCount}}</div>
+          </div>
+        </div>
+        <div class="event-wrapper old" v-if="oldActivities.length">
+          <div class="text-small mb-8">{{tr('old')}} ({{oldActivities.length}})</div>
+          <div class="event flex" v-for="item in oldActivities" @click="goToChat(item)">
+            <div class="logo-wrapper">
+              <img :src="eventImage(item)" v-if="eventImage(item)" />
+            </div>
+            <div class="info ml-8">
+              <div class="color-s-accent">{{item.title}}</div>
+              <div class="color-grey text-tiny">{{item.role}}</div>
+            </div>
+            <div class="unread-count text-10" v-if="item.unreadCount">{{item.unreadCount}}</div>
+          </div>
+        </div>
+      </template>
+    </div>
+    <div class="messages">
+      <div class="content">
+        <div class="placeholder text-big color-blue pb-16 mb-44">{{tr('select_event_or_stand')}}</div>
+        <img src="./img/chat-placeholder.svg" />
+      </div>
+    </div>
+  </div>
+
+</div>

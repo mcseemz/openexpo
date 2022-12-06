@@ -1,0 +1,33 @@
+$grey80: #254854;
+$grey60: #386D7D;
+$grey40: #7096A1;
+$grey20: #AFC5CB;
+$grey10: #EBF0F2;
+$orange: #E5843D;
+$black: #1A323B;
+$secondary: #70B9C3;
+
+.page_my_company {
+	.title_box {
+		justify-content: space-between;
+		align-items: center;
+	}
+	.content_sidebar_left .main_section {
+		width: 656px;
+	}
+	.content_sidebar_left .main_section.fw_main_section {
+		width: 100%;
+	}
+	.form_input_qr {
+		width: 152px;
+	}
+
+	.company_not_found {
+		
+		.container {
+			align-items: center;
+			justify-content: center;
+			height: calc(100vh - 128px);
+		}
+	}
+}

@@ -1,0 +1,149 @@
+<div class="page_add_event page_checkout" v-if="localesLoaded">
+    
+    <header class="add_event_header checkout_header">
+        <div class="container flex">
+            
+            <router-link v-if="!checkoutStep" :to="'/'+routes.event+'/'+ (eventObj.customName ? eventObj.customName : $route.params.id) + '/tickets'" class="back_link flex"><img src="./img/arrow_bold_left.svg" alt="">Back</router-link>
+            <span v-if="checkoutStep" @click="changeStep" class="back_link flex"><img src="./img/arrow_bold_left.svg" alt="">Back</span>
+
+        </div>
+    </header>
+    
+    <section class="checkout_main_section">
+        <div class="container flex">
+            <div class="checkout_left">
+                <div class="checkout_left_top">
+                    <div class="error_message" v-if="paymentError">
+                        <div class="icon_box"><img src="./img/error.svg" alt=""></div>
+                        <p>{{tr('checkout_error_msg')}}</p>
+                    </div>
+                    <div class="form_section_title">
+                        {{eventObj.name}}
+                    </div>
+                    <p v-if="evtItemDate" class="checkout_subtitle small_text">{{evtItemDate.longFormat}}</p>
+                    <!-- <div class="checkout_promocode">
+                        <a href="#" class="checkout_promocode_link">{{tr('checkout_enter_promo_code')}}</a>
+                    </div> -->
+                    
+                    <div class="checkout_placeorder_details" v-if="checkoutStep">
+                        
+                        <div class="checkout_placeorder_row">
+                            <p class="main_section_title big_text">{{tr('checkout_contact_information')}}</p>
+                            <!-- <p><strong>Matthew Grant Wellbeing</strong></p> -->
+                            <p class="small_text checkout_email">{{userEmail}}</p>
+
+                            <div class="flex form_checkbox_row ">
+                                <ui-checkbox v-model="usePersonalData" color="accent" checked>{{tr('checkout_billing_checkbox')}}</ui-checkbox>
+                            </div>
+                        </div>
+
+                        <div class="checkout_placeorder_row">
+                            <p class="main_section_title big_text">{{tr('checkout_payment_method')}}</p>
+                            
+                            <div class="checkout_payment_method" :class="paymentMethod == 'credit' ? 'method_checked' : ''" @click="selectPayment('credit')">
+                                <img src="./img/creditcard.svg" alt="" class="icon">
+                                <span class="payment_name">{{tr('checkout_credit_debit')}}</span>
+                            </div>
+                            <div class="checkout_payment_method" :class="paymentMethod == 'paypal' ? 'method_checked' : ''" @click="selectPayment('paypal')">
+                                <img src="./img/paypal.svg" alt="" class="icon">
+                                <span class="payment_name">{{tr('checkout_paypal')}}</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="checkout_tickets" v-if="!checkoutStep">
+                        <div class="ticket" v-if="ticket && ticket.id">
+                            <div class="top flex">
+                                <div class="left">
+                                    <p class="big_text ticket_title">{{ticketName}}</p>
+                                    <p class="ticket_price" v-if="!tierCheckout">{{formatPrice(ticket.access_price, ticket.access_currency)}}</p>
+                                    <p class="ticket_price" v-if="tierCheckout && tier">{{formatPrice(tier.price.ticket_price, tier.price.currency)}}</p>
+                                </div>
+                                <div class="right">
+                                   <!--  <ui-textbox 
+                                        placeholder="0" 
+                                        v-model="qty"
+                                        type="number"
+                                        :min="0"
+                                        :max="ticket.quantity"
+                                    >
+                                    </ui-textbox> -->
+                                </div>
+                            </div>
+                            <p class="bottom small_text" v-if="!tierCheckout">
+                                {{ticket.description_long}}
+                            </p>
+                            <p class="bottom small_text" v-if="tierCheckout && tier">
+                                {{tier.price.ticket_descr}}
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="checkout_left_bottom">
+                    <div class="flex form_checkbox_row "  v-if="checkoutStep">
+                        <ui-checkbox v-model="acceptTerms" color="accent"><span v-html="tr('checkout_terms')"></span></ui-checkbox>
+                    </div>
+                    
+                    <div class="button_box flex">
+                        <button @click="changeStep('checkout')" class="btn btn_orange" :class="!checkoutValidator ? 'disabled' : ''" v-if="!checkoutStep">
+                            {{tr('checkout')}}
+                        </button>
+                        <button @click="placeOrder" class="btn btn_orange" :class="!placeOrderValidator ? 'disabled' : ''" v-if="checkoutStep">
+                            {{tr('checkout_place_order')}}
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- "apply": "Apply",
+                "promo_code": "Promo code" -->
+            </div>
+            <div class="checkout_right">
+                <div class="image_box">
+                    <img :src="eventBranding.templateCover.url" alt="" v-if="eventBranding.templateCover.url">
+                </div>
+                <div class="checkout_summary">
+                    <div class="checkout_row bold">
+                        <span class="text">{{tr('checkout_ticket_summary')}}</span><span class="price"></span>
+                    </div>
+                    <div class="checkout_row" v-if="cartTicketName">
+                        <span class="text">{{cartTicketName}}</span>
+                        <span class="price" v-if="!tierCheckout">{{formatPrice(ticket.access_price, ticket.access_currency)}}</span>
+                        <span class="price" v-if="tierCheckout && tier">{{formatPrice(tier.price.ticket_price, tier.price.currency)}}</span>
+                    </div>
+                    <div class="checkout_divider"></div>
+                    <div class="checkout_row">
+                        <span class="text">{{tr('checkout_subtotal')}}</span>
+                        <span class="price" v-if="!tierCheckout">{{formatPrice(cartSubtotal, ticket.access_currency)}}</span>
+                        <span class="price" v-if="tierCheckout && tier">{{formatPrice(cartSubtotal, tier.price.currency)}}</span>
+                    </div>
+                    <div class="checkout_row">
+                        <span class="text">{{tr('checkout_fees')}}</span>
+                        <span class="price" v-if="!tierCheckout">{{formatPrice(cartFees, ticket.access_currency)}}</span>
+                        <span class="price" v-if="tierCheckout && tier">{{formatPrice(cartFees, tier.price.currency)}}</span>
+                    </div>
+                    <div class="checkout_row">
+                        <span class="text">{{tr('checkout_sales_tax')}}</span>
+                        <span class="price" v-if="!tierCheckout">{{formatPrice(cartTax, ticket.access_currency)}}</span>
+                        <span class="price" v-if="tierCheckout && tier">{{formatPrice(cartTax, tier.price.currency)}}</span>
+                    </div>
+                    <div class="checkout_divider"></div>
+                    <div class="checkout_row bold">
+                        <span class="text">{{tr('checkout_total')}}</span>
+                        <span class="price" v-if="!tierCheckout">{{formatPrice(cartTotal, ticket.access_currency)}}</span>
+                        <span class="price" v-if="tierCheckout && tier">{{formatPrice(cartTotal, tier.price.currency)}}</span>
+                    </div> 
+                </div>
+                
+            </div>
+        </div>
+    </section>
+    
+    <ui-modal ref="messageModal" removeHeader size="auto">
+        {{modalMsg}}
+    </ui-modal>
+
+
+
+</div>

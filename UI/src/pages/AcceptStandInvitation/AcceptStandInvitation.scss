@@ -1,0 +1,28 @@
+$grey80: #254854;
+$grey60: #386D7D;
+$grey40: #7096A1;
+$grey20: #AFC5CB;
+$grey10: #EBF0F2;
+$orange: #E5843D;
+$black: #1A323B;
+$secondary: #70B9C3;
+
+.accept_invitation_section {
+	padding: 108px 0 150px;
+	text-align: center;
+
+	img {
+		margin: 0 auto 12px;
+	}
+	.section_title {
+		font-size: 32px;
+		line-height: 124%;
+		margin: 0 auto 32px;
+	}
+	.text {
+		margin: 0 auto 20px;
+	}
+	.button_box {
+		justify-content: center;
+	}
+}

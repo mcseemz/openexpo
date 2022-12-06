@@ -1,0 +1,246 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  This template deploys a VPC with a pair of subnets spread across two Availability
+  Zones. It deploys an Internet Gateway, with a default route on the public subnets.
+  It deploys an RDS PostgreSQL master and single read replica database.
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+  VpcCIDR:
+    Description: IP range (CIDR notation) for this VPC
+    Type: String
+    Default: 10.0.0.0/24
+    AllowedPattern: ((\d{1,3})\.){3}\d{1,3}/\d{1,2}
+  SubnetMasterCIDR:
+    Description: IP range (CIDR notation) for the subnet in the RDS Master Availability
+      Zone
+    Type: String
+    Default: 10.0.0.0/28
+    AllowedPattern: ((\d{1,3})\.){3}\d{1,3}/\d{1,2}
+  SubnetReplicaCIDR:
+    Description: IP range (CIDR notation) for the subnet in the RDS Read Replica Availability
+      Zone
+    Type: String
+    Default: 10.0.0.16/28
+    AllowedPattern: ((\d{1,3})\.){3}\d{1,3}/\d{1,2}
+  DBInstanceIdentifier:
+    Type: String
+    Default: tex-dev-instance
+  ReplicaInstanceIdentifier:
+    Type: String
+    Default: tex-dev-replica
+  DBEngine:
+    Type: String
+    Default: postgres
+  DBEngineVersion:
+    Type: String
+    Default: '11.6'
+  DBSourceRegion:
+    Type: String
+    Default: eu-central-1
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.micro
+    AllowedValues:
+      - db.t3.micro
+      - db.t3.small
+      - db.m5.large
+  DBStorageType:
+    Type: String
+    Default: gp2
+  DBAllocatedStorage:
+    Type: Number
+    Default: 5
+  DBName:
+    Type: String
+    Default: db_name_dev
+    Description: 'now we use credentials from parameters file, but for security reasons
+      they should be in ssm, and used like: {{resolve:ssm:/rds_demo/db_name:1}}'
+  DBUser:
+    Type: String
+    Default: db_user_dev
+    Description: '{{resolve:ssm:/rds_demo/master_username:1}} check https://github.com/garystafford/aws-rds-postgres/blob/master/parameter_store_values.sh'
+  DBPassword:
+    Type: String
+    Default: db_passwoed_dev
+    NoEcho: true
+    Description: '{{resolve:ssm-secure:/rds_demo/master_password:1}}'
+Conditions:
+  CreateProdResources: !Equals
+    - !Ref 'Environment'
+    - prod
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref 'VpcCIDR'
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: TEX VPC
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: TEX Internet Gateway
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref 'InternetGateway'
+      VpcId: !Ref 'VPC'
+    DependsOn: InternetGateway
+  SubnetMasterDB:
+    Type: AWS::EC2::Subnet
+    DependsOn: VPC
+    Properties:
+      VpcId: !Ref 'VPC'
+      AvailabilityZone: !Select
+        - '0'
+        - !GetAZs ''
+      CidrBlock: !Ref 'SubnetMasterCIDR'
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Master Subnet (AZ1)
+  SubnetReplicaDB:
+    Type: AWS::EC2::Subnet
+    DependsOn: VPC
+    Properties:
+      VpcId: !Ref 'VPC'
+      AvailabilityZone: !Select
+        - '1'
+        - !GetAZs ''
+      CidrBlock: !Ref 'SubnetReplicaCIDR'
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Replica Subnet (AZ2)
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+      Tags:
+        - Key: Name
+          Value: Public Route Table
+    DependsOn: VPC
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
+  SubnetMasterRouteTableAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      SubnetId: !Ref 'SubnetMasterDB'
+    DependsOn: SubnetMasterDB
+  SubnetReplicaRouteTableAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: SubnetReplicaDB
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      SubnetId: !Ref 'SubnetReplicaDB'
+  DBSubnetGroup:
+    Properties:
+      DBSubnetGroupDescription: DBSubnetGroup for RDS instances
+      SubnetIds:
+        - !Ref 'SubnetMasterDB'
+        - !Ref 'SubnetReplicaDB'
+    Type: AWS::RDS::DBSubnetGroup
+  VpcDefaultSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !GetAtt 'VPC.DefaultSecurityGroup'
+      CidrIp: '0.0.0.0/0'
+      IpProtocol: tcp
+      FromPort: 5432
+      ToPort: 5432
+  TexMasterInstance:
+    Properties:
+      DBInstanceIdentifier: !Ref 'DBInstanceIdentifier'
+      DBName: !Ref 'DBName'
+      AllocatedStorage: !Ref 'DBAllocatedStorage'
+      DBInstanceClass: !Ref 'DBInstanceClass'
+      StorageType: !Ref 'DBStorageType'
+      Engine: !Ref 'DBEngine'
+      EngineVersion: !Ref 'DBEngineVersion'
+      MasterUsername: !Ref 'DBUser'
+      MasterUserPassword: !Ref 'DBPassword'
+      PubliclyAccessible: true
+      Tags:
+        - Key: Name
+          Value: TEX RDS PostgreSQL Master
+      VPCSecurityGroups:
+        - !GetAtt 'VPC.DefaultSecurityGroup'
+      DBSubnetGroupName: !Ref 'DBSubnetGroup'
+    Type: AWS::RDS::DBInstance
+  TexReadReplica:
+    Condition: CreateProdResources
+    Properties:
+      DBInstanceIdentifier: !Ref 'ReplicaInstanceIdentifier'
+      AllocatedStorage: !Ref 'DBAllocatedStorage'
+      DBInstanceClass: !Ref 'DBInstanceClass'
+      SourceDBInstanceIdentifier: !Ref 'TexMasterInstance'
+      SourceRegion: !Ref 'DBSourceRegion'
+      Tags:
+        - Key: Name
+          Value: TEX RDS PostgreSQL Read Replica
+    Type: AWS::RDS::DBInstance
+Outputs:
+  EndpointMaster:
+    Description: Endpoint of the newly created RDS master
+    Value: !Ref 'TexMasterInstance'
+    Export:
+      Name: !Sub 'TexMasterInstance-${Environment}'
+  EndpointMasterConn:
+    Description: Endpoint of the newly created RDS master
+    Value: !Join
+      - /
+      - - !Join
+          - ':'
+          - - jdbc
+            - !GetAtt 'TexMasterInstance.Endpoint.Address'
+            - !GetAtt 'TexMasterInstance.Endpoint.Port'
+        - !Ref 'DBName'
+    Export:
+      Name: !Sub 'TexMasterInstanceConn-${Environment}'
+  EndpointMasterURL:
+    Description: Endpoint of the newly created RDS master
+    Value: !GetAtt 'TexMasterInstance.Endpoint.Address'
+    Export:
+      Name: !Sub 'TexMasterInstanceURL-${Environment}'
+  EndpointReplica:
+    Description: Endpoint of the newly created RDS replica
+    Value: !Ref 'TexReadReplica'
+    Export:
+      Name: !Sub 'TexReadReplica-${Environment}'
+    Condition: CreateProdResources
+  EndpointReplicaURL:
+    Description: Endpoint of the newly created RDS replica
+    Value: !Join
+      - /
+      - - !Join
+          - ':'
+          - - jdbc
+            - !GetAtt 'TexReadReplica.Endpoint.Address'
+            - !GetAtt 'TexReadReplica.Endpoint.Port'
+        - !Ref 'DBName'
+    Export:
+      Name: !Sub 'TexReadReplicaURL-${Environment}'
+    Condition: CreateProdResources
+  TexVPC:
+    Description: main VPC to run resources in
+    Value: !Ref VPC
+    Export:
+      Name: !Sub 'TexVPC-${Environment}'
+  TexMasterSubnet:
+    Description: main VPC to run resources in
+    Value: !Ref SubnetMasterDB
+    Export:
+      Name: !Sub 'TexMasterSubnet-${Environment}'

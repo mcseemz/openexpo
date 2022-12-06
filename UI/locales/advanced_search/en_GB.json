@@ -1,0 +1,23 @@
+{
+  "page_advanced_search_title": "Advanced Search",
+  "advanced_search_subtitle": "Advanced search",
+  "advanced_search_title": "Advanced search at Openexpo!",
+  "advanced_search_text": "Finding different type of information on a crowded event is a primary functionality. Whereas trying to find the needed company by a specific category or a speaker on the event.",
+  "advanced_search_quicksearch_title": "<span class=\"orange\">Quick search</span> with tons of functionality.",
+  "advanced_search_quicksearch_text": "Sometimes you need to search something quickly for a specific category or a person, our platform allows to achieve that by simply entering a line of text in the top spotlight search.",
+  "advanced_search_quicksearch_text_tab1": "View stands right from the quick menu!",
+  "advanced_search_quicksearch_text_tab2": "Schedule meetings without leaving quick search.",
+  "advanced_search_quicksearch_text_tab3": "Start chat with notable people on the event!",
+  "advanced_search_find_anything_title": "<span class=\"orange\">Find anything</span> that interests you on the event!",
+  "advanced_search_find_anything_text": "Apart from a spotlight search the attendee can search for data in an advanced mode by filtering the search results for a specific types of data. At the moment one can search for:",
+  "advanced_search_find_anything_text_tab1": "People search",
+  "advanced_search_find_anything_text_tab2": "Stand search",
+  "advanced_search_find_anything_text_tab3": "Tag search",
+  "advanced_search_people_search_title": "<span class=\"orange\">People</span> Search",
+  "advanced_search_people_search_text": "Find and instantly chat with or arrange meeting with notable people that attend an event or stand.",
+  "advanced_search_stand_search_title": "<span class=\"orange\">Stand</span> Search",
+  "advanced_search_stand_search_text": "Easy access to stands and brands that may interest you. Find out who is present on each stand!",
+  "advanced_search_tage_search_title": "<span class=\"orange\">Tag</span> Search",
+  "advanced_search_tage_search_text": "Just looking for something specific that interests you on a certain event? Tag seach is your best friend!"
+
+}

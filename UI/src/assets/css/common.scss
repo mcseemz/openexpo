@@ -1,0 +1,90 @@
+/*
+  common.sccs can be used for such purposes:
+  1. spacings - add your own if you need to
+  2. fonts - classes for text size and weight
+  3. colors - classes for text color
+  4. any helper classes or functions for common usage - flex features, borders, backgrounds, etc
+
+  Please do not use this file for overriding third party libs and huge style structures
+
+  TODO: variables
+*/
+
+// spacings, examples - mt-4, pl-24
+$spaceamounts: (4, 8, 10, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60);
+$sides: (top, bottom, left, right);
+
+@each $space in $spaceamounts {
+  @each $side in $sides {
+    .m#{str-slice($side, 0, 1)}-#{$space} {
+      margin-#{$side}: #{$space}px !important;
+    }
+
+    .p#{str-slice($side, 0, 1)}-#{$space} {
+      padding-#{$side}: #{$space}px !important;
+    }
+  }
+}
+
+// Fonts
+.text-micro {
+  font-size: 8px;
+  line-height: 10px;
+}
+.text-10 {
+  font-size: 10px;
+  line-height: 16px;
+}
+.text-tiny {
+  font-size: 12px;
+  line-height: 14px;
+}
+.text-small {
+  font-size: 14px;
+  line-height: 17px;
+}
+.text-20 {
+  font-size: 20px;
+  line-height: 24px;
+}
+.text-middle {
+  font-size: 24px;
+  line-height: 31px;
+}
+.text-big {
+  font-size: 28px;
+  line-height: 35px;
+}
+.text-34 {
+  font-size: 34px;
+  line-height: 35px;
+}
+.text-48 {
+  font-size: 48px;
+  line-height: 48px;
+}
+.text-bold {
+  font-weight: bold;
+}
+
+// Colors
+$light-blue: #ecf4fa;
+
+.color-s-accent {
+  color: #254854;
+}
+.color-grey {
+  color: #6e7c8d;
+}
+.color-grey-40 {
+  color: #7096a1;
+}
+.color-black {
+  color: #140c35;
+}
+.color-orange {
+  color: #e5853c;
+}
+.color-blue {
+  color: $light-blue;
+}

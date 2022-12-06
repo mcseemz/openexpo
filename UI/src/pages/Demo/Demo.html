@@ -1,0 +1,110 @@
+<div class="page_wrapper demo_page preloader_wrapper" v-if="localesLoaded">
+	<div class="preloader_overlay fixed preload_overlay_white" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+	<div class="container flex" v-if="activeSection == 'main'">
+		<div class="demo_left">
+			<h2 class="title">{{tr('demo_request_demo')}}</h2>
+			<p class="demo_subtitle">{{tr('demo_request_subtitle')}}</p>
+			<div class="demo_left_items">
+				<div class="demo_item flex">
+					<div class="left">
+						<p class="title">{{tr('demo_1x1_title')}}</p>
+						<p class="item_subtitle">{{tr('demo_1x1_subtitle')}}</p>
+					</div>
+					<div class="right">
+						<button class="btn btn_orange" @click="openRequestModal('personalized')">{{tr('demo_1x1_button')}}</button>
+					</div>
+				</div>
+				<div class="demo_item flex">
+					<div class="left">
+						<p class="title">{{tr('demo_group_title')}}</p>
+						<p class="item_subtitle">{{tr('demo_group_subtitle')}}</p>
+					</div>
+					<div class="right">
+						<button class="btn btn_orange" @click="openRequestModal('group_demo')">{{tr('demo_group_button')}}</button>
+					</div>
+				</div>
+				<div class="demo_item flex">
+					<div class="left">
+						<p class="title">{{tr('demo_recorded_title')}}</p>
+						<p class="item_subtitle">{{tr('demo_recorded_subtitle')}}</p>
+					</div>
+					<div class="right">
+						<button class="btn btn_orange" @click="openRequestModal('recorded_demo')">{{tr('demo_recorded_button')}}</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container" v-if="activeSection == 'playlist'">
+
+		<div class="demo_left">
+			<h2 class="title">{{tr('demo_recorded_title')}}</h2>
+			<p class="demo_subtitle">{{tr('demo_comming_soon')}}</p>
+			<div class="demo_left_items">
+				<div class="button_box"><button class="btn btn_orange" @click="goBack">{{tr('back')}}</button></div>
+			</div>
+		</div>
+		<div class="demo_right"></div>
+	</div>
+
+	<ui-modal ref="requestDemoModal" class="status_modal get_in_touch_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content get_in_touch_section">
+                <form action="#" class="contact_form">
+    				<p class="form_title big_text">{{tr('demo_request_demo')}}</p>
+    				<ui-textbox
+	                    :placeholder="tr('demo_name_ph')"
+	                    v-model="request.name"
+	                    :invalid="reqNameTouched && !request.name"
+	                    v-on:touch.passive="reqNameTouched = true"
+	                    id="reqDemoNameField"
+	                >
+	                </ui-textbox>
+	                <ui-textbox
+	                    :placeholder="tr('demo_email_ph')"
+	                    v-model="request.email"
+	                    :invalid="(reqMailTouched && !request.email) || (reqTelTouched && request.email && !validateEmail(request.email))"
+	                    v-on:touch.passive="reqMailTouched = true"
+	                    id="reqDemoEmailField"
+	                >
+	                </ui-textbox>
+	                <ui-textbox
+	                    :placeholder="tr('demo_phone_ph')"
+	                    v-model="request.tel"
+	                    :invalid="(reqTelTouched && !request.tel) || (reqTelTouched && request.tel && !(/^[\d()\-#+\s]*$/.test(request.tel)))"
+	                    v-on:touch.passive="reqTelTouched = true"
+	                    id="reqDemoPhoneField"
+	                >
+	                </ui-textbox>
+	                <ui-textbox
+	                    :placeholder="tr('demo_msg_ph')"
+	                    v-model="request.msg"
+                        :multi-line="true"
+                        id="reqDemoMsgField"
+	                >
+	                </ui-textbox>
+    				<div class="form_footer flex">
+    					<ui-checkbox id="reqDemoTermsCheckbox" v-model="terms" color="accent">
+    						<span v-html="tr('terms_html')"></span>
+    					</ui-checkbox>
+    					<button class="btn btn_orange" id="reqDemoSendButton" @click.prevent="sendRequest">{{tr('demo_send')}}</button>
+    				</div>
+    			</form>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="modalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="messageModal" class="status_modal" :class="{status_modal_success: statusModalSuccess}" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{modalTitle}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

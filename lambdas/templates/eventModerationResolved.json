@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "eventModerationResolved",
+    "SubjectPart": "Your event was {{resolution}}ed",
+    "HtmlPart": "Your event was {{resolution}}ed: {{url}}",
+    "TextPart": "Your event was {{resolution}}ed: {{url}}"
+  }
+}

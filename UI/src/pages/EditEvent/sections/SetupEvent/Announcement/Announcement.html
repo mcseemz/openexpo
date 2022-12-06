@@ -1,0 +1,41 @@
+<div class="main main_sections_wrapper">
+    <div class="main_form_box">
+        <div class="main_section">            
+            <p class="main_section_title flex big_text">
+                {{tr('adev_announcement_label')}}
+                <span class="question_icon">?<span class="tooltip_text_box">{{tr('adev_announcement_tooltip')}}</span></span>
+            </p>
+            <div class="form_input_row">
+                <ui-textbox
+                    ref="announcementText"    
+                    :label="tr('adev_announcement_label')"
+                    :placeholder="tr('adev_notification_visitors')"
+                    v-model="announcement"
+                    :disabled="isLoading"
+                    :maxlength="500"
+                    :multi-line="true"
+                    :invalid="announcement.length > 500 || /[<>;{}$]/.test(announcement)"
+                    :autosize="true"
+                    @:touch.passive="eventAnnounsTouched = true"
+                    :help="lastEdited"
+                    :error="announcement.length > 500 ? tr('maximum_characters_announcement'):' ' + /[<>;{}$]/.test(announcement) ? tr('name_not_contain_special'): ''"
+                >
+                </ui-textbox>
+            </div>
+            <div>
+                <ui-button ref="updateAnnouncementBtn" class="btn btn_orange" :loading="isLoading" :disabled="!updateIsAvailable" :class="{disabled: !updateIsAvailable}"@click="updateAnnouncement">{{tr('update')}}</ui-button>
+            </div>
+        </div>
+    </div>
+
+    <ui-modal ref="messageModal" class="status_modal" :class="{status_modal_success: statusModalSuccess}" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{modalTitle}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

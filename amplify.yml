@@ -1,0 +1,66 @@
+version: 0.1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - cd UI/src
+        - npm install
+    build:
+      commands: 
+        - npm run-script build 
+  artifacts:
+    baseDirectory: UI/statics
+    files:
+      - '**/*'
+  customHeaders:
+    # cache static assets!
+    # js
+    - pattern: '**/*.js'
+      headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+    # css
+    - pattern: '**/*.css'
+      headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+    # images
+    - pattern: '**/*.gif'
+      headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+    - pattern: '**/*.jpg'
+      headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+    - pattern: '**/*.png'
+      headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+    - pattern: '**/*.svg'
+      headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+    - pattern: '**/*.woff2'
+      headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+    # videos
+    - pattern: '**/*.mp4'
+      headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+    - pattern: '**/*.webm'
+      headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+  cache:
+    paths: 
+      - nodes_modules/**/*
+test:
+  artifacts:
+    baseDirectory: /UI/cypress
+    configFilePath: "**/mochawesome.json"
+    files:
+      - "**/*.png"
+      - "**/*.mp4"
+      - "**/mochawesome.json"
+  phases:
+    preTest:
+      commands:
+        - wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+        - yum install -y ./google-chrome-stable_current_*.rpm
+        - cd UI
+        - npm install
+        - npm install wait-on
+        - npm install mocha mochawesome mochawesome-merge mochawesome-report-generator
+        - npm install --save-dev cypress-audit
+        - "npm run serve & npx wait-on http://localhost:8080"
+    test:
+      commands:
+        - 'npx cypress run --browser chrome --headless --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
+    postTest:
+      commands:
+        - npx mochawesome-merge@4 cypress/report/mochawesome-report/*.json > cypress/report/mochawesome.json

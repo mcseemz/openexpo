@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "sponsorshipBoughtToOrganizer",
+    "SubjectPart": "You have new sponsor for the event '{{eventName}}'",
+    "HtmlPart": "{{entity}} '{{entityName}}' is now sponsoring your event. Tier options are: {{tierOptions}}, price: {{price}} {{currency}}",
+    "TextPart": "{{entity}} '{{entityName}}' is now sponsoring your event. Tier options are: {{tierOptions}}, price: {{price}} {{currency}}"
+  }
+}

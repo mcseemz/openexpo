@@ -1,0 +1,19 @@
+<ui-modal ref="croppModal" dismissOn="close-button" class="status_modal cropp_modal" removeHeader size="auto">
+  <div class="status_modal_wrapper">
+    <div class="content">
+      <clipper-fixed
+        ref="croppBox"
+        :src="urlForCropp"
+        :ratio="croppRatio"
+        v-if="urlForCropp"
+      ></clipper-fixed>
+      <p class="text">
+        {{tr('scale_message')}}
+      </p>
+      <div class="button_box flex">
+        <button class="btn btn_owhite" @click="back">{{tr('back')}}</button>
+        <button class="btn btn_orange" @click="save">{{tr('save')}}</button>
+      </div>
+    </div>
+  </div>
+</ui-modal>

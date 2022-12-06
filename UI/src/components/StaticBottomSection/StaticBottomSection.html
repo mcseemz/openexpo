@@ -1,0 +1,13 @@
+<article class="article-block article-block--center" :class="{'article-block--blue': color == 'blue', 'article-block--white': color != 'blue'}">
+    <div class="content-wrapper">
+        <div class="mascot_article">
+            <div class="mascot_text">
+                <h2 class="article-title article-title--center article-title-m">{{tr('event_what_type of_event_you_planning_title')}}</h2>
+                <div class="mascot_btns">
+                    <router-link :to="'/'+routes.solutions" class="primary-btn">{{tr('event_solutions_page_btn')}}</router-link>
+                    <router-link :to="'/'+routes.howitworks" class="primary-btn primary-btn--reverse">{{tr('how_it_works_btn')}}</router-link>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>

@@ -1,0 +1,61 @@
+<div>
+    <ui-modal ref="requestDemoModal" class="status_modal get_in_touch_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content get_in_touch_section">
+                <form action="#" class="contact_form">
+                    <p class="form_title big_text">{{tr('rd_modal_contact_us')}}</p>
+                    <ui-textbox 
+                        :placeholder="tr('rd_modal_name_ph')" 
+                        v-model="request.name"
+                        :invalid="reqNameTouched && !request.name"
+                        v-on:touch.passive="reqNameTouched = true"
+                        id="reqDemoNameField"
+                    >
+                    </ui-textbox>
+                    <ui-textbox 
+                        :placeholder="tr('rd_modal_email_ph')" 
+                        v-model="request.email"
+                        :invalid="(reqMailTouched && !request.email) || (reqTelTouched && request.email && !validateEmail(request.email))"
+                        v-on:touch.passive="reqMailTouched = true"
+                        id="reqDemoEmailField"
+                    >
+                    </ui-textbox>
+                    <ui-textbox 
+                        :placeholder="tr('rd_modal_phone_ph')" 
+                        v-model="request.tel"
+                        :invalid="(reqTelTouched && !request.tel) || (reqTelTouched && request.tel && !(/^[\d()\-#+\s]*$/.test(request.tel)))"
+                        v-on:touch.passive="reqTelTouched = true"
+                        id="reqDemoPhoneField"
+                    >
+                    </ui-textbox>
+                    <ui-textbox 
+                        :placeholder="tr('rd_modal_msg_ph')" 
+                        v-model="request.msg"
+                        :multi-line="true"
+                        id="reqDemoMsgField"
+                    >
+                    </ui-textbox>
+                    <div class="form_footer flex">
+                        <ui-checkbox id="reqDemoTermsCheckbox" v-model="terms" color="accent">
+                            <span v-html="tr('terms_html')"></span>
+                        </ui-checkbox>
+                        <button class="btn btn_orange" id="reqDemoSendButton" @click.prevent="sendRequest">{{tr('rd_modal_send')}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="modalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="messageModal" class="status_modal" :class="{status_modal_success: statusModalSuccess}" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{modalTitle}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="13px" height="13px" viewBox="0 0 13 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 10</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Openexpo_Welcome" transform="translate(-881.000000, -856.000000)" fill="#000000">
+            <g id="Group-10" transform="translate(881.000000, 856.000000)">
+                <g id="001-calendar" fill-rule="nonzero">
+                    <path d="M11.3242188,1.015625 L10.15625,1.015625 L10.15625,0.40625 C10.15625,0.181898437 9.97437695,0 9.75,0 C9.52562305,0 9.34375,0.181898437 9.34375,0.40625 L9.34375,1.015625 L3.65625,1.015625 L3.65625,0.40625 C3.65625,0.181898437 3.47437695,0 3.25,0 C3.02562305,0 2.84375,0.181898437 2.84375,0.40625 L2.84375,1.015625 L1.67578125,1.015625 C0.751740234,1.015625 0,1.76736523 0,2.69140625 L0,11.3242188 C0,12.2482598 0.751740234,13 1.67578125,13 L11.3242188,13 C12.2482598,13 13,12.2482598 13,11.3242188 L13,2.69140625 C13,1.76736523 12.2482598,1.015625 11.3242188,1.015625 Z M12.1875,11.3242188 C12.1875,11.8010039 11.8010039,12.1875 11.3242188,12.1875 L1.67578125,12.1875 C1.19899609,12.1875 0.8125,11.8010039 0.8125,11.3242188 L0.8125,4.59570312 C0.8125,4.52559961 0.869349609,4.46875 0.939453125,4.46875 L12.0605469,4.46875 C12.1306504,4.46875 12.1875,4.52559961 12.1875,4.59570312 L12.1875,11.3242188 Z" id="Shape"></path>
+                </g>
+                <g id="Group-9" transform="translate(1.950000, 6.175000)">
+                    <rect id="Rectangle-4" x="0" y="0" width="1.3" height="1.3" rx="0.65"></rect>
+                    <rect id="Rectangle-4" x="2.6" y="0" width="1.3" height="1.3" rx="0.65"></rect>
+                    <rect id="Rectangle-4" x="5.2" y="0" width="1.3" height="1.3" rx="0.65"></rect>
+                    <rect id="Rectangle-4" x="7.8" y="0" width="1.3" height="1.3" rx="0.65"></rect>
+                    <rect id="Rectangle-4" x="0" y="2.6" width="1.3" height="1.3" rx="0.65"></rect>
+                    <rect id="Rectangle-4" x="2.6" y="2.6" width="1.3" height="1.3" rx="0.65"></rect>
+                    <rect id="Rectangle-4" x="5.2" y="2.6" width="1.3" height="1.3" rx="0.65"></rect>
+                    <rect id="Rectangle-4" x="7.8" y="2.6" width="1.3" height="1.3" rx="0.65"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

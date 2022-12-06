@@ -1,0 +1,226 @@
+$grey80: #254854;
+$grey60: #386D7D;
+$grey40: #7096A1;
+$grey20: #AFC5CB;
+$grey10: #EBF0F2;
+$orange: #E5843D;
+$black: #1A323B;
+$secondary: #70B9C3;
+$error: #E42526;
+
+.page_checkout {
+	padding-top: 56px;
+
+	.content_wrapper {
+		min-height: calc(100vh - 56px);
+	}
+
+	&.checkout_success {
+
+	}
+}
+.checkout_success_container {
+	width: 100%;
+	max-width: 560px;
+	margin: 0 auto;
+
+	.form_section_title {
+		margin-bottom: 40px;
+	}
+	.checkout_list {
+		margin-top: 6px;
+		margin-bottom: 20px;
+		padding: 0;
+		list-style: none;
+
+		li {
+			padding-left: 27px;
+			background-color: #fff;
+			min-height: 24px;
+			background: url('img/check.svg') 0 0 no-repeat;
+			margin-bottom: 8px;
+		}
+	}
+	.button_box {
+		justify-content: flex-start;
+	}
+}
+.checkout_header {
+	height: 56px;
+    
+    .container {
+    	height: 100%;
+    }
+}
+
+.checkout_main_section {
+	
+
+	.container {
+		justify-content: space-between;
+		min-height: calc(100vh - 56px);
+	}
+}
+.checkout_left {
+	width: 560px;
+	padding-top: 24px;
+	padding-bottom: 80px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+
+	.ui-checkbox__label-text {
+		font-size: 12px;
+		line-height: 130%;
+	}
+	
+	.checkout_left_bottom {
+		.form_checkbox_row {
+			margin-bottom: 40px;
+
+			a {
+				color: $secondary;
+			}
+		}		
+	}
+	
+	.button_box {
+		justify-content: flex-end;
+	}
+
+	.error_message {
+		width: 100%;
+		background-color: #fff;
+		box-shadow: 0px 0px 16px #EBF0F2;
+		border-radius: 4px;
+		padding: 16px 8px;
+		display: flex;
+		justify-content: flex-start;
+		align-items: flex-start;
+		color: $error;
+		border-top: 4px solid $error;
+		width: 640px;
+		margin-bottom: 24px;
+
+		.icon_box {
+			width: 24px;
+			min-width: 24px;
+			height: 24px;
+			margin-right: 8px;
+
+			img {
+				max-width: 100%;
+				max-height: 100%;
+			}
+		}
+	}
+}
+.checkout_right {
+	width: 464px;
+	background-color: $grey10;
+	padding-top: 32px;
+
+	.image_box {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		max-height: 261px;
+
+		img {
+			max-width: 100%;
+			max-height: 100%;
+			width: auto;
+			height: auto;
+		}
+	}
+	.checkout_summary {
+		padding: 35px 32px;
+
+		.checkout_divider {
+			background-color: $grey20;
+			opacity: .3;
+		}
+	}
+	.checkout_row {
+		margin-bottom: 16px;
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+
+		&.bold {
+			font-weight: bold;
+		}
+	}
+	.checkout_divider {
+		margin-bottom: 16px;
+		background-color: $grey10;
+		width: 100%;
+		height: 1px;
+	}
+}
+.checkout_promocode {
+	margin-top: 32px;
+
+	.checkout_promocode_link {
+		margin-bottom: 16px;
+		color: $secondary;
+	}
+}
+.checkout_tickets {
+	margin-top: 16px;
+
+	.ticket {
+		padding: 8px 0 16px;
+		border-bottom: 1px solid $grey10;
+		.top {
+			justify-content: space-between;
+			align-items: center;
+
+			.ticket_price {
+				color: $grey60;
+				font-weight: bold;
+				margin: 4px 0;
+			}
+			.right {
+				width: 80px;
+				min-width: 80px;
+			}
+		}
+		.bottom {
+			color: $grey40;
+		}
+	}
+}
+
+.checkout_placeorder_details {
+	margin-top: 32px;
+
+	.checkout_placeorder_row {
+		margin-bottom: 56px;
+	}
+	
+	.form_checkbox_row {
+		margin-top: 8px;
+	}		
+
+	.checkout_payment_method {
+		padding: 8px;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		width: 100%;
+		border-bottom: 1px solid $grey10;
+		cursor: pointer;
+
+		&.method_checked {
+			color: $grey60;
+			background-color: #fff;
+			border-radius: 8px;
+		}
+
+		.icon {
+			margin-right: 8px;
+		}
+	}
+}

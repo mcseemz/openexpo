@@ -1,0 +1,53 @@
+.ticket_tags{
+  padding-top: 0.4rem;
+  padding-bottom: 0.3rem;
+  display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: stretch;
+    align-items: baseline;
+}
+.page_wrapper .vue-tags-input, .page_add_event .vue-tags-input, .ticket_tags .ti-tag  {
+  max-width: 100%;
+  color: #1A323B; }
+  .page_wrapper .vue-tags-input .ti-input, .page_add_event .vue-tags-input .ti-input, .ticket_tags .ti-tag {
+    border: 1px solid #AFC5CB;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 4px;
+    font-size: 16px;
+    line-height: 1.5em;
+    height: auto; }
+  .page_wrapper .vue-tags-input ::-webkit-input-placeholder, .page_add_event .vue-tags-input ::-webkit-input-placeholder, .ticket_tags .ti-tag   {
+    color: #AFC5CB; }
+  .page_wrapper .vue-tags-input ::-moz-placeholder, .page_add_event .vue-tags-input ::-moz-placeholder, .ticket_tags .ti-tag   {
+    color: #AFC5CB; }
+  .page_wrapper .vue-tags-input :-ms-input-placeholder, .page_add_event .vue-tags-input :-ms-input-placeholder, .ticket_tags .ti-tag   {
+    color: #AFC5CB; }
+  .page_wrapper .vue-tags-input :-moz-placeholder, .page_add_event .vue-tags-input :-moz-placeholder, .ticket_tags .ti-tag   {
+    color: #AFC5CB; }
+  .page_wrapper .vue-tags-input .ti-tag, .page_add_event .vue-tags-input .ti-tag, .ticket_tags .ti-tag{
+    margin: 4px 4px;
+    padding: 4px 16px;
+    background-color: #EBF0F2;
+    border-radius: 40px;
+    font-size: 12px;
+    line-height: 1.3em;
+    color: #1A323B; }
+  .page_wrapper .vue-tags-input .ti-new-tag-input, .page_add_event .vue-tags-input .ti-new-tag-input, .ticket_tags .ti-tag   {
+    font-size: 16px;
+    line-height: 1.5em; }
+
+.page_wrapper .vue-tags-input, .page_add_event .vue-tags-input.novalid .ti-input {
+  border-color: #E42526;
+  color: #E42526;
+  background-color: #FCE9E9;
+}
+.page_wrapper .vue-tags-input, .page_add_event .vue-tags-input.novalid input {
+  border-color: #E42526;
+  color: #E42526;
+  background-color: #FCE9E9;
+}

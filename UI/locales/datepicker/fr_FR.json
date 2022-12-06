@@ -1,0 +1,15 @@
+{
+
+
+  	"months": {
+	    "full": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
+	    "abbreviated": ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"]
+	  },
+	  "days": {
+	    "full": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+	    "abbreviated": ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"],
+	    "initials": ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"]
+	  }
+  
+
+}

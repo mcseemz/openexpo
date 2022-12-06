@@ -1,0 +1,58 @@
+<div class="main_sections_wrapper">
+    <a class="main_sections_anchor" id="customize_tabs"></a> 
+    <div class="main_section event_datetime_section">
+        <p class="main_section_title flex big_text">
+            {{tr('adev_customize_tabs')}}
+            <span class="question_icon">?<span class="tooltip_image_box"><img src="./img/tabs_tooltip.jpg" alt=""></span></span>
+        </p>
+
+        <div class="form_input_row ct_theme_row">
+            <div class="form_input_hr">
+                <ui-select
+                    :label="tr('adev_customize_tabs_theme_label')"
+                    :options="themeList"
+                    v-model="theme"
+                    iconPosition="right"
+                    @change="selectTheme"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+        </div>
+
+        <div class="tabs-customization-arrow" @click='toggle = !toggle'>
+            <div class="plus-tabs" v-show='!toggle'></div>
+            <div class="minus-tabs" v-show='toggle'></div>
+           <div> {{tr('tabs_visibility_settings')}}</div>
+        </div>
+
+        <div class="form_input_row customize_tabs_list" v-show='toggle'>
+
+            <div class="ctlist_item flex" v-for="item in tabsList">
+                <div class="left">
+                    <div class="ctlist_description">{{tr('adev_ct_'+item.id+'_desc')}}</div>
+                    <div class="ctlist_name" :class="{disabled: item.hidden}">{{tr('ct_tn_' + item.id + '_' + theme.value)}}</div>
+                </div>
+                <div class="right">
+                    <label :for="'ctlist_'+item.id" class="ctlist_hiden flex" :class="{active: item.hidden}">
+                        <input type="checkbox" :id="'ctlist_'+item.id" v-model="item.hidden" @change="hiddenClick()">
+                        <div class="ctlist_checkbox_icon flex">
+                            <div class="ctlist_checkbox_icon_active"></div>
+                        </div>
+                        <span>{{tr('adev_ct_hide')}}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="ctlist_item flex noaction external-ticket-url">
+              <ui-textbox
+                :label="tr('external_ticket_url')"
+                :placeholder="tr('external_ticket_url_ph')"
+                v-model="eventObj.externalTicketUrl"
+              />
+          </div>
+
+    </div>
+
+</div>

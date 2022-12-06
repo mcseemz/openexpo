@@ -1,0 +1,63 @@
+<div class="mymeetings_webinar">
+	<div class="container">
+		<div class="webinar_organizer_content">
+
+			<div class="webinar_video_content">
+				
+				<div class="video_box_wrapper">
+					<div id="localVideo" class="video_box local_video">
+				    </div>
+				    <p class="text big_text">Local</p>
+				    <button id="shareBtn" v-if="sharing" @click="unsharingClick" type="button" class="btn btn_owhite share_button">Unshare</button>
+				    <button id="shareBtn" v-if="!sharing" @click="sharingClick" type="button" class="btn btn_owhite share_button">Share</button>
+				</div>
+				
+				<div class="video_box_wrapper">
+					<div id="remoteVideo" class="video_box remote_video">
+					    <video id="remoteVideoControls" muted="true" controls="controls"></video>
+				    </div>
+				    <p class="text big_text">Preview</p>
+				</div>
+				
+			</div>
+
+		</div>
+		<div class="row" v-if="false">
+
+	        <h2 class="text-center col-sm-9">Streamer</h2>
+
+	        <h2 id="notifyFlash" class="text-danger"></h2>
+	        <div class="col-sm-10 text-center">
+	            <div class="col-sm-5">
+	                <div id="localVideo" class="fp-localVideo"></div>
+	                <div class="text-center text-muted">Local</div>
+
+	            </div>
+	            <div class="col-sm-1 text-center" style="margin: 8% auto">
+	                <i class="fa fa-arrow-right" aria-hidden="true" style="font-size: 42px"></i>
+	            </div>
+	            <div class="col-sm-5">
+	                <div id="remoteVideo" class="fp-remoteVideo">
+	                	<video id="videoControls" muted="true" controls="controls"></video>
+	                </div>
+	                <!-- <video src="" class="fp-remoteVideo" id="remoteVideo" controls="controsl"></video> -->
+	                <div class="text-center text-muted">Preview</div>
+	            </div>
+	        </div>
+	        <div class="col-sm-8 text-center col-sm-offset-2" style="margin-top: 20px">
+	            <div class="col-sm-6">
+	                <input type="text" class="form-control" id="url" placeholder="Enter url with stream name"/>
+	            </div>
+	            
+	            <div class="col-sm-3 text-left" id="publishBtnDiv">
+	                <button id="publishBtn" type="button" class="btn btn-default" v-if="!started" @click="start">Start</button>
+	                <button id="publishBtn" type="button" class="btn btn-default" v-if="started" @click="stop">Stop</button>
+	            </div>
+	        </div>
+	        <div class="col-sm-9 text-center" style="margin-top: 20px">
+	            <div id="status" :class="statusFieldClass">{{statusFieldValue}}</div>
+	            <div id="info" :class="infoFieldClass">{{infoFieldValue}}</div>
+	        </div>
+	    </div>
+	</div>
+</div>

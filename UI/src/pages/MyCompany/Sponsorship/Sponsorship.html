@@ -1,0 +1,32 @@
+<div class="main">
+
+<div class="company_sponsors_section">
+    <div class="sponsor_event_list">
+        
+        <div class="item" v-for="event in eventList">
+            <div class="image_box">
+                <img src="" alt="">
+            </div>
+            <div class="middle">
+                <p class="middle_title">
+                    {{event.title}}                       
+                </p>
+                <p class="text"><strong>Organizer:</strong> {{event.organizer}}</p>
+                <p class="text"><strong>Email:</strong> {{event.email}}</p>
+                <p class="text"><strong>Phone:</strong> {{event.phone}}</p>
+            </div>
+            <div class="button_box">
+                <router-link :to="'/'+routes.report+'/'+event.id" class="btn btn_orange">
+                    Go to report page
+                </router-link>
+                <button class="btn btn_dark">Request for refound</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- 1. Link to report page
+2. Event organizer name, email, phone
+3. "Request for refund" button -->
+    
+</div>

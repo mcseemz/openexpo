@@ -1,0 +1,13 @@
+{
+  "myevents_title": "My Events",
+  "myevents_create_event": "Create Event",
+  "myevents_standowner": "Stand Owner",
+  "myevents_visitor": "Visitor",
+  "myevents_organizer": "Organizer",
+  "myevents_noevents_text": "There are still no events your are going to attend",
+  "myevents_search_ph": "Search for events",
+  "myevents_search_events": "Search events",
+  "myevents_accept": "Accept",
+  "myevents_refuse": "Refuse",
+  "myevents_pending_invitation": "Pending invitation"
+}

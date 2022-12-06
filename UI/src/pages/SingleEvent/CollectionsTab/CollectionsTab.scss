@@ -1,0 +1,145 @@
+.collections_tab_section {
+  padding: 44px 0 64px;
+
+  .container {
+    .main-container {
+      flex-wrap: wrap;
+
+      &.thin {
+        max-width: 890px;
+        margin: 0 auto;
+      }
+
+      .collection, .collection-item {
+        padding: 12px;
+
+        .image-wrapper {
+          width: 255px;
+          height: 154px;
+          overflow: hidden;
+          border-radius: 4px;
+
+          img {
+            height: 154px;
+            object-fit: cover;
+            margin: 0 auto;
+            width: 100%;
+          }
+        }
+
+        .name-wrapper {
+          width: 255px;
+
+          .name {
+            width: 77%;
+          }
+        }
+
+        &:hover {
+          background: #f9fbfc;
+          cursor: pointer;
+        }
+
+        &.disabled {
+          opacity: 0.5;
+
+          &:hover {
+            background: transparent;
+            cursor: unset;
+          }
+        }
+      }
+
+      .category-title {
+        cursor: pointer;
+        align-items: flex-end;
+
+        &.collections-back {
+          align-items: center;
+        }
+
+        .text-48 {
+          line-height: 36px;
+        }
+      }
+
+      .collection-content {
+        flex-wrap: wrap;
+      }
+
+      .product-content {
+        flex-direction: column;
+
+        .hero-banner {
+          max-width: 255px;
+          height: 340px;
+        }
+
+        iframe {
+          max-width: 605px;
+          width: 100%;
+        }
+
+        .tags {
+          .tag {
+            border: 1px solid #6e7c8d;
+            margin-right: 8px;
+            padding: 4px 16px;
+            border-radius: 12px;
+          }
+        }
+
+        .film-info {
+          flex-direction: column;
+
+          .line {
+            margin: 12px 0;
+            width: 50px;
+            border: 1px solid black;
+          }
+        }
+      }
+
+      .hero-wrapper {
+        max-height: 200px;
+        overflow: hidden;
+        position: relative;
+
+        img {
+          width: 100%;
+          min-height: 200px;
+          object-fit: cover;
+        }
+
+        .hero-mask {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 100%;
+          height: 100%;
+          opacity: 0.7;
+          z-index: 40;
+        }
+
+        .hero-info {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          z-index: 50;
+          color: #fff;
+
+          .description {
+            max-width: 455px;
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+}

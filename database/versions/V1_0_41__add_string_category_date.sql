@@ -1,0 +1,1 @@
+ALTER TYPE string_type ADD VALUE IF NOT EXISTS 'date';

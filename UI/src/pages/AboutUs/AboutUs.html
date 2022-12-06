@@ -1,0 +1,179 @@
+<div class="page_wrapper static_nik_page about_us">
+
+	<!-- Hero -->
+    <div class="page-hero_wrapper about_us_hero">
+        <div class="page-hero content-wrapper">
+            <div class="breadcrumbs">
+                <ul class="breadcrumbs_list">
+                    <li class="breadcrumbs_item breadcrumbs_item--grey">
+                        <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--grey">{{tr('home')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--grey">
+                        <span class="breadcrumbs_link breadcrumbs_link--grey breadcrumbs_link--active">{{tr('about_us')}}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="hero_content hero_content--center">
+                <p class="hero_subtitle hero_subtitle--grey">{{tr('about_us')}}</p>
+                <h1 class="hero_title hero_title--grey">{{tr('about_us_title')}}</h1>
+                <p class="hero_text hero_text--grey">{{tr('about_us_herotext')}}</p>
+            </div>
+            <div class="hero--btns hero--btns--center hero--btns--m70">
+                <router-link :to="'/'+routes.addevent" class="btn btn_orange">{{tr('create_event_btn')}}</router-link>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-hero_wrapper expect_section">
+        <div class="page-hero content-wrapper">
+            <div class="hero_content hero_content--center">
+                <h2 class="hero_title hero_title--grey">{{tr('about_us_expect_title')}}</h2>
+                <p class="hero_text hero_text--grey mt40">{{tr('about_us_expect_text')}}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="page-main_wrapper">
+        <main class="page-main">
+            <!-- 1 -->
+            <article class="content-wrapper article-block--m120 article-block--white article_4items">
+            	 <div class="">
+                    <div class="article_header article_header--m70">
+                        <div class="article_header_content article_text--center">
+                            <h2 class="article-title article-title-m0">{{tr('about_us_choose_title')}}</h2>
+                            <p class="article_text">{{tr('about_us_choose_text')}}</p>
+                        </div>
+                    </div>
+                    <div class="article_4col_row">
+                    	<div class="article_4col_item flex">
+                    		<img src="@/img/static-pages/about-us/suit-icon.jpg" class="article_4col_image" alt="">
+                    		<p class="article_4col_text">{{tr('about_us_choose_1')}}</p>
+                    	</div>
+                    	<div class="article_4col_item flex">
+                    		<img src="@/img/static-pages/about-us/networking-icon.jpg" class="article_4col_image" alt="">
+                    		<p class="article_4col_text">{{tr('about_us_choose_2')}}</p>
+                    	</div>
+                    	<div class="article_4col_item flex">
+                    		<img src="@/img/static-pages/about-us/knowledge-icon.jpg" class="article_4col_image" alt="">
+                    		<p class="article_4col_text">{{tr('about_us_choose_3')}}</p>
+                    	</div>
+                    	<div class="article_4col_item flex">
+                    		<img src="@/img/static-pages/about-us/handshake-icon.jpg" class="article_4col_image" alt="">
+                    		<p class="article_4col_text">{{tr('about_us_choose_4')}}</p>
+                    	</div>
+                    </div>
+                    <p class="small_bold_text">
+                    	{{tr('about_us_choose_bottom_bold')}}
+                    </p>
+                    <p class="article_text article_text_bottom">{{tr('about_us_choose_bottom')}}</p>
+                </div>
+            </article>
+
+
+
+            <div class="article_foxlist">
+            	<h2 class="article-title article-title-m0">{{tr('about_us_foxlist_title')}}</h2>
+                <p class="article_text">{{tr('about_us_foxlist_text')}}</p>
+            </div>
+            <ol class="fox-list fox-list-about-us">
+                <li class="fox-item content-wrapper">
+                    <p class="fox-list--head"></p>
+                    <article class="article-block article-block--m70 article-block--white">
+                        <div class="article_header article_header--center content-wrapper">
+
+                            <div class="article_header_content article_header_content-ml mr30">
+                                <h2 class="article-title article-title--small article-title-m0" v-html="tr('about_us_fox_item_1_title')"></h2>
+                                <p class="article_text">{{tr('about_us_fox_item_1_text')}}</p>
+                                <router-link :to="'/'+routes.feature+'/'+routes.event_customisation" class="btn btn_orange">{{tr('learn_more')}}</router-link>
+                            </div>
+                            <div class="article_img_wrapper article_img_wrapper--small">
+                                <img class="article_img" src="@/img/static-pages/about-us/step1.jpg">
+                            </div>
+                        </div>
+                    </article>
+                </li>
+                <li class="fox-item content-wrapper">
+                    <article class="article-block article-block--m70 article-block--white">
+                        <div class="article_header article_header--center content-wrapper">
+                            <div class="article_img_wrapper article_img_wrapper--small">
+                                <img class="article_img" src="@/img/static-pages/about-us/step2.jpg">
+                            </div>
+                            <div class="article_header_content article_header_content-ml ml30">
+                                <h2 class="article-title article-title--small article-title-m0" v-html="tr('about_us_fox_item_2_title')"></h2>
+                                <p class="article_text">{{tr('about_us_fox_item_2_text')}}</p>
+                                <router-link :to="'/'+routes.feature+'/'+routes.booths_and_stands" class="btn btn_orange">{{tr('learn_more')}}</router-link>
+                            </div>
+
+                        </div>
+                    </article>
+                </li>
+                <li class="fox-item content-wrapper">
+                    <article class="article-block article-block--m70 article-block--white">
+                        <div class="article_header article_header--center content-wrapper">
+
+                            <div class="article_header_content article_header_content-ml mr30">
+                                <h2 class="article-title article-title--small article-title-m0" v-html="tr('about_us_fox_item_3_title')"></h2>
+                                <p class="article_text">{{tr('about_us_fox_item_3_text')}}</p>
+                                <router-link :to="'/'+routes.feature+'/'+routes.inhouse_broadcast" class="btn btn_orange">{{tr('learn_more')}}</router-link>
+                            </div>
+                            <div class="article_img_wrapper article_img_wrapper--small">
+                                <img class="article_img" src="@/img/static-pages/about-us/step3.jpg" alt="1 on 1 meeting">
+                            </div>
+                        </div>
+                    </article>
+                    <p class="fox-list--tail"></p>
+                </li>
+            </ol>
+
+            <article class="accordeon_article content-wrapper article-block--white">
+            	<div class="article_header">
+                    <div class="article_header_content article_text--center">
+                        <h2 class="article-title article-title-m0" v-html="tr('about_us_interactivity_title')"></h2>
+                        <p class="articles_text">{{tr('about_us_interactivity_text')}}</p>
+                    </div>
+                </div>
+                <div class="accordeon_content flex">
+                	<div class="left">
+                		<ui-collapsible ref="tab1" removeIcon disableRipple @open="setAccordeon('tab1')" open>
+			                <div class="accordeon_header" slot="header">
+			                    <div class="accordeon_title">{{tr('about_us_accordeon_1_title')}}</div>
+			                    <div class="icon_block"><img src="@/img/dropdown_icon.svg" alt=""></div>
+			                </div>
+			                <div class="accordeon_text">{{tr('about_us_accordeon_1_text')}}</div>
+			            </ui-collapsible>
+			            <ui-collapsible ref="tab2" removeIcon disableRipple @open="setAccordeon('tab2')">
+			                <div class="accordeon_header" slot="header">
+			                    <div class="accordeon_title">{{tr('about_us_accordeon_2_title')}}</div>
+			                    <div class="icon_block"><img src="@/img/dropdown_icon.svg" alt=""></div>
+			                </div>
+			                <div class="accordeon_text">{{tr('about_us_accordeon_2_text')}}</div>
+			            </ui-collapsible>
+			            <ui-collapsible ref="tab3" removeIcon disableRipple @open="setAccordeon('tab3')">
+			                <div class="accordeon_header" slot="header">
+			                    <div class="accordeon_title">{{tr('about_us_accordeon_3_title')}}</div>
+			                    <div class="icon_block"><img src="@/img/dropdown_icon.svg" alt=""></div>
+			                </div>
+			                <div class="accordeon_text">{{tr('about_us_accordeon_3_text')}}</div>
+			            </ui-collapsible>
+			            <ui-collapsible ref="tab4" removeIcon disableRipple @open="setAccordeon('tab4')">
+			                <div class="accordeon_header" slot="header">
+			                    <div class="accordeon_title">{{tr('about_us_accordeon_4_title')}}</div>
+			                    <div class="icon_block"><img src="@/img/dropdown_icon.svg" alt=""></div>
+			                </div>
+			                <div class="accordeon_text">{{tr('about_us_accordeon_4_text')}}</div>
+			            </ui-collapsible>
+                	</div>
+                	<div class="right">
+                		<img src="@/img/static-pages/about-us/acc1.jpg" class="accordeon_image" alt="" v-if="currentTab == 'tab1'">
+						<img src="@/img/static-pages/about-us/acc3.jpg" class="accordeon_image" alt="" v-if="currentTab == 'tab3'">
+                	</div>
+                </div>
+            </article>
+
+            <!-- 6 -->
+            <StaticBottomSection :color="'blue'"></StaticBottomSection>
+        </main>
+    </div>
+
+</div>

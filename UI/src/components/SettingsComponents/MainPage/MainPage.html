@@ -1,0 +1,161 @@
+<div class="main_sections_wrapper">
+    <a class="main_sections_anchor" id="event_page"></a>
+    <div class="main_section event_page_main_section">
+
+        <h3 class="big_text form_section_title" v-if="objectType == 'event'"><img src="./img/basic_info_icon.svg" alt="" class="form_section_title_icon">{{tr(locPrefix+'event_page')}}</h3>
+        <p class="form_section_text" v-if="objectType == 'event'"></p>
+
+        <div class="form_section" v-if="objectType == 'event'">
+            <p class="main_section_title big_text">{{tr(locPrefix+'event_langs')}}</p>
+
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-select
+                        :label="tr(locPrefix+'langs_label')"
+                        :placeholder="tr(locPrefix+'langs_ph')"
+                        :options="langList"
+                        v-model="selectedLang"
+                        @select="langSelected"
+                        iconPosition="right"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+
+            </div>
+        </div>
+        <!-- <div class="form_section">
+            <p class="main_section_title big_text">{{tr(locPrefix+'featured_title')}}</p>
+
+            <div class="flex form_checkbox_row form_checkbox_m_row"> -->
+                <!-- <ui-checkbox v-model="eventData.offline" color="accent">Offline event</ui-checkbox> -->
+        <!--         <ui-checkbox v-model="mainObj.featured" color="accent" @change="forceUpdate">{{tr(locPrefix+'featured_event')}}</ui-checkbox>
+            </div>
+        </div> -->
+        <div class="title_box flex">
+            <p class="main_section_title big_text">
+                {{tr(locPrefix+'main_page_content_title')}}
+            </p>
+            <button v-if="!edit_status" class="btn btn_orange" @click="toggle_edit">{{tr('edit')}}</button>
+            <div v-if="edit_status" class="edit_status_bbox">
+                <button v-if="edit_status" class="btn btn_white" @click="cancel_edit">{{tr('cancel')}}</button>
+                <button v-if="edit_status" class="btn btn_orange" @click="preview_edit">{{tr(locPrefix+'preview_text')}}</button>
+            </div>
+
+        </div>
+
+
+        <div class="lr_content">
+            <div class="left event_left_droparea upload_with_tooltip">
+                <span class="question_icon">?<span class="tooltip_image_box"></span></span>
+                <VueUploadComponent
+                ref="event_left_upload"
+                v-model="mainBranding.mainContent.new"
+                drop=".event_left_droparea"
+                :multiple="false"
+                :input-id="'mainPage'"
+                class="upload_image_iconstyle"
+                @input-file="inputMainFile"
+                >
+                    <div v-if="mainUrlx || containMainUrl" class="preview_image_box">
+                        <img :src="mainUrlx || containMainUrl" alt="" class="">
+                    </div>
+                    <div v-if="!containMainUrl" class="placeholder_text">
+                        <img src="@/img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                        <p class="file_upload_title">{{tr(locPrefix+'main_page_main_ph_main')}}</p>
+                        <p class="file_upload_desc">{{tr(locPrefix+'main_page_main_ph_desc')}}</p>
+                    </div>
+
+                    <div class="icons_box" v-if="mainUrlx || containMainUrl">
+                        <span @click="removeMainImage"><img src="@/img/remove_icon.svg" alt=""></span>
+                        <span @click="editImage"><img src="@/img/edit_icon.svg" alt=""></span>
+                    </div>
+
+
+                </VueUploadComponent>
+            </div>
+            <div v-html="getTextVal(mainObj.description_long)" class="right" v-if="!edit_status">
+
+            </div>
+            <div class="right" v-if="edit_status">
+                <div class="form_input_row">
+                    <ui-textbox
+                        :label="tr(locPrefix+'main_text_label')"
+                        v-model="mainObj.description_long"
+                        :multi-line="true"
+                        @input="forceUpdate"
+                        :maxlength="4000"
+                        :invalid="mainObj.description_long.length > 4000"
+                        :help="eventLDescMsg"
+
+                    >
+                    </ui-textbox>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="upload_with_tooltip"><span class="question_icon">?<span class="tooltip_image_box"></span></span></div>
+        <div class="images flex">
+            <div class="image_box" :class="'carousel_droparea'+name" :key="name" :data-index="name" v-for="(item, name) in mainBranding.mainCarousel.exist">
+                <VueUploadComponent
+                :ref="'stand_carousel_upload_ex'+name"
+                v-model="reuploded"
+                :drop="'.carousel_droparea'+name"
+                :multiple="false"
+                @input-file="inputCarouselFile"
+                >
+                    <div v-if="item" class="preview_image_box">
+                        <img :src="item" alt="" class="">
+
+                    </div>
+                    <div v-if="!item" class="placeholder_text">
+                        <img src="@/img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                        <p class="file_upload_title">{{tr(locPrefix+'main_page_carousel_ph_main')}}</p>
+                        <p class="file_upload_desc">{{tr(locPrefix+'main_page_carousel_ph_desc')}}</p>
+                    </div>
+
+                </VueUploadComponent>
+
+                <div class="icons_box" v-if="item">
+                    <span :data-index="name" @click="removeExistImage(name)"><img src="@/img/remove_icon.svg" alt=""></span>
+                    <span :data-index="name" @click="editImage"><img src="@/img/edit_icon.svg" alt=""></span>
+                </div>
+            </div>
+    <!-- NEW IMAGES -->
+            <div class="image_box" :class="'carousel_droparea_n'+item.index" :key="item.index" :data-index="item.index" v-for="item in mainBranding.mainCarousel.new">
+
+                <VueUploadComponent
+                :ref="'stand_carousel_upload_'+item.index"
+                v-model="item.image"
+                :input-id="'file_'+item.index"
+                :drop="'.carousel_droparea_n'+item.index"
+                :multiple="false"
+                @input-file="inputCarouselFile"
+                >
+                    <div v-if="item.image.length && imagePlaceholders.carousel_previews[item.image[0].id]" class="preview_image_box">
+                        <img :src="imagePlaceholders.carousel_previews[item.image[0].id]" alt="" class="">
+
+                    </div>
+                    <div v-if="!item.image.length || imagePlaceholders.carousel_previews[item.image.id]" class="placeholder_text">
+                        <img src="@/img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                        <p class="file_upload_title">{{tr(locPrefix+'main_page_carousel_ph_main')}}</p>
+                        <p class="file_upload_desc">{{tr(locPrefix+'main_page_carousel_ph_desc')}}</p>
+                    </div>
+
+                </VueUploadComponent>
+
+                <div class="icons_box" v-if="item.image.length && imagePlaceholders.carousel_previews[item.image[0].id]">
+                    <span :data-index="item.index" @click="removeImage"><img src="@/img/remove_icon.svg" alt=""></span>
+                    <span :data-index="item.index" @click="editImage"><img src="@/img/edit_icon.svg" alt=""></span>
+                </div>
+            </div>
+
+        </div>
+        <div class="button_box flex">
+            <button href="#" class="btn btn_white" @click="addMoreImages">{{tr(locPrefix+'add_more_pics')}}</button>
+        </div>
+
+    </div>
+</div>

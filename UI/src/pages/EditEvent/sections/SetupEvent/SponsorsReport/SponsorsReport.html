@@ -1,0 +1,28 @@
+<div class="main preloader_wrapper sponsor_report_section">
+    <div class="preloader_overlay" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+    <div class="main_form_box">
+	    <div class="main_section" v-if="!preload">
+	      	<p class="main_section_title big_text">{{tr('adev_sponsors_report_title')}}</p>
+	      	<div v-if="chartsReady && key != 'undefined'" v-for="chart, key in charts">
+	      		<p class="big_text chart_title" v-if="chart.reports.view.datasets.length && chart.reports.view.title != 'lottery'">{{tr('adev_charts_'+key)}} - {{tr('adev_charts_view')}}</p>
+	      		<p class="big_text chart_title" v-if="chart.reports.view.datasets.length && chart.reports.view.title == 'lottery'">{{tr('adev_charts_'+key)}} - {{tr('adev_charts_win')}}</p>
+
+	      		<bar-chart :key="key+'view'" v-if="chart.reports.view.datasets.length" :chartData="chart.reports.view" :options="options" ></bar-chart>
+
+	      		<p class="big_text chart_title" v-if="chart.reports.action.datasets.length">{{tr('adev_charts_'+key)}} - {{tr('adev_charts_action')}}</p>
+	      		<bar-chart :key="key+'action'" v-if="chart.reports.action.datasets.length" :chartData="chart.reports.action" :options="options" ></bar-chart>
+
+
+	      		<div class="chart_download_block" v-if="chart.reports.view.title == 'lottery'">
+	      			<a :href="getFileData(fileData.file)" class="btn btn_orange" target="_blank" download="openexpo_lottery_report.json" v-if="fileData.file" v-for="fileData in filesList.lottery">{{tr('adev_charts_download')}} - {{fileData.sponsorName}}</a>
+	      		</div>
+	      		<div class="chart_download_block" v-if="chart.reports.action.title == 'survey'">
+	      			<!-- <a :href="getFileData(chart.reports.survey)" class="btn btn_orange" target="_blank" download="openexpo_survey_report.json">{{tr('adev_charts_download')}}</a> -->
+	      			<a :href="getFileData(fileData.file)" class="btn btn_orange" target="_blank" download="openexpo_survey_report.json" v-if="fileData.file" v-for="fileData in filesList.survey">{{tr('adev_charts_download')}} - {{fileData.sponsorName}}</a>
+	      		</div>
+	      	</div>
+
+        </div>
+    </div>
+
+</div>

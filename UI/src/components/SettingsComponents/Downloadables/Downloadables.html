@@ -1,0 +1,490 @@
+<div class="main">
+    <div class="main_form_box" >
+
+        <div class="main_section downloadables_main_section">
+
+        <div v-if="newForm">
+            <p class="text" v-if="product">Here you can upload your products</p>
+            <p class="text" v-else>{{ tr(locPrefix + 'downl_text') }}</p>
+
+            <div class="form_input_row hero_drop">
+                <VueUploadComponent
+                        ref="upload"
+                        v-model="fileInput"
+                        drop=".hero_drop"
+                        :multiple="false"
+                        class=" mb-24"
+                >
+                    <img src="./img/file_input_icon.svg" alt="" class="file_upload_icon">
+                    <p class="file_upload_title">{{ fileTitle }}</p>
+                    <p class="file_upload_desc">{{ fileSubtitle }}</p>
+                </VueUploadComponent>
+            </div>
+
+            <div class="form_input_row">
+                <ui-textbox
+                        :label="tr(locPrefix+'downl_name_label')"
+                        :placeholder="tr(locPrefix+'downl_name_ph')"
+                        v-model="fileNameInpt"
+                        :maxlength="200"
+                        :invalid="fileNameInpt.length > 200"
+                >
+                </ui-textbox>
+            </div>
+
+            <div class="form_input_row">
+                <ui-textbox
+                        :label="tr(locPrefix+'downl_desc_label')"
+                        :placeholder="tr(locPrefix+'downl_desc_ph')"
+                        :multi-line="true"
+                        :rows="5"
+                        v-model="fileDescInpt"
+                        :maxlength="4000"
+                        :invalid="fileDescInpt.length > 4000"
+                />
+            </div>
+
+            <div class="form_input_row" v-if="product">
+                <ui-textbox
+                        :label="categorySel ? tr('film_link') :tr('product_url')"
+                        :placeholder="categorySel ? tr('film_link_ph') : tr('not_film_link')"
+                        v-model="filmLink"
+                />
+            </div>
+
+            <div class="form_input_row" v-if="product">
+                <div class="text-middle text-bold mb-16">{{ tr('add_details') }}:</div>
+                <div class="flex aic product-details mb-8" v-for="(item, index) in details">
+                    <div class="detail-wrapper">
+                        <ui-textbox
+                                :label="'Detail '+(index+1)"
+                                :placeholder="tr('add_detail')"
+                                v-model="item.detail"
+                        />
+                    </div>
+
+                    <div class="detail-wrapper ml-16">
+                        <ui-textbox
+                                :label="'Value '+(index+1)"
+                                :placeholder="tr('add_value')"
+                                v-model="item.value"
+                        />
+                    </div>
+                    <img src="@/img/trash.svg" class="ml-16 mt-12" @click="removeDetail(index)"/>
+                </div>
+
+                <div class="flex aic add-item color-orange text-small mt-24" @click="addDetail(false)">
+                    <img src="@/img/orange_plus.svg"/>
+                    <div class="ml-12">{{ tr('add_item') }}</div>
+                </div>
+            </div>
+
+            <div class="form_input_row thumbnail_drop">
+                <div class="thumbnail_title">{{ tr('thumbnail') }}</div>
+                <VueUploadComponent
+                        input-id="thumbnail"
+                        ref="thumbnail"
+                        v-model="thumbnail"
+                        drop=".thumbnail_drop"
+                        :multiple="false"
+                        @input-file="inputFile"
+                        :drop-directory="false"
+                        class="upload_image_iconstyle mb-24"
+                >
+
+                    <div v-if="thumbnailPlaceholder" class="preview_image_box">
+                        <img :src="thumbnailPlaceholder"/>
+                    </div>
+
+                    <div class="placeholder_text" v-if="!thumbnailPlaceholder">
+                        <img src="@/img/file_input_icon.svg" alt="" class="file_upload_icon">
+                        <p class="file_upload_title">{{ tr(locPrefix + 'event_thumb_ph_main') }}</p>
+                        <p class="file_upload_desc">{{ tr(locPrefix + 'event_cover_ph_desc') }}</p>
+                    </div>
+
+                    <div class="icons_box" v-if="thumbnailPlaceholder">
+                        <span @click="removeThumbnail"><img src="@/img/remove_icon.svg"/></span>
+                        <span @click="editThumbnail"><img src="@/img/edit_icon.svg"/></span>
+                    </div>
+                </VueUploadComponent>
+            </div>
+
+            <div class="mb-16 height_80">
+                <div>
+                    <label class="typo__label"> {{ tr(locPrefix + 'tags_label') }}</label>
+                    <multiselect :options="value" :custom-label="customLabel" :show-labels="false"
+                                 :value="tags" :multiple="true" :searchable="true" :max-height="150"
+                                 @select="onSelect($event,'create')" @open="getTags()"
+                                 :taggable="true" @remove="onTouch($event,'create',null)" @tag="addTag('create',$event,null)"
+                                 ref="Vueselect"
+                                 @search-change="onChangeTag($event,'create')"
+                                 tag-placeholder="Press enter or comma to create a tag"
+                    >
+                        <template slot="option" slot-scope="props">
+                            <div class="option__desc">
+                                <span class="option__title">{{ props.option.text }}</span>
+                            </div>
+                        </template>
+                    </multiselect>
+                </div>
+            </div>
+
+            <div class="form_input_row" v-if="priceTags && priceTags.length">
+                <div class="pricings">
+                    <div class="text-middle text-bold mb-16">{{ tr('pricing_tags') }}:</div>
+                    <div>
+                        <div style="display: inline-block">
+                            <ui-checkbox v-model="tag.selected" v-for="tag in priceTags">{{ tag.text }}</ui-checkbox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form_input_row">
+                <button class="btn btn_orange" @click="addFile">{{ product ? tr(locPrefix+'add_product') : tr(locPrefix+'add_file') }} </button>
+            </div>
+        </div>
+
+        <div class="main_section agenda_main_section flex btn_action" v-if="!newForm" @click="newForm = true">
+            <button class="btn btn_oval" >+</button>  <span class="btn_oval_text">{{ product ? tr(locPrefix + 'new_product') : tr(locPrefix + 'new_file') }}</span>
+        </div>
+
+            <p class="main_section_title big_text" v-if="product">Products added</p>
+            <p class="main_section_title big_text" v-else>{{ tr(locPrefix + 'downl_added') }}</p>
+
+            <ul class="file_uploaded_list" :class="{'product-wrapper': product}">
+
+                <template v-for="(file, index) in content">
+                    <li class="file_uploaded_list_item" v-if="!file.edit" :key="file.id">
+                        <div class="content flex jcsb">
+                            <div class="file_uploaded_list_item_url" @click="getFileLink(file)"
+                                 :class="{'file': !product}">
+                                <div class="info">
+                                    <img :src="file.thumbnail" v-if="file.thumbnail" class="thumbnail"/>
+                                    <img src="./img/uploaded_file_icon.svg" v-else/>
+                                    <div class="text">
+                                        <p class="file_uploaded_list_item_title">{{ file.title || file.name }}</p>
+                                        <p class="file_uploaded_list_item_meta">{{ file.fileType }} - {{ file.size }}
+                                            KB</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="controls">
+                      <span class="controls_item" @click="editExistFile(file, index)" v-if="product">
+                        <img src="@/img/edit_sec.svg"/>
+                      </span>
+                      <span class="controls_item ml-8" @click="removeExistFile(file.id, index)">
+                        <img src="./img/trash_dark.svg"/>
+                      </span>
+                    <span v-if="$store.getters.getEditedItem.length && $store.getters.getEditedItem.includes(file.id)">
+                        <ui-tooltip>{{tr('dont_forget_save')}}</ui-tooltip><img src="../img/edited_dot.svg"/>
+                    </span>
+                            </div>
+                        </div>
+                        <div class="tags" v-if="fileTags(file)">
+                            {{ fileTags(file) }}
+                        </div>
+                    </li>
+                    <li class="file-edit-wrapper mb-20" :key="file.id" v-else>
+                        <div class="form_input_row">
+                            <ui-textbox
+                                    :label="tr(locPrefix+'downl_name_label')"
+                                    :placeholder="tr(locPrefix+'downl_name_ph')"
+                                    v-model="file.name"
+                                    :maxlength="200"
+                                    :invalid="file.name.length > 200"
+                            />
+                        </div>
+
+                        <div class="form_input_row">
+                            <ui-textbox
+                                    :label="tr(locPrefix+'downl_desc_label')"
+                                    :placeholder="tr(locPrefix+'downl_desc_ph')"
+                                    :multi-line="true"
+                                    :rows="5"
+                                    v-model="file.description"
+                                    :maxlength="4000"
+                                    :invalid="file.description && file.description.length > 4000"
+                            />
+                        </div>
+
+                        <div class="form_input_row">
+                            <ui-textbox
+                                    :label="tr('film_link')"
+                                    :placeholder="categorySel ? tr('film_link_ph') : tr('not_film_link')"
+                                    v-model="file.filmLink"
+                            />
+                        </div>
+
+                        <div class="form_input_row">
+                            <div class="text-middle text-bold mb-16">{{ tr('add_details') }}:</div>
+                            <div class="flex aic product-details mb-8" v-for="(item, index) in file.detailsParsed">
+                                <div class="detail-wrapper">
+                                    <ui-textbox
+                                            :label="'Detail '+(index+1)"
+                                            :placeholder="tr('add_detail')"
+                                            v-model="item.detail"
+                                    />
+                                </div>
+
+                                <div class="detail-wrapper ml-16">
+                                    <ui-textbox
+                                            :label="'Value '+(index+1)"
+                                            :placeholder="tr('add_value')"
+                                            v-model="item.value"
+                                    />
+                                </div>
+                                <img src="@/img/trash.svg" class="ml-16 mt-12" @click="removeDetail(index, file)"/>
+                            </div>
+
+                            <div class="flex aic add-item color-orange text-small mt-24" @click="addDetail(file)">
+                                <img src="@/img/orange_plus.svg"/>
+                                <div class="ml-12">{{ tr('add_item') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="form_input_row" :class="[`thumb_droparea${index}`]">
+                            <div class="thumbnail_title">{{ tr('thumbnail') }}</div>
+                            <VueUploadComponent
+                                    :input-id="'thumbInput'+index"
+                                    :ref="'thumb_upload'+index"
+                                    v-model="file.thumb"
+                                    :drop="'.thumb_droparea'+index"
+                                    :multiple="false"
+                                    @input-file="existedFile($event, index, 'thumb')"
+                                    class="upload_image_iconstyle mb-24"
+                                    :drop-directory="false"
+                            >
+                                <div v-if="file.thumbnail" class="preview_image_box">
+                                    <img :src="file.thumbnail">
+                                </div>
+                                <div v-if="!file.thumbnail" class="placeholder_text">
+                                    <img src="@/img/image_placeholder_img.svg" class="file_upload_icon">
+                                    <p class="file_upload_title">{{ tr('event_collection_ph') }}</p>
+                                    <p class="file_upload_desc">{{ tr('event_cover_ph_desc') }}</p>
+                                </div>
+
+                                <div class="icons_box" v-if="file.thumbnail">
+                                    <span @click="removeThumbnail($event, file, 'thumb')"><img
+                                            src="@/img/remove_icon.svg"/></span>
+                                    <span @click="editThumbnail"><img src="@/img/edit_icon.svg"/></span>
+                                </div>
+                            </VueUploadComponent>
+                        </div>
+
+                        <div class="mb-16 height_80">
+                            <multiselect :placeholder="tr('tags_collection_list')" :options="value"
+                                         :custom-label="customLabel" :show-labels="false" @open="getTags()"
+                                         :value="file.tagsList" :multiple="true" :searchable="true" :max-height="150"
+                                         @select="onSelect($event,'edit',index)"
+                                         :taggable="true" @remove="onTouch($event,'edit',index)" @tag="addTag('edit',$event,index)"
+                                         ref="VueselectSec"
+                                         @search-change="onChangeTag($event,'edit',index)"
+                                         tag-placeholder="Press enter or comma to create a tag"
+                            >
+                                <template slot="option" slot-scope="props">
+                                    <div class="option__desc">
+                                        <span class="option__title">{{ props.option.text }}</span>
+                                    </div>
+                                </template>
+                            </multiselect>
+                        </div>
+
+                        <div class="form_input_row" v-if="file.priceTags && file.priceTags.length">
+                            <div class="text-middle text-bold mb-16">{{ tr('pricing_tags') }}:</div>
+                                <div class="pricings">
+                                    <div v-for="tag in file.priceTags">
+                                        <div  style="display: inline-block !important;">
+                                            <ui-checkbox v-model="tag.selected" >{{ tag.text }}
+                                            </ui-checkbox>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+
+                  <div class="buttons flex">
+                      <button class="btn btn_owhite" @click="file.edit = false">{{tr('back')}}</button>
+                      <button class="btn btn_orange ml-20" @click="editFile(file,index)">{{tr('update')}}</button>
+                  </div>
+                </li>
+              </template>
+
+                <!-- NEW FILES -->
+                <template v-if="!product">
+                    <li v-for="file, index in downloadables.new" class="file_uploaded_list_item" style="flex-direction: row ;">
+                        <div class="info">
+                            <img src="./img/uploaded_file_icon.svg" alt="">
+                            <div class="text">
+                                <p class="file_uploaded_list_item_title">
+                                    {{ file.fileTitle ? file.fileTitle : file.name }}</p>
+                                <p class="file_uploaded_list_item_meta">{{ getFileType(file.name) }} -
+                                    {{ Math.round((file.size / 1024)) }} KB</p>
+                            </div>
+                        </div>
+                        <div class="controls">
+                            <span class="controls_item small_text" v-if="product">({{ tr('new') }})</span>
+                            <span class="controls_item" @click="removeFile(file, index)"><img src="./img/trash_dark.svg"
+                                                                                              alt=""></span>
+                            <span >
+                              <ui-tooltip>{{tr('dont_forget_save')}}</ui-tooltip><img src="../img/edited_dot.svg"/>
+                            </span>
+                        </div>
+                    </li>
+                </template>
+                <template v-else>
+                    <li v-for="file, index in downloadables.new" class="file_uploaded_list_item"  v-if="!file.edit">
+                        <div class="content flex jcsb">
+                            <div class="info">
+                                <img :src="file.thumbnailPlaceholder" v-if="file.thumbnailPlaceholder"
+                                     class="thumbnail"/>
+                                <img src="./img/uploaded_file_icon.svg" v-else/>
+                                <div class="text">
+                                    <p class="file_uploaded_list_item_title">
+                                        {{ file.fileTitle ? file.fileTitle : file.name }} <span
+                                            class="text-bold small_text">({{ tr('new') }})</span>
+                                    </p>
+                                    <p class="file_uploaded_list_item_meta">{{ getFileType(file.name) }} -
+                                        {{ Math.round((file.size / 1024)) }} KB</p>
+                                </div>
+
+                            </div>
+                            <div class="controls">
+                              <span class="controls_item" @click="editNewFile(file)">
+                                <img src="@/img/edit_sec.svg"/>
+                              </span>
+                              <span class="controls_item ml-8" @click="removeFile(file, index)">
+                                <img src="./img/trash_dark.svg" alt="">
+                              </span>
+                            </div>
+                        </div>
+                        <div class="tags" v-if="fileTags(file)">
+                            {{ fileTags(file) }}
+                        </div>
+                    </li>
+                    <li class="file-edit-wrapper mb-20" :key="file.id" v-else>
+                        <div class="form_input_row">
+                            <ui-textbox
+                                    :label="tr(locPrefix+'downl_name_label')"
+                                    :placeholder="tr(locPrefix+'downl_name_ph')"
+                                    v-model="file.fileTitle"
+                                    :maxlength="200"
+                                    :invalid="file.fileTitle.length > 200"
+                                    @input="editedNewFile"
+                            />
+                        </div>
+
+                        <div class="form_input_row">
+                            <ui-textbox
+                                    :label="tr(locPrefix+'downl_desc_label')"
+                                    :placeholder="tr(locPrefix+'downl_desc_ph')"
+                                    :multi-line="true"
+                                    :rows="5"
+                                    v-model="file.fileDesc"
+                                    :maxlength="4000"
+                                    :invalid="file.fileDesc && file.fileDesc.length > 4000"
+                                    @input="editedNewFile"
+                            />
+                        </div>
+
+                        <div class="form_input_row">
+                            <ui-textbox
+                                    :label="tr('film_link')"
+                                    :placeholder="categorySel ? tr('film_link_ph') : tr('not_film_link')"
+                                    v-model="file.filmLink"
+                                    @input="editedNewFile"
+                            />
+                        </div>
+
+                        <div class="form_input_row">
+                            <div class="text-middle text-bold mb-16">{{ tr('add_details') }}:</div>
+                            <div class="flex aic product-details mb-8" v-for="(item, index) in file.detailsParsed">
+                                <div class="detail-wrapper">
+                                    <ui-textbox
+                                            :label="'Detail '+(index+1)"
+                                            :placeholder="tr('add_detail')"
+                                            v-model="item.detail"
+                                            @input="editedNewFile"
+                                    />
+                                </div>
+
+                                <div class="detail-wrapper ml-16">
+                                    <ui-textbox
+                                            :label="'Value '+(index+1)"
+                                            :placeholder="tr('add_value')"
+                                            v-model="item.value"
+                                            @input="editedNewFile"
+                                    />
+                                </div>
+
+                                <img src="@/img/trash.svg" class="ml-16 mt-12" @click="removeDetail(index, file)"/>
+                            </div>
+
+                            <div class="flex aic add-item color-orange text-small mt-24" @click="addDetail(file)">
+                                <img src="@/img/orange_plus.svg"/>
+                                <div class="ml-12">{{ tr('add_item') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="form_input_row" :class="[`thumb_new_droparea${index}`]">
+                            <div class="thumbnail_title">{{ tr('thumbnail') }}</div>
+                            <VueUploadComponent
+                                    :input-id="'thumbNewInput'+index"
+                                    :ref="'thumb_new_upload'+index"
+                                    v-model="file.thumbnail"
+                                    :drop="'.thumb_new_droparea'+index"
+                                    :multiple="false"
+                                    @input-file="existedNewFile($event, index)"
+                                    class="upload_image_iconstyle mb-24"
+                                    :drop-directory="false"
+                            >
+                                <div v-if="file.thumbnailPlaceholder" class="preview_image_box">
+                                    <img :src="file.thumbnailPlaceholder">
+                                </div>
+                                <div v-if="!file.thumbnailPlaceholder" class="placeholder_text">
+                                    <img src="@/img/image_placeholder_img.svg" class="file_upload_icon">
+                                    <p class="file_upload_title">{{ tr('event_collection_ph') }}</p>
+                                    <p class="file_upload_desc">{{ tr('event_cover_ph_desc') }}</p>
+                                </div>
+
+                                <div class="icons_box" v-if="file.thumbnailPlaceholder">
+                                    <span @click="removeThumbnail($event, file, 'thumb')"><img
+                                            src="@/img/remove_icon.svg"/></span>
+                                    <span @click="editThumbnail"><img src="@/img/edit_icon.svg"/></span>
+                                </div>
+                            </VueUploadComponent>
+                        </div>
+
+                        <div class="form_input_row">
+                            <p class="form_input_row_label">
+                                {{ tr(locPrefix + 'tags_label') }}
+                            </p>
+                            <vue-tags-input
+                                    :placeholder="tr(locPrefix+'tags_ph')"
+                                    v-model="file.tag"
+                                    :tags="file.tagsList"
+                                    :allow-edit-tags="true"
+                                    :add-on-key="[13,';',',']"
+                                    @tags-changed="newTags => tagsChanged(newTags, file)"
+                            />
+                        </div>
+
+                        <div class="form_input_row" v-if="file.priceTags && file.priceTags.length">
+                            <div class="text-middle text-bold mb-16">{{ tr('pricing_tags') }}:</div>
+                            <div class="pricings">
+                                <ui-checkbox v-model="tag.selected" v-for="tag in file.priceTags">{{ tag.text }}
+                                </ui-checkbox>
+                            </div>
+                        </div>
+
+                        <div class="buttons flex">
+                            <button class="btn btn_owhite" @click="editNewFile(file)">{{ tr('back') }}</button>
+                            <button class="btn btn_orange ml-20" @click="saveNewFile(file)">{{ tr('update') }}</button>
+                        </div>
+                    </li>
+                </template>
+            </ul>
+        </div>
+    </div>
+
+    <CroppModal ref="croppModal" :croppRatio="302/211" @cropp-finished="croppFinished" @clearData="clearThumbnail"/>
+</div>

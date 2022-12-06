@@ -1,0 +1,89 @@
+<footer id="footer" class="footer">
+	<div class="container">
+		<div class="footer_top flex">
+			<div class="footer_col logo_col">
+				<div class="footer_logo">
+                    <h2>Openexpo</h2>
+				</div>
+				<div class="text">
+					{{tr('footer_text')}}
+				</div>
+			</div>
+			<div class="footer_col">
+				<h3 class="footer_title">{{tr('about_us')}}</h3>
+				<ul class="footer_menu">
+					<li class="footer_menu_item">
+						<router-link id="footer_aboutus" :to="'/'+routes.aboutus">{{tr('about_us')}}</router-link>
+					</li>
+					<li class="footer_menu_item">
+						<router-link id="footer_howitworks" :to="'/'+routes.solutions">{{tr('how_it_works')}}</router-link>
+					</li>
+					<li class="footer_menu_item">
+						<router-link id="footer_faq" :to="'/'+routes.faq">{{tr('faqs')}}</router-link>
+					</li>
+					<li class="footer_menu_item">
+						<router-link id="footer_termsconditions" :to="'/'+routes.termsconditions">{{tr('terms_conditions')}}</router-link>
+					</li>
+					<li class="footer_menu_item">
+						<router-link id="footer_privacypolicy" :to="'/'+routes.privacypolicy">{{tr('privacy_policy')}}</router-link>
+					</li>
+					<!-- <li class="footer_menu_item">
+						<router-link id="footer_cookies" :to="'/'+routes.cookies">{{tr('cookies')}}</router-link>
+					</li> -->
+				</ul>
+			</div>
+
+			<div class="footer_col">
+				<h3 class="footer_title">{{tr('organize_events')}}</h3>
+				<ul class="footer_menu">
+					<li class="footer_menu_item">
+						<router-link id="footer_onlineeventmanagement" :to="'/'+routes.onlineeventmanagement">{{tr('online_event_management')}}</router-link>
+					</li>
+					<!-- <li class="footer_menu_item">
+						<router-link id="footer_professionaleventmanagement" :to="'/'+routes.professionaleventmanagement">{{tr('professional_event_management')}}</router-link>
+					</li> -->
+					<li class="footer_menu_item">
+						<router-link id="footer_conferenceorganization" :to="'/'+routes.conferenceorganization">{{tr('conference_organization')}}</router-link>
+					</li>
+					<!-- <li class="footer_menu_item">
+						<router-link id="footer_organizesportingevents" :to="'/'+routes.organizesportingevents">{{tr('organize_sporting_events')}}</router-link>
+					</li> -->
+					<!-- <li class="footer_menu_item">
+						<router-link id="footer_sellticketsonline" :to="'/'+routes.sellticketsonline">{{tr('sell_tickets_online')}}</router-link>
+					</li> -->
+				</ul>
+			</div>
+
+			<div class="footer_col">
+				<h3 class="footer_title">{{tr('get_in_touch')}}</h3>
+				<ul class="footer_menu">
+					<li class="footer_menu_item"><a href="email:contact-us@openexpo.com">contact-us@openexpo.com</a></li>
+					<li class="footer_menu_item">
+						<router-link id="footer_contact" :to="'/'+routes.contact">{{tr('customer_support')}}</router-link>
+					</li>
+				</ul>
+
+			</div>
+
+		</div>
+		<div class="footer_bottom flex">
+			<div class="lang_switcher">
+				<p class="current">{{getLocaleName}}</p>
+				<span class="lang_arrow"><img src="./img/dropdown_icon.svg" width="13" height="7" alt=""></span>
+				<ul class="lang_list" v-if="langList">
+					<li v-for="locale in langList"><a href="#" @click.prevent="setLoc(locale.iso)">{{locale.name}}</a></li>
+				</ul>
+			</div>
+			<div class="socials flex">
+				<a href="https://www.facebook.com/openexpo" target="_blank"><img src="./img/facebook.svg" width="30" height="30" alt=""></a>
+				<a href="#" target="_blank" v-if="false"><img src="./img/Instagram.svg" width="30" height="30" alt=""></a>
+				<a href="https://twitter.com/openexpo" target="_blank"><img src="./img/twitter.svg" width="30" height="30" alt=""></a>
+				<a href="https://www.linkedin.com/company/openexpo/" target="_blank"><img src="./img/linkedin.svg" width="30" height="30" alt=""></a>
+				<a href="#" target="_blank" v-if="false"><img src="./img/youtube.svg" width="30" height="30" alt=""></a>
+			</div>
+			<p class="copytext"><span class="copy">©</span> {{ new Date().getFullYear() }} Openexpo</p>
+
+		</div>
+
+	</div>
+</footer>

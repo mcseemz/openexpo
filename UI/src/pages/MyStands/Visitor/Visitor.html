@@ -1,0 +1,86 @@
+<section class="my_events_main">
+	<div class="container">
+		<div class="my_events_not_found" v-if="notFound">
+			<img src="../img/illustration_calendar.svg" alt="">
+			<div class="big_text">You haven’t participated in any event yet</div>
+		</div>
+		<div class="my_events_grid_section" v-if="!notFound">
+			
+			<div class="my_events_search_block events_search_block">
+				<div class="events_search">
+					<div class="events_search_left flex">
+						<div class="search_input_block">
+							<input type="search" class="search_input" placeholder="Search for events">
+							<a href="#" class="search_btn"><img src="../../../img/search_icon.svg" alt=""></a>
+						</div>	
+					</div>
+
+					<div class="events_search_right flex">
+						<div class="events_search_date">
+							<ui-datepicker
+				                placeholder="Select a date"
+				                iconPosition="right"
+				                v-model="date_val"
+				                :lang="datepicker_lang"
+				            >
+				            	<img slot="icon" src="../../../img/dropdown_arrow.svg" alt="">
+				            	Date
+				            </ui-datepicker>
+						</div>
+						<div class="filter_trigger_block"><a href="#" @click="triggerFilter" class="filter_trigger"><img src="../../../img/filter_icon.svg" alt=""></a></div>
+					</div>
+				</div>
+				<div class="events_search_filter_items" v-if="expand_filter">
+					<div class="filter_item">
+						<div class="text">
+							<div class="item_title">Order By:</div>
+							<div class="item_text">Upcoming First</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div>
+					<div class="filter_item">
+						<div class="text">
+							<div class="item_title">Order By:</div>
+							<div class="item_text">Upcoming First</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div>
+					<div class="filter_item">
+						<div class="text">
+							<div class="item_title">Order By:</div>
+							<div class="item_text">Upcoming First</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div>
+					
+				</div>
+			</div>
+
+			<div class="events_grid">
+				<div class="events_grid">
+
+					<div class="events_item"  v-for="event in events_list">
+						<a href="#" class="img_block"><img src="../../../img/c1.png" alt=""></a>
+						<div class="content">
+							<div class="top flex">
+								<div class="logo"><img src="../../../img/event_logo_1.png" alt=""></div>
+								<div class="top_stand_num">STAND 6A05</div>
+							</div>
+							<div class="main">
+								<a href="#"><h3 class="title">The Digital Health Technology Show 2020</h3></a>
+								<p class="descr">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Temporibus quidem aliquid fugit.</p>
+							</div>
+							<div class="bottom button_bottom flex">
+								<a href="#" class="btn btn_owhite">Schedule a meeting</a>
+								<a href="#" class="btn btn_white">Chat</a>
+							</div>
+						</div>
+						<div class="time_remaning">5 days left</div>
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+</section>

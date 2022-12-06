@@ -1,0 +1,170 @@
+<div class="main_sections_wrapper">
+    <a class="main_sections_anchor" id="basic_information"></a>
+    <div class="main_form_box">
+
+        <div class="main_section basicinformation_main_section">
+
+            <div class="form_section">
+                <h3 class="big_text form_section_title"><img src="./img/basic_info_icon.svg" alt="" class="form_section_title_icon">{{tr('adev_basic_information')}}</h3>
+                <p class="form_section_text">{{tr('adev_basic_info_descr')}}</p>
+                <div class="form_input_row" >
+                    <ui-textbox
+                        :label="tr('adev_event_name_label')"
+                        :placeholder="tr('adev_event_name_ph')"
+                        v-model="eventData.name"
+                        :maxlength="60"
+                        :invalid="eventNameTouched && eventData.name.length === 0 || eventData.name.length > 60 ||
+                        ValidName(eventData.name,eventData.customNameWanted)"
+                        v-on:touch.passive="eventNameTouched = true"
+                        @input="forceUpdateEvent"
+                        :help="eventNameMsg"
+                    >
+                    </ui-textbox>
+                </div>
+                <div class="form_input_row">
+                  <ui-checkbox v-model="eventData.customNameWanted" color="accent" @change="forceUpdateEvent">{{tr('i_want_custom_url_name')}}</ui-checkbox>
+                </div>
+                <div class="form_input_row" v-if="eventObj.customNameWanted">
+                    <ui-textbox
+                        :label="tr('adev_custom_event_name_label')"
+                        :placeholder="tr('adev_custom_event_name_ph')"
+                        v-model="eventData.customName"
+                        :maxlength="60"
+                        :invalid="customNameTouched && eventData.customName.length === 0 || eventData.customName.length > 60 ||
+                        ValidName(eventData.customName,eventData.customNameWanted) && customNameAvaliable"
+                        v-on:touch.passive="customEventNameTouched = true"
+                        :help="customNameMsg"
+                        @input="customNameInput"
+                    >
+                    </ui-textbox>
+                </div>
+
+                <div class="form_input_row">
+                    <div class="ui-textbox">
+                        <div>
+                            <div class="ui-textbox__label-text custom_styled_label">{{tr('adev_event_color')}}</div>
+                            <input @input="eventData.colorSelected = true" label="qwe" type="color" name="color" id="color" v-model="eventData.color">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form_input_row">
+                    <ui-textbox
+                        :label="tr('adev_short_desc_label')"
+                        :placeholder="tr('adev_short_desc_ph')"
+                        v-model="eventData.description_short"
+                        :maxlength="60"
+                        :multi-line="false"
+                        :invalid="eventSDescTouched && eventData.description_short.length === 0 || eventData.description_short.length > 60 ||
+                        /[<>;{}$]/.test(eventData.description_short)"
+                        v-on:touch.passive="eventSDescTouched = true"
+                        @input="forceUpdateEvent"
+                        :help="eventSDescMsg"
+                    >
+                    </ui-textbox>
+                </div>
+                
+                <div class="form_input_row">
+                    <ui-textbox
+                        :label="tr('adev_video_url') + ' ('+tr('adev_video_description')+')'"
+                        type="text"
+                        placeholder="https://"
+                        v-model="eventData.video"
+                        @input="videoChanged($event)"
+                    >
+                    </ui-textbox>
+                </div>
+
+                <div class="form_input_row">
+                  <ui-textbox
+                      :label="tr('adev_video_name')"
+                      type="text"
+                      placeholder="Intro video"
+                      v-model="eventData.videoname"
+                      v-show="eventData.video"
+                  >
+                  </ui-textbox>
+                </div>
+
+                <div class="form_input_row">
+                    <div class="form_input_shr">
+                        <ui-select
+                            :label="tr('adev_category_label')"
+                            :placeholder="tr('adev_category_ph')"
+                            :options="categoriesList"
+                            v-model="category"
+                            iconPosition="right"
+                            @change="changeCategory"
+                        >
+                            <img slot="icon" src="./img/hsb_dropdown.svg" alt="">
+                        </ui-select>
+                    </div>
+                </div>
+
+                <div class="form_input_row">
+                    <p class="form_input_row_label">
+                        {{tr('adev_tags_label')}}
+                    </p>
+                    <vue-tags-input
+                        :placeholder="tr('adev_tags_pers_rec')"
+                        v-model="eventData.tag"
+                        :tags="eventData.tagsList"
+                        :allow-edit-tags="true"
+                        :add-on-key="[13,';',',']"
+                        @tags-changed="newTags => eventData.tagsList = newTags"
+                    />
+                </div>
+
+                <div class="flex form_checkbox_row">
+                    <ui-checkbox v-model="eventData.showVisitorsCounter" @change="forceUpdateEvent" color="accent" :checked="eventData.showVisitorsCounter">{{tr('adev_show_visitors_counter')}}</ui-checkbox>
+                </div>
+
+                <p class="main_section_title flex" v-if="eventObj.discount">
+                  {{tr('adev_discount')}}
+                  <span class="question_icon discount" @click="showDiscount">?
+                    <ui-tooltip position="top" animation="fade" open-on="click">
+                      <span v-if="discountValue">{{discountValue}}</span>
+                      <span v-else>...</span>
+                    </ui-tooltip>
+                  </span>
+                </p>
+            </div>
+
+            <div class="form_section">
+                <h3 class="big_text form_section_title"><img src="./img/location_icon.svg" alt="" class="form_section_title_icon">{{tr('adev_location')}}</h3>
+                <p class="form_section_text">{{tr('adev_loc_desc')}}</p>
+
+                <div class="flex form_checkbox_row form_checkbox_m_row">
+                    <!-- <ui-checkbox v-model="eventData.offline" color="accent">{{tr('offline_event')}}</ui-checkbox> -->
+                    <ui-checkbox v-model="eventData.online" color="accent" checked :disabled="true">{{tr('online_event')}}</ui-checkbox>
+                </div>
+
+         <!--        <div class="form_input_row">
+                    <ui-textbox
+                        placeholder="Search for a venue or address"
+                        v-model="eventData.address"
+                        class="ui-search-input"
+                    >
+                        <img slot="icon" src="./img/search_icon.svg" alt="">
+                    </ui-textbox>
+                </div>
+ -->
+                <!-- <div class="form_input_row">
+                    <ui-select
+                        :label="tr('adev_timezone_label')"
+                        :placeholder="tr('adev_timezone_ph')"
+                        :options="timeZoneList"
+                        v-model="eventData.timezone"
+                        iconPosition="right"
+                    >
+                        <img slot="icon" src="./img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div> -->
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,72 @@
+.height_80 {
+  height: 80px;
+}
+.main {
+  position: relative;
+
+  .disabled_block {
+    color: grey;
+    &:hover {
+      background: #fff !important;
+      cursor: grab !important;
+    }
+  }
+
+  .main-wrapper {
+    .topics {
+      flex-wrap: wrap;
+
+      .topic {
+        margin-right: 16px;
+        padding: 24px;
+        background: #fff;
+        border: 1px solid #ecf4fa;
+        border-radius: 12px;
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        &:hover {
+          cursor: pointer;
+          background: darken(#fff, 5%);
+        }
+      }
+    }
+
+    .saved-collections {
+      .collections-wrapper {
+        flex-direction: column;
+
+        .collection-item {
+          position: relative;
+          width: 100%;
+          padding: 12px;
+          background: #EBF0F2;
+          border-radius: 8px;
+
+          img {
+            width: 100px;
+            max-height: 100px;
+          }
+
+          .buttons {
+            display: flex;
+            position: absolute;
+            right: 16px;
+            bottom: 16px;
+
+            img {
+              width: 24px;
+              cursor: pointer;
+            }
+          }
+        }
+
+        .collection-edit {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

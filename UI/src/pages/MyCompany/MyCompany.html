@@ -1,0 +1,83 @@
+<div class=" page_add_event preloader_wrapper page_my_company shl" v-if="localesLoaded">
+    
+    <div class="preloader_overlay preload_overlay_white fixed" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+   
+   <div class="content_wrapper company_not_found" v-if="companyNotFound">
+       <div class="container flex">
+           <p class="big_text">{{tr('mycomp_notfound')}}</p>
+       </div>
+   </div>
+    <div class="content_wrapper" v-if="!companyNotFound">
+        <div class="container">
+            <div class="title_box flex">
+                <h2 class="title">{{tr('mycomp_title')}}</h2>
+                <button class="btn btn_orange" @click="saveClick" v-if="userCan('company-edit')">{{tr('save')}}</button>
+            </div>
+            <div class="content_sidebar_left flex">
+                <div class="sidebar">
+                    
+                    <ul class="sidebar_menu">
+                        <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'company_info'}">
+                            <div class="sidebar_menu_item_title"  @click="selectedMenu = 'company_info'">{{tr('mycomp_comp_info')}}</div>
+                        </li>
+
+                        <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'contact_info'}">
+                            <div class="sidebar_menu_item_title"  @click="selectedMenu = 'contact_info'">{{tr('mycomp_contact_info')}}</div>
+                        </li>
+
+                        <li class="sidebar_menu_item" v-if="userCan('company-manage-staff')" :class="{'active': selectedMenu == 'users'}">
+                            <div class="sidebar_menu_item_title"  @click="selectedMenu = 'users'">{{tr('mycomp_users')}}</div>
+                        </li>
+
+                        <li v-if="userCan('company-edit')" class="sidebar_menu_item" :class="{'active': selectedMenu == 'downloadables'}">
+                            <div class="sidebar_menu_item_title"  @click="selectedMenu = 'downloadables'">{{tr('downloadables')}}</div>
+                        </li>
+
+                        <li v-if="userCan('company-view-reports') && sponsorshipList.length" class="sidebar_menu_item" :class="{'active': selectedMenu == 'sponsorship'}">
+                            <div class="sidebar_menu_item_title" v-if="features.sponsors"  @click="selectedMenu = 'sponsorship'">{{tr('sponsorship')}}</div>
+                        </li>
+
+                        <!-- <li class="sidebar_menu_item">
+                        
+                            <ui-collapsible removeIcon disableRipple :open="['downloadables'].includes(selectedMenu)">
+                                <div class="" slot="header">
+                                    <div class="sidebar_menu_item_title">My Stand</div>
+                                    <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                                </div>
+
+                                <ul class="sidebar_menu submenu">
+                                    <li class="sidebar_menu_subitem" :class="{'active': selectedMenu == 'downloadables'}" @click="selectedMenu = 'downloadables'">
+                                        <div class="sidebar_menu_item_title">Downloadables</div>
+                                    </li>
+                                </ul>
+                            </ui-collapsible>
+                            
+                        </li> -->
+                        
+                    </ul>
+                </div>
+                
+                
+                <CompanyInfo :canEdit="userCan('company-edit')" :industryList="industryList" :countryList="countryList" :companyBranding="companyBranding" :companyObj="companyObj" v-if="selectedMenu == 'company_info'"></CompanyInfo>
+                <ContactInfo :canEdit="userCan('company-edit')" :companyObj="companyObj" v-if="selectedMenu == 'contact_info'"></ContactInfo>
+                <Users :companyObj="companyObj" v-if="selectedMenu == 'users' && userCan('company-manage-staff')"></Users>
+                <Downloadables :companyObj="companyObj" :downloadables="companyDownloadables" v-if="selectedMenu == 'downloadables' && userCan('company-edit')"></Downloadables>
+                <Sponsorship :sponsorshipList="sponsorshipList" v-if="selectedMenu == 'sponsorship' && features.sponsors && userCan('company-view-reports') && sponsorshipList.length"></Sponsorship>
+
+            </div>
+
+        </div>  
+    </div> 
+
+    <ui-modal ref="messageModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('validation_error')}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+</div>

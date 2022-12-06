@@ -1,0 +1,114 @@
+<div class="page_wrapper static_nik_page" v-if="localesLoaded">
+
+	<!-- Hero -->
+    <div class="page-hero_wrapper">
+        <div class="page-hero content-wrapper">
+            <div class="breadcrumbs">
+                <ul class="breadcrumbs_list">
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('home')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'+routes.all_features" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('openexpo_features')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray ">
+                        <span class="breadcrumbs_link breadcrumbs_link--gray breadcrumbs_link--active">{{tr('agenda')}}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="hero_content">
+                <div class="hero_content_inner">
+                    <div class="hero_content_text hero_content_text--mr">
+                        <p class="hero_subtitle hero_subtitle--gray">{{tr('advanced_agenda_subtitle')}}</p>
+                        <h1 class="hero_title hero_title--gray">{{tr('advanced_agenda_title')}}</h1>
+                        <p class="hero_text hero_text--gray">{{tr('advanced_agenda_text')}}</p>
+                        <div class="hero--btns">
+                            <router-link :to="'/'+routes.addevent" class="primary-btn">{{tr('create_event_btn')}}</router-link>
+                            <button @click="requestDemoClick" class="primary-btn primary-btn--reverse">{{tr('request_a_demo_btn')}}</button>
+                        </div>
+                    </div>
+                    <div class="hero_content_img">
+                        <img class="hero_img--people" src="@/img/static-pages/agenda-features/hero.png" alt="Advantages of Agenda at Openexpo!">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="page-main_wrapper">
+        <main class="page-main">
+            <!-- 1 -->
+            <article class="article-block article-block--m100 article-block--blue">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/agenda-features/1.png" alt="Create agenda based on your requirements">
+                    </div>
+                    <div class="article_header_content article_header_content-ml">
+                        <h2 class="article-title article-title-m0" v-html="tr('advanced_agenda_basedonrequirements_title')"></h2>
+                        <p class="article_text ">{{tr('advanced_agenda_basedonrequirements_text1')}}</p>
+                        <p class="article_text ">{{tr('advanced_agenda_basedonrequirements_text2')}}</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 2 -->
+            <article class="article-block article-block--m100 article-block--white">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_header_content article_header_content-mr">
+                        <h2 class="article-title article-title-m0" v-html="tr('advanced_agenda_multiple_presenters_title')"></h2>
+                        <p class="article_text ">{{tr('advanced_agenda_multiple_presenters_text')}}</p>
+                        <ul class="unordered_list">
+                            <li class="unordered_item">{{tr('advanced_agenda_multiple_presenters_tab1')}}</li>
+                            <li class="unordered_item">{{tr('advanced_agenda_multiple_presenters_tab2')}}</li>
+                            <li class="unordered_item">{{tr('advanced_agenda_multiple_presenters_tab3')}}</li>
+                        </ul>
+                    </div>
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/agenda-features/2.png" alt="Add multiple presenters to your agenda!">
+                    </div>
+                </div>
+            </article>
+
+            <!-- 3 -->
+            <article class="article-block article-block--m100 article-block--blue">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/agenda-features/3.png" alt="Find speakers on the topic that interests you most">
+                    </div>
+                    <div class="article_header_content article_header_content-ml">
+                        <h2 class="article-title article-title-m0" v-html="tr('advanced_agenda_find_speakers_title')"></h2>
+                        <p class="article_text ">{{tr('advanced_agenda_find_speakers_text')}}</p>
+                        <ul class="unordered_list">
+                            <li class="unordered_item">{{tr('advanced_agenda_find_speakers_tab1')}}</li>
+                            <li class="unordered_item">{{tr('advanced_agenda_find_speakers_tab2')}}</li>
+                            <li class="unordered_item">{{tr('advanced_agenda_find_speakers_tab3')}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 4 -->
+            <article class="article-block article-block--m100 article-block--white">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_header_content article_header_content-ml article_header_content--w100">
+                        <h2 class="article-title article-title--center article-title-m0 article-title--w60" v-html="tr('in_house_video_big_div_title')"></h2>
+                        <p class="article_text article-title--w50">{{tr('in_house_video_big_div_text')}}</p>
+                        <div class="article_img_wrapper">
+                            <img class="article_img article_img--w100" src="@/img/static-pages/agenda-features/4.png" alt="Check out how our In-House video looks like">
+                        </div>
+                        <router-link tag="button" :to="'/'+routes.feature+'/'+routes.inhouse_broadcast" class="primary-btn">{{tr('in_house_video_big_div_btn')}}</router-link>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 5 -->
+            <OtherFeatures></OtherFeatures>
+
+            <!-- 6 -->
+            <StaticBottomSection></StaticBottomSection>
+        </main>
+    </div>
+
+    <RequestDemo ref="request_demo"></RequestDemo>
+</div>

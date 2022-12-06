@@ -1,0 +1,104 @@
+<div class="main preloader_wrapper">
+    <div class="preloader_overlay preload_overlay_white preload_overlay_semitrans" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+    <div class="form_section">
+        <p class="main_section_title big_text">{{tr('adev_create_stand')}}</p>
+
+        <div class="form_input_row">
+            <ui-textbox
+                :label="tr('adev_stand_name')"
+                :placeholder="tr('adev_stand_name')"
+                v-model="name"
+                :multi-line="false"
+                >
+            </ui-textbox>
+        </div>
+
+        <div class="form_input_row flex">
+            <div class="form_input_hr">
+                <p class="form_input_row_label">
+                    {{tr('adev_tags_label')}}
+                </p>
+                <vue-tags-input
+                    :placeholder="tr('adev_tags_stand_ph')"
+                    v-model="tag"
+                    :tags="tags"
+                    :allow-edit-tags="true"
+                    :add-on-key="[13,';',',']"
+                    @tags-changed="tagsChanged"
+                />
+            </div>
+
+            <div class="form_input_hr">
+                <ui-select
+                    :label="tr('adev_langs_label_required')"
+                    :placeholder="tr('adev_langs_ph')"
+                    :options="langList"
+                    v-model="selectedLang"
+                    @select="langSelected"
+                    iconPosition="right"
+                >
+                    <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+        </div>
+
+        <div class="form_input_row">
+            <button class="btn btn_orange" @click="createStand">
+              {{tr('adev_create_stand')}}
+              <ui-tooltip v-if="!language || !name" position="top">{{tr('adev_add_stand_tooltip')}}</ui-tooltip>
+            </button>
+        </div>
+
+    </div>
+
+    <div class="main_section" v-if="!preload">
+        <p class="main_section_title big_text">
+            {{tr('adev_stands_list')}}
+        </p>
+
+        <div class="lds-dual-ring" v-if="!standsList.length && loaderShow"></div>
+
+        <p class="text tac" v-if="!standsList.length && !loaderShow">
+            {{tr('adev_stands_list_empty')}}
+        </p>
+    </div>
+
+    <div class="event_grid_new" v-if="standsList.length">
+        <div class="item" v-for="item in standsList">
+            <div class="image_box" :class="{'image_placeholder': !item.templateCoverUrl }">
+                <img class="item_image" :src="item.templateCoverUrl" alt="">
+                <div class="hover_box align_center">
+                    <div class="button_box">
+                        <router-link :to="'/'+routes.stand+'/'+item.id" class="btn btn_tr" v-if="!['archived'].includes(item.status)" target="_blank">{{tr('preview')}}</router-link>
+                        <router-link :to="'/'+routes.editstand+'/'+item.id" class="btn btn_tr" v-if="!['archived'].includes(item.status)">{{tr('edit')}}</router-link>
+                        <button class="btn btn_tr" @click="makeAction(item.id, 'ban')" v-if="['draft','published'].includes(item.status) && userCan('event-invite-stand')">{{tr('ban')}}</button>
+                        <button class="btn btn_tr" @click="makeAction(item.id, 'unban')" v-if="['inactive'].includes(item.status) && userCan('event-invite-stand')">{{tr('unban')}}</button>
+                        <button class="btn btn_tr" @click="makeAction(item.id, 'publish')" v-if="['draft'].includes(item.status) && item.grants.includes('stand-edit')">{{tr('publish')}}</button>
+                        <button class="btn btn_tr" @click="makeAction(item.id, 'unpublish')" v-if="['published'].includes(item.status) && (userCan('event-invite-stand') || item.grants.includes('stand-edit'))">{{tr('unpublish')}}</button>
+                        <button class="btn btn_tr" @click="archiveItem(item.id)" v-if="['published', 'inactive', 'draft'].includes(item.status) && (userCan('event-invite-stand') || item.grants.includes('stand-edit'))">{{tr('archive')}}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="text_box">
+                <router-link :to="'/'+routes.stand+'/'+item.id" class="name">{{item.name}}</router-link>
+                <p class="price">{{item.status}}</p>
+            </div>
+        </div>
+    </div>
+
+    <ui-modal ref="archiveModal" class="status_modal fields_error_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_text">{{tr('archive_stand_text')}}</p>
+            </div>
+            <div class="button_row flex">
+                <button class="btn btn_orange" @click="archiveAccept">{{tr('accept')}}</button>
+                <button class="btn btn_orange" @click="closeArchiveModal">{{tr('cancel')}}</button>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="closeArchiveModal"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

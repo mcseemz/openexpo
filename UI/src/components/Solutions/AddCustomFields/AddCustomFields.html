@@ -1,0 +1,17 @@
+<article class="article-block article-block--m100" :class="{'article-block--blue': color == 'blue', 'article-block--white': color != 'blue'}">
+    <div class="article_header article_header--center content-wrapper">
+        <div class="article_header_content article_header_content-ml">
+            <h2 class="article-title article-title-m0" v-html="tr('add_custom_fields_title')"></h2>
+            <p class="article_text">{{tr('add_custom_fields_text')}}</p>
+            <ul class="unordered_list">
+                <li class="unordered_item">{{tr('add_custom_fields_tab1')}}</li>
+                <li class="unordered_item">{{tr('add_custom_fields_tab2')}}</li>
+                <li class="unordered_item">{{tr('add_custom_fields_tab3')}}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="added-info article_text--center">
+        <a :href="'/'+routes.feature+'/'+routes.custom_field" class="primary-btn" target="_blank">{{tr('learn_more_about_custom_fields')}}</a>
+    </div>
+
+</article>

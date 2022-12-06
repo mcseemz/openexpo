@@ -1,0 +1,32 @@
+<div class="main">
+    <div class="main_section privacy_settings_main_section">
+      
+        <!-- <ul class="privacy_submenu flex">
+            <li class="privacy_submenu_item">Customize</li>
+            <li class="privacy_submenu_item">Event page</li>
+            <li class="privacy_submenu_item">Contact Info</li>
+            <li class="privacy_submenu_item active">Privacy Settings</li>
+        </ul> -->
+        <div class="main_form_box">
+            <p class="text">
+                Choose if you want to show your event or if you prefer to keep it private, this way only you and your team will be able to see it
+            </p>
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-select
+                        label="Privacy"
+                        placeholder="Select Privacy Settings"
+                        :options="privacyList"
+                        v-model="privacyVal"
+                        iconPosition="right"
+                    >
+                        <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+</div>

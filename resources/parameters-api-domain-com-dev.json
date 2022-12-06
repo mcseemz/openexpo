@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "APIStage",
+    "ParameterValue": "LATEST"
+  },
+  {
+    "ParameterKey": "BaseDomain",
+    "ParameterValue": "enter_your.domain"
+  },
+  {
+    "ParameterKey": "CertificateArn",
+    "ParameterValue": "arn:aws:acm:us-east-1:698718118888:certificate/f492d557-b591-4c89-ab5c-e64e82152a1a"
+  }
+]

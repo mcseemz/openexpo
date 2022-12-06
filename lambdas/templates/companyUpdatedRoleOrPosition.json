@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "CompanyUpdatedRoleOrPosition",
+    "SubjectPart": "Your role in the company was updated",
+    "HtmlPart": "Your new role in the company '{{companyName}}': '{{roleName}}' and position: '{{position}}'",
+    "TextPart": "Your new role in the company '{{companyName}}': '{{roleName}}' and position: '{{position}}'"
+  }
+}

@@ -1,0 +1,114 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template deploys Elasticsearch
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+  InstanceCount:
+    Type: String
+    Default: '1'
+    NoEcho: false
+  InstanceType:
+    Type: String
+    Default: t2.small.elasticsearch
+    NoEcho: false
+  DedicatedMasterType:
+    Type: String
+    Default: t2.small.elasticsearch
+    NoEcho: false
+  DedicatedMasterCount:
+    Type: String
+    Default: '0'
+    NoEcho: false
+  DedicatedMasterEnabled:
+    Type: String
+    Default: 'True'
+    NoEcho: false
+  EBSVolumeSize:
+    Type: Number
+    Default: 10
+    NoEcho: false
+  EBSEnabled:
+    Type: String
+    Default: 'true'
+    NoEcho: false
+Conditions:
+  CreateDevResources: !Equals
+    - !Ref 'Environment'
+    - dev
+  HasSingleClusterInstance: !Equals
+    - !Ref 'InstanceCount'
+    - '1'
+  HasDedicatedMasterNodes: !Not
+    - !Equals
+      - !Ref 'DedicatedMasterCount'
+      - '0'
+  HasEBSEnabled: !Equals
+    - !Ref 'EBSEnabled'
+    - true
+Resources:
+  ElasticsearchDomain:
+    Type: AWS::Elasticsearch::Domain
+    Properties:
+      DomainName: !Sub 'es-${Environment}'
+      ElasticsearchClusterConfig:
+        InstanceCount: !Ref 'InstanceCount'
+        ZoneAwarenessEnabled: 'false'
+        InstanceType: !Ref 'InstanceType'
+        DedicatedMasterEnabled: !If
+          - HasDedicatedMasterNodes
+          - 'True'
+          - 'False'
+        DedicatedMasterType: !If
+          - HasDedicatedMasterNodes
+          - !Ref 'DedicatedMasterType'
+          - !Ref 'AWS::NoValue'
+        DedicatedMasterCount: !If
+          - HasDedicatedMasterNodes
+          - !Ref 'DedicatedMasterCount'
+          - !Ref 'AWS::NoValue'
+      ElasticsearchVersion: '7.9'
+      EBSOptions:
+        EBSEnabled: !Ref 'EBSEnabled'
+        Iops: !If
+          - HasEBSEnabled
+          - 0
+          - !Ref 'AWS::NoValue'
+        VolumeSize: !If
+          - HasEBSEnabled
+          - !Ref 'EBSVolumeSize'
+          - !Ref 'AWS::NoValue'
+        VolumeType: !If
+          - HasEBSEnabled
+          - gp2
+          - !Ref 'AWS::NoValue'
+      SnapshotOptions:
+        AutomatedSnapshotStartHour: '0'
+      AccessPolicies:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/LambdaESRole-dev-${AWS::Region}'
+            Action: es:*
+            Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/es-${Environment}/*'
+#duplicating role access for a service until we decouple dev and prod
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/LambdaESRole-prod-${AWS::Region}'
+            Action: es:*
+            Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/es-${Environment}/*'
+      AdvancedOptions:
+        rest.action.multi.allow_explicit_index: 'true'
+Outputs:
+  esArn:
+    Value: !GetAtt 'ElasticsearchDomain.DomainArn'
+    Export:
+      Name: !Sub 'tex-es-arn'
+    Description: ARN for es. NOW IT IS GLOBAL. when we separate environments for it, this output should be renames to have ${Environment}
+  esEndpoint:
+    Value: !GetAtt 'ElasticsearchDomain.DomainEndpoint'
+    Export:
+      Name: !Sub 'tex-es-endpoint'
+    Description: Endpoint for es. NOW IT IS GLOBAL. when we separate environments for it, this output should be renames to have ${Environment}

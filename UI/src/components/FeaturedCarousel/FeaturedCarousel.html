@@ -1,0 +1,55 @@
+<div class="events_carousel">
+	<VueSlickCarousel v-bind="event_carousel_settings" ref="event_carousel">
+      
+    
+		<div class="events_carousel_item" :key="event.id" v-for="event in catEventList">
+			<div class="events_item">
+				<router-link :to="'/'+routes.event+'/'+event.id" class="img_block" :class="{'image_placeholder': !event.templateCoverUrl }"><img :src="event.templateCoverUrl" alt=""></router-link>
+				<div class="content">
+					<div class="top flex">
+						<div class="logo"><img :src="event.logoUrl" alt=""></div>
+						<div class="date" v-if="event.evtItemDate">
+							<p class="month">{{event.evtItemDate.month}}</p>
+							<p class="nums">{{event.evtItemDate.date}}</p>
+						</div>
+					</div>
+					<div class="main">
+						<router-link :to="'/'+routes.event+'/'+event.id"><h3 class="title">{{event.name}}</h3></router-link>
+						<p class="descr">{{event.description_short}}</p>
+					</div>
+					<div class="bottom flex">
+						<div class="location flex">
+							<!-- <img src="./img/loc2.svg" alt="">
+							<p>London, UK</p> -->
+							<p v-if="event.langList">{{event.langList}}</p>
+						</div>
+						<div class="price_box" v-if="event.pricing && event.pricing.access_price">
+							<p class="text">{{tr('starts_at')}}</p>
+							<p class="price">{{startPricing(event)}}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<template #prevArrow="arrowOption">
+	      <div class="events_carousel_arrow arrow_left"><img src="./img/arrow_esr.svg" alt=""></div>
+	    </template>
+
+	    <template #nextArrow="arrowOption">
+	      <div class="events_carousel_arrow arrow_right"><img src="./img/arrow_esr.svg" alt=""></div>
+	    </template>
+
+	    <template #customPaging="page">
+	      <div class="event_carousel_dot">
+	        
+	      </div>
+	    </template>
+
+	</VueSlickCarousel>
+
+		
+		<!-- <div class="events_carousel_arrow arrow_right" @click="showNext"><img src="./img/arrow_esr.svg" alt=""></div> -->
+
+</div>

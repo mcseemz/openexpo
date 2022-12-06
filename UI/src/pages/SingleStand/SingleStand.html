@@ -1,0 +1,108 @@
+<div class="page_wrapper page_single_event page_single_stand preloader_wrapper" v-if="localesLoaded">
+
+	<div class="preloader_overlay fixed preload_overlay_white" v-show="globalPreload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+	<NotFound v-if="standObj.notFound"></NotFound>
+
+	<div class="floating_link" v-if="preview">
+		<router-link class="imagelink" :to="'/'+routes.editstand+'/'+standObj.id"><img src="@/img/edit_sec.svg" alt=""><span>{{tr('ss_edit_stand_link')}}</span></router-link>
+	</div>
+
+	<section class="single_event_main_new" v-if="!standObj.notFound" v-bind:style="standBannerStyle">
+		<div class="mask_box" v-bind:style="customStandColorStyle" v-if="customStandColorStyle"></div>
+		<div class="container">
+			<div class="top_row">
+				<div class="breadcrumbs flex">
+					<router-link :to="'/'">{{tr('home')}}</router-link>
+					<span class="delimeter">/</span>
+					<router-link :to="'/'+routes.event+'/'+eventObj.id" class="event_name">{{eventObj.name}}</router-link>
+					<span class="delimeter">/</span>
+					<span class="current">{{standObj.name}}</span>
+				</div>
+				<div class="event_box">
+
+				</div>
+			</div>
+
+			<div class="breadcrumb_line"></div>
+            <div  class="preview_image_box logo_stand" v-if="getStandLogo">
+                <img :src="getStandLogo" >
+            </div>
+			<div class="map flex">
+				<div class="icon_box"><img src="./img/location_icon_white.svg" alt=""></div>
+				<p>{{tr('online_stand')}}</p>
+			</div>
+
+			<h1 class="event_title">{{standObj.name}}</h1>
+			<p class="date" v-if="evtItemDate"><!-- {{evtItemDate.startString}} --></p>
+			<div class="button_box flex">
+				<router-link :to="'/'+routes.chat+'/'+routes.stand+'/'+standObj.id" v-if="eventObj.letmein && standObj.chat_enable" class="btn">{{tr('ss_start_chat')}}</router-link>
+			</div>
+
+		</div>
+	</section>
+
+	<section class="single_tabs" v-if="!standObj.notFound">
+		<div class="single_tabs_header_block">
+			<div class="container flex">
+				<div class="single_tabs_header" v-bind:style="customStandBorderStyle" v-bind:class="{ active: activeTab == 'dt1' }" @click="selectTab('dt1')">
+					{{tr('ss_the_stand')}}
+				</div>
+				<div class="single_tabs_header" v-bind:style="customStandBorderStyle" v-if="standObj.id && alreadyVisitor && !eventObj.hidden.includes('staff')" v-bind:class="{ active: activeTab == 'dt3' }" @click="selectTab('dt3')">
+					{{tr('ct_tn_staff_'+eventObj.theme)}}
+				</div>
+				<div class="single_tabs_header" v-bind:style="customStandBorderStyle" v-if="standObj.id && alreadyVisitor && !eventObj.hidden.includes('collections')" v-bind:class="{ active: activeTab == 'dt5' }" @click="selectTab('dt5')">
+					{{tr('ct_tn_collections_'+eventObj.theme)}}
+				</div>
+				<div class="single_tabs_header" v-bind:style="customStandBorderStyle" v-bind:class="{ active: activeTab == 'dt2' }" @click="selectTab('dt2')" v-if="Object.keys(standDownloadables.exist).length">
+					{{tr('ct_tn_downloads_'+eventObj.theme)}}
+				</div>
+
+				<div class="single_tabs_header" v-bind:style="customStandBorderStyle" v-bind:class="{ active: activeTab == 'dt4' }" @click="selectTab('dt4')" v-if="standAgenda.sessions.length || standObj.show_empty">
+					{{tr('ct_tn_agenda_'+eventObj.theme)}}
+				</div>
+			</div>
+		</div>
+
+		<ui-tabs ref="single_tabs">
+            <ui-tab id="dt1" key="dt1">
+                <div slot="header" class="my-custom-tab-header">
+                </div>
+
+				<MainTab v-if="standObj.description_long.length && standAgenda" :agenda="standAgenda" :mainObj="standObj" :branding="standBranding" type="stand"></MainTab>
+
+            	<EmptyTabContent v-if="!standObj.description_long.length" :message="tr('ss_empty_tab_text')"></EmptyTabContent>
+
+            </ui-tab>
+						<ui-tab id="dt5" key="dt5">
+                <div slot="header" class="my-custom-tab-header">
+                </div>
+
+                <CollectionsTab ref="collectionsTab" :eventObj="eventObj" :collections="collections" :standObj="standObj" v-if="collections && collections.length"></CollectionsTab>
+								<EmptyTabContent v-if="!collections.length" :message="tr('ss_empty_tab_text')"></EmptyTabContent>
+            </ui-tab>
+            <ui-tab id="dt2" v-if="Object.keys(standDownloadables.exist).length" key="dt2">
+                <div slot="header" class="my-custom-tab-header">
+                </div>
+
+                <DownloadTab type="stand" :downloadables="standDownloadables"></DownloadTab>
+            </ui-tab>
+            <ui-tab id="dt3" key="dt3">
+                <div slot="header" class="my-custom-tab-header">
+                </div>
+
+				<StaffTab v-if="standObj.id && alreadyVisitor" :eventObj="eventObj" :standObj="standObj"></StaffTab>
+            </ui-tab>
+
+            <ui-tab id="dt4" v-if="standAgenda.sessions.length || standObj.show_empty" key="dt4">
+                <div slot="header" class="my-custom-tab-header">
+                </div>
+
+                <AgendaTab ref="agendaTab" type="stand" v-if="standAgenda.sessions.length" :evtDayList="evtDayList" :eventObj="eventObj" :agenda="standAgenda" :standObj="standObj"></AgendaTab>
+                <EmptyTabContent v-if="!standAgenda.sessions.length" :message="tr('ss_empty_tab_text')"></EmptyTabContent>
+            </ui-tab>
+        </ui-tabs>
+
+	</section>
+
+</div>

@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This lambda cleans up bucket before deleteing it with the stack. Applicable only for non-prod environments
+Resources:
+  TexEmptyBucketLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [lambda.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:ListBucket"
+                Resource:
+                  - Fn::Join:
+                      - ""
+                      - - "arn:aws:s3:::"
+                        - "*"
+              - Effect: "Allow"
+                Action:
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                  - "s3:DeleteObject"
+                  - "s3:GetObjectTagging"
+                  - "s3:PutObjectTagging"
+                Resource:
+                  - Fn::Join:
+                      - ""
+                      - - "arn:aws:s3:::"
+                        - "*"
+                        - "/*"
+  TexEmptyBucketLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+            #!/usr/bin/env python
+            # -*- coding: utf-8 -*-
+
+            import json
+            import boto3
+            from botocore.vendored import requests
+
+
+            def lambda_handler(event, context):
+                try:
+                    bucket = event['ResourceProperties']['BucketName']
+
+                    if event['RequestType'] == 'Delete':
+                        s3 = boto3.resource('s3')
+                        bucket = s3.Bucket(bucket)
+                        for obj in bucket.objects.filter():
+                            s3.Object(bucket.name, obj.key).delete()
+
+                    sendResponseCfn(event, context, "SUCCESS")
+                except Exception as e:
+                    print(e)
+                    sendResponseCfn(event, context, "FAILED")
+
+
+            def sendResponseCfn(event, context, responseStatus):
+                response_body = {'Status': responseStatus,
+                                 'Reason': 'Log stream name: ' + context.log_stream_name,
+                                 'PhysicalResourceId': context.log_stream_name,
+                                 'StackId': event['StackId'],
+                                 'RequestId': event['RequestId'],
+                                 'LogicalResourceId': event['LogicalResourceId'],
+                                 'Data': json.loads("{}")}
+
+                requests.put(event['ResponseURL'], data=json.dumps(response_body))
+      Handler: index.lambda_handler
+      Runtime: python3.6
+      Role: !GetAtt TexEmptyBucketLambdaExecutionRole.Arn
+  TexEmptyBucketLambdaFunctionPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt TexEmptyBucketLambda.Arn
+      Principal: 'cloudformation.amazonaws.com'
+  TexEmptyBucketLambdaTransform:
+    Type: AWS::CloudFormation::Macro
+    Properties:
+      Name: !Sub 'PyPlate'
+      Description: Processes inline python in templates
+      FunctionName: !GetAtt TexEmptyBucketLambda.Arn
+Outputs:
+    TexEmptyBucketLambda:
+        Value: !GetAtt TexEmptyBucketLambda.Arn
+        Export:
+            Name: TexEmptyBucketLambda
+        Description: Lambda to empty bucket before deletion. Used to streamline Cloudformation stack deletion

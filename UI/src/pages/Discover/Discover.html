@@ -1,0 +1,177 @@
+<div class="page_wrapper signed_area_home preloader_wrapper">
+
+	<div class="preloader_overlay fixed preload_overlay_white" v-show="globalPreload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+	<section class="section_banner banner_v4 flex">
+		<div class="container flex">
+			<div class="section_banner_content">
+				
+				<h1 class="section_banner_title">{{tr('events')}}</h1>
+				
+				<div class="events_search">
+					<div class="events_search_left flex">
+						<div class="search_input_block">
+							<input type="search" class="search_input" v-model="searchVal" :placeholder="tr('search_for_events')">
+							<a href="#" class="search_btn"><img src="../../img/search_icon.svg" alt=""></a>
+						</div>	
+					</div>
+
+					<div class="events_search_right flex">
+						<ui-select
+			                :label="tr('choose_category')"
+			                :placeholder="tr('all')"
+			                :options="categoriesList"
+			                v-model="searchCatVal"
+			                iconPosition="right"
+			            >
+			            	<img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+			            </ui-select>
+						<button class="btn btn_orange" @click="searchAction">{{tr('search')}}</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</section>
+
+	<section class="featured_events" v-if="featuredEventList && featuredEventList.length && false" >
+		<div class="container flex">
+			
+			<h2 class="title">{{tr('featured_events')}}</h2>
+
+			<div class="featured_carousel_arrows">
+		      	<div class="carousel_arrow arrow_left" @click="showPrev">
+			      	<svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M1.18429 13.1359C0.698112 13.5863 0.669113 14.3455 1.11951 14.8317C1.54621 15.2923 2.2501 15.3425 2.73639 14.9636L2.81534 14.8964L9.29626 8.89238C9.78426 8.44028 9.80774 7.68378 9.36651 7.2024L9.29684 7.13233L2.81592 1.1203C2.33004 0.669575 1.57078 0.698072 1.12005 1.18395C0.693053 1.64425 0.696156 2.34992 1.11079 2.80616L1.1837 2.87981L6.24075 7.57133C6.48368 7.7967 6.49792 8.17633 6.27254 8.41926L6.24046 8.45132L1.18429 13.1359Z" fill="#386D7D"/>
+					</svg>
+				</div>
+
+		      	<div class="carousel_arrow arrow_right" @click="showNext">
+		      		<svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M1.18429 13.1359C0.698112 13.5863 0.669113 14.3455 1.11951 14.8317C1.54621 15.2923 2.2501 15.3425 2.73639 14.9636L2.81534 14.8964L9.29626 8.89238C9.78426 8.44028 9.80774 7.68378 9.36651 7.2024L9.29684 7.13233L2.81592 1.1203C2.33004 0.669575 1.57078 0.698072 1.12005 1.18395C0.693053 1.64425 0.696156 2.34992 1.11079 2.80616L1.1837 2.87981L6.24075 7.57133C6.48368 7.7967 6.49792 8.17633 6.27254 8.41926L6.24046 8.45132L1.18429 13.1359Z" fill="#386D7D"/>
+					</svg>
+				</div>
+			</div>
+
+		</div>	
+			
+		<div class="featured_events_carousel">
+			
+			<VueSlickCarousel v-bind="featured_carousel_settings" ref="featured_carousel" v-if="featuredEventList && featuredEventList.length">
+			      
+			    
+				<div class="featured_carousel_item" v-for="event in featuredEventList">
+					<div class="featured_item_wrapper">
+						<div class="events_item" :class="{'no_active_style': featuredNoActiveClass || true}">
+							<router-link @mousedown.native="mouseDownEvt" @mouseup.native="mouseUpEvt" :to="'/'+routes.event+'/'+event.id" class="img_block" :class="{'image_placeholder': !event.templateCoverUrl }">
+                                <img :src="event.templateCoverUrl" alt="">
+                            </router-link>
+							<div class="content">
+								<div class="top flex">
+									<div class="date" v-if="event.evtItemDate">
+										<p class="month">{{event.evtItemDate.month}}</p>
+										<p class="nums">{{event.evtItemDate.date}}</p>
+									</div>
+									<div class="logo"><img :src="event.logoUrl" alt=""></div>
+								</div>
+								<div class="main">
+									<router-link @mousedown.native="mouseDownEvt" @mouseup.native="mouseUpEvt" :to="'/'+routes.event+'/'+event.id"><h3 class="title">{{event.name ? event.name : 'NoName'}}</h3></router-link>
+                                    <p class="descr">{{event.description_short}}</p>
+								</div>
+								<div class="bottom flex">
+									<div class="location flex">
+										<!-- <img src="../../img/loc2.svg" alt="">
+										<p>London, UK</p> -->
+										<p v-if="event.langList">{{event.langList}}</p>
+									</div>
+									<div class="price_box" v-if="event.pricing && event.pricing.access_price">
+										<p class="text">{{tr('starts_at')}}</p>
+										<p class="price">{{startPricing(event)}}</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			    <template #customPaging="page">
+			      <div class="event_carousel_dot">
+			        
+			      </div>
+			    </template>
+
+			</VueSlickCarousel>
+		</div>
+
+	</section>
+
+	<section class="others_events">
+		<div class="container_big" v-if="othersEventList && othersEventList.length">
+			<!-- <h2 class="title">{{tr('others_events')}}</h2> -->
+			<div class="event_grid_new">
+        		<router-link :to="'/'+routes.event+'/'+(event.customName ? event.customName :event.id)" class="item" v-if="featuredEventList || othersEventList" v-for="event in [...featuredEventList, ...othersEventList]">
+        			<div class="image_box" :class="{'image_placeholder': !event.templateCoverUrl }">
+        				<img class="item_image" :src="event.templateCoverUrl" alt="">
+        				<div class="hover_box">
+        					<div class="hover_top">
+        						<div class="follow">
+        							<div class="icon_box"><img src="@/img/ICON_Follow.svg" alt=""></div>
+        							<span>{{tr('follow')}}</span>
+        						</div>
+        					</div>
+        					<div class="hover_text">{{event.description_short}}</div>
+        					<div class="button_box">
+        						<button class="btn btn_tr">{{tr('learn_more')}}</button>
+        					</div>
+        				</div>
+        			</div>
+        			<div class="text_box">
+        				<p class="name">{{event.name}}</p>
+        				<p class="price">{{startPricing(event)}}</p>
+        			</div>
+        			<div class="date">
+        				<div class="icon_box"><img src="@/img/ICON_calendar.svg" alt=""></div>
+        				<p>{{event.evtItemDate.month}} {{event.evtItemDate.date}}</p>
+        			</div>
+        		</router-link>
+
+        	</div>
+			<div class="events_grid" style="display: none">
+				<div class="events_grid">
+
+					<div class="events_item"  v-for="event in [...featuredEventList, ...othersEventList]">
+						<router-link :to="'/'+routes.event+'/'+event.id" class="img_block" :class="{'image_placeholder': !event.templateCoverUrl }">
+                            <img :src="event.templateCoverUrl" alt="">
+                        </router-link>
+						<div class="content">
+							<div class="top flex">
+								<div class="logo"><img :src="event.logoUrl" alt=""></div>
+								<div class="date" v-if="event.evtItemDate">
+									<p class="month">{{event.evtItemDate.month}}</p>
+									<p class="nums">{{event.evtItemDate.date}}</p>
+								</div>
+							</div>
+							<div class="main">
+								<router-link :to="'/'+routes.event+'/'+event.id"><h3 class="title">{{event.name ? event.name : 'NoName'}}</h3></router-link>
+                                <p class="descr">{{event.description_short}}</p>
+							</div>
+							<div class="bottom flex">
+								<div class="location flex">
+									<!-- <img src="../../img/loc2.svg" alt="">
+									<p>London, UK</p> -->
+									<p v-if="event.langList">{{event.langList}}</p>
+								</div>
+								<div class="price_box" v-if="event.pricing && event.pricing.access_price">
+									<p class="text">{{tr('starts_at')}}</p>
+									<p class="price">{{startPricing(event)}}</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</section>
+
+</div>

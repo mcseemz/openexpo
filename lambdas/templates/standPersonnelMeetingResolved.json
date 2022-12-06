@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "standPersonnelMeetingResolved",
+    "SubjectPart": "Openexpo meeting request {{resolution}}ed",
+    "HtmlPart": "{{user}} answer on meeting request: {{resolution}}",
+    "TextPart": "{{user}} answer on meeting request: {{resolution}}"
+  }
+}

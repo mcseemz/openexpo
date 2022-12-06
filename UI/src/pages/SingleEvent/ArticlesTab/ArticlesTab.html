@@ -1,0 +1,30 @@
+<section class="articles_tab_section">
+    <div class="container">
+        <div class="articles_list">
+            <div class="articles_item" v-for="item in articles" v-if="item.articleTitle && item.articleContent">
+                <div class="image_box">
+                    <img :src="item.articleBranding.articleBanner.url" alt="" class="article_main" v-if="item.articleBranding && item.articleBranding.articleBanner.url">
+                </div>
+                <div class="content">
+                    <div class="top">
+                        <div class="source">
+                            <div class="source_img_box"><img v-if="users[item.editor] && users[item.editor].userBranding && users[item.editor].userBranding.logo.url" :src="users[item.editor].userBranding.logo.url" alt=""></div>
+                            <p v-if="users[item.editor]">{{users[item.editor].userObj.name}} {{users[item.editor].userObj.surname}}</p>
+                        </div>
+                        <div class="date">{{getDatePublished(item).date}}  {{getDatePublished(item).time}} (UTC{{timezone}})</div>
+                    </div>
+                    <div class="middle">
+                        <h3 class="article_title">{{item.articleTitle}}</h3>
+                        <p class="article_text">{{item.articleDescription}}</p>
+                    </div>
+                    <div class="bottom">
+                        <router-link :to="'/'+routes.article+'/'+item.id" class="article_goto">Go to full article <img src="./img/Shape.svg" alt=""></router-link>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="more_button_block flex">
+            <router-link :to="'#'" style="display: none" class="btn btn_md btn_white">Show more articles</router-link>
+        </div>
+    </div>
+</section>

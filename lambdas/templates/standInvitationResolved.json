@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "standInvitationResolved",
+    "SubjectPart": "Invitation {{resolution}}ed",
+    "HtmlPart": "{{user}} answer on invitation: {{resolution}}",
+    "TextPart": "{{user}} answer on invitation: {{resolution}}"
+  }
+}

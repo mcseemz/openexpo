@@ -1,0 +1,109 @@
+<div class="header_search_dropdown_results" v-if="searchResult">
+	<div class="item_wrapper" v-if="item.ref != 'activity'" v-for="item in searchResult">
+		<div class="item flex" v-if="item.ref == 'event'">
+			<div class="left">
+				<div class="img_box">
+					<img v-if="item.imgUrl" :src="item.imgUrl" alt="" class="item_img img_waha">
+					<img v-if="!item.imgUrl" src="@/img/image_placeholder_img.svg" alt="" class="item_img img_waha">
+				</div>
+			</div>
+			<div class="center">
+				<div class="title_box flex">
+					<p class="item_title" v-if="item.name && item.name.length">{{item.name[0]}}</p> 
+					<!-- <div class="item_tags flex"><span class="tag">Social</span></div> -->
+				</div>
+				
+				<!-- <p class="subtitle_primary"></p> -->
+				<p class="subtitle_secondary" v-if="item.displayDate">{{item.displayDate.short}}</p>
+				<!-- <p class="price">{{tr('search_from')}} 75$</p> -->
+				<p class="text" v-if="item.descshort && item.descshort.length">{{item.descshort[0]}}</p>
+			</div>
+			<div class="right flex">
+				<div class="socials"></div>
+				<router-link :to="'/'+routes.event+'/'+item.ref_id" class="btn btn_orange">{{tr('search_view_event')}}</router-link>
+			</div>
+		</div>
+
+		<div class="item flex" v-if="item.ref == 'stand'">
+			<div class="left">
+				<div class="img_box">
+					<img v-if="item.imgUrl" :src="item.imgUrl" alt="" class="item_img img_waha">
+					<img v-if="!item.imgUrl" src="@/img/image_placeholder_img.svg" alt="" class="item_img img_waha">
+				</div>
+			</div>
+			<div class="center">
+				<div class="title_box flex">
+					<p class="item_title" v-if="item.name && item.name.length">{{item.name[0]}}</p> 
+				</div>
+				
+				<p class="text" v-if="item.descshort && item.descshort.length">{{item.descshort[0]}}</p>
+			</div>
+			<div class="right flex">
+				<div class="socials"></div>
+				<router-link :to="'/'+routes.stand+'/'+item.ref_id" class="btn btn_orange">{{tr('search_view_stand')}}</router-link>
+			</div>
+		</div>
+
+		<div class="item flex" v-if="item.ref == 'personnel'">
+			<div class="left">
+				<div class="img_box">
+					<img v-if="item.imgUrl" :src="item.imgUrl" alt="" class="item_img img_waha">
+					<img v-if="!item.imgUrl" src="@/img/image_placeholder_img.svg" alt="" class="item_img img_waha">
+				</div>
+			</div>
+			<div class="center">
+				<div class="title_box flex">
+					<p class="item_title" v-if="item.name">{{item.name}}</p> 
+				</div>
+				<p class="subtitle_primary" v-if="item.descshort">{{item.descshort}}</p>
+				<!-- <p class="subtitle_secondary">Wed, 31 January 2020</p> -->
+				
+			</div>
+			<div class="right flex">
+				<div class="socials"></div>
+			</div>
+		</div>
+
+		<div class="item flex" v-if="item.ref == 'activity'">
+			<div class="left">
+<!-- 							<div class="img_box">
+					<img v-if="item.imgUrl" :src="item.imgUrl" alt="" class="item_img img_waha">
+					<img v-if="!item.imgUrl" src="@/img/image_placeholder_img.svg" alt="" class="item_img img_waha">
+				</div> -->
+			</div>
+			<div class="center">
+				<div class="title_box flex">
+					<p class="item_title" v-if="item.name && item.name.length">{{item.name[0]}}</p> 
+				</div>
+				<p class="subtitle_primary" v-if="item.descshort && item.descshort.length">{{item.descshort[0]}}</p>
+				<p class="subtitle_secondary" v-if="item.displayDate">{{item.displayDate.long}}</p>
+				
+			</div>
+			<!-- <div class="right flex">
+				<div class="socials"></div>
+			</div> -->
+		</div>
+
+		<div class="item flex" v-if="item.ref == 'news'">
+			<div class="left">
+				<div class="img_box">
+					<img v-if="item.imgUrl" :src="item.imgUrl" alt="" class="item_img img_waha">
+					<img v-if="!item.imgUrl" src="@/img/image_placeholder_img.svg" alt="" class="item_img img_waha">
+				</div>
+			</div>
+			<div class="center">
+				<div class="title_box flex">
+					<p class="item_title" v-if="item.name && item.name.length">{{item.name[0]}}</p> 
+				</div>
+				
+				<p class="text" v-if="item.descshort && item.descshort.length">{{item.descshort[0]}}</p>
+			</div>
+			<div class="right flex">
+				<div class="socials"></div>
+				<router-link :to="'/'+routes.article+'/'+item.ref_id" class="btn btn_orange">{{tr('search_view_article')}}</router-link>
+			</div>
+		</div>
+
+	</div>
+
+</div>

@@ -1,0 +1,14 @@
+{
+  "myinv_title": "My Invitations",
+  "myinv_notfound_text": "Invitations not found",
+  "myinv_create_stand_title": "Create stand invitations",
+  "myinv_event_personnel_title": "Event personnel invitations",
+  "myinv_stand_personnel_title": "Stand personnel invitations",
+  "myinv_company_personnel_title": "Company personnel invitations",
+  "myinv_role": "Role",
+  "myinv_position": "Position",
+  "myinv_reject": "Reject",
+  "myinv_accept_msg": "Invitation was successfully accepted",
+  "myinv_reject_msg": "Invitation was successfully rejected",
+  "myinv_event_visitor_title": "Events invitations"
+}

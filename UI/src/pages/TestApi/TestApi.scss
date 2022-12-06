@@ -1,0 +1,19 @@
+.testapisecrion {
+	padding: 150px 0;
+	
+
+	.testflex {
+		align-items: center;
+		justify-content: flex-start;
+	}
+
+	.button_box {
+		margin-top: 32px;
+		margin-bottom: 50px;
+		display: flex;
+
+		.btn {
+			margin-right: 16px;
+		}
+	}
+}

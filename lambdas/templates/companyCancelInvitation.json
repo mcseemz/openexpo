@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "CompanyCancelInvitation",
+    "SubjectPart": "Invitation to join the company was canceled",
+    "HtmlPart": "Invitation to join the company '{{company}}' was canceled",
+    "TextPart": "Invitation to join the company '{{company}}' was canceled"
+  }
+}

@@ -1,0 +1,38 @@
+.height_80 {
+  height: 80px;
+}
+
+.product-details {
+  .detail-wrapper {
+    flex: 1 1 40%;
+  }
+
+  img {
+    cursor: pointer;
+  }
+}
+
+.add-item {
+  cursor: pointer;
+}
+
+.multiselect__tag {
+  margin: 4px 4px !important;
+  padding: 4px 16px !important;
+  background-color: #EBF0F2 !important;
+  border-radius: 40px !important;
+  font-size: 12px !important;
+  line-height: 1.3em !important;
+  color: #1A323B !important;
+  i {
+    &:hover {
+      background: none !important;
+      color: #1A323B !important;;
+    }
+  }
+  .multiselect__tag-icon:after {
+    content: "\D7";
+    color: #6e7c8d;
+    font-size: 14px;
+  }
+}

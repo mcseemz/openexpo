@@ -1,0 +1,130 @@
+<div class="main_sections_wrapper">
+    <a class="main_sections_anchor" id="contact_info"></a>
+    <div class="main_form_box">
+        <div class="main_section contact_info_main_section">
+            <h3 class="big_text form_section_title"><img src="../img/basic_info_icon.svg" alt="" class="form_section_title_icon">{{tr('contact_info')}}</h3>
+            <p class="form_section_text"></p>
+
+       
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('adev_contact_email_label')" 
+                        type="email"
+                        :placeholder="tr('adev_contact_email_ph')" 
+                        v-model="eventObj.contacts.email"
+                        :invalid="!eventObj.contacts.email || !validateEmail(eventObj.contacts.email)"
+                        @input="forceUpdate"
+                        
+                    >
+                    </ui-textbox>    
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('adev_contact_phone_label')" 
+                        type="tel"
+                        :placeholder="tr('adev_contact_phone_ph')" 
+                        v-model="eventObj.contacts.phone"
+                        :invalid="eventObj.contacts.phone && !(/^[\d()\-#+\s]*$/.test(eventObj.contacts.phone))"
+                    >
+                    </ui-textbox>    
+                </div>
+                
+            </div>
+
+            <div class="form_checkbox_row">
+                <ui-checkbox v-model="eventObj.contacts.showContacts" color="accent">
+                    {{tr('adev_contact_show_info')}}
+                </ui-checkbox>
+            </div>
+    
+        </div>
+
+        <div class="main_section contact_info_main_section">
+      
+            <p class="main_section_title big_text">
+                {{tr('adev_contact_social_network')}}
+            </p>
+
+       
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('adev_contact_fb_label')" 
+                        type="text"
+                        :placeholder="tr('adev_contact_fb_ph')" 
+                        v-model="eventObj.contacts.facebook"
+                        :invalid="eventObj.contacts.facebook && !(/^(https?:\/\/)?((w{3}\.)?)facebook.com\/.*/i.test(eventObj.contacts.facebook))"
+                    >
+                    </ui-textbox>    
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('adev_contact_linkedin_label')" 
+                        type="text"
+                        :placeholder="tr('adev_contact_linkedin_ph')" 
+                        v-model="eventObj.contacts.linkedin"
+                        :invalid="eventObj.contacts.linkedin && !(/^(https?:\/\/)?((w{3}\.)?)linkedin.com\/.*/i.test(eventObj.contacts.linkedin))"
+                    >
+                    </ui-textbox>    
+                </div>
+                
+            </div>
+
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('adev_contact_twitter_label')" 
+                        type="text"
+                        :placeholder="tr('adev_contact_twitter_ph')" 
+                        v-model="eventObj.contacts.twitter"
+                        :invalid="eventObj.contacts.twitter && ( !/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g.test(eventObj.contacts.twitter) && !/^(@)[-a-zA-Z0-9@:%._\+~#=]*/g.test(eventObj.contacts.twitter) )"
+        
+                    >
+                    </ui-textbox>    
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :label="tr('adev_contact_instagram_label')" 
+                        type="text"
+                        :placeholder="tr('adev_contact_instagram_ph')" 
+                        v-model="eventObj.contacts.instagram"
+                        :invalid="eventObj.contacts.instagram && !(/^(https?:\/\/)?((w{3}\.)?)instagram.com\/.*/i.test(eventObj.contacts.instagram))"
+                    >
+                    </ui-textbox>    
+                </div>
+                
+            </div>
+    
+        </div>
+
+        <div class="main_section contact_info_main_section">
+      
+            <p class="main_section_title big_text">
+                {{tr('adev_contact_website_label')}}
+            </p>
+
+       
+            <div class="form_input_row">
+
+                <ui-textbox 
+                    type="text"
+                    :placeholder="tr('adev_contact_website_ph')" 
+                    v-model="eventObj.contacts.website"
+                    :invalid="eventObj.contacts.website && !(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g.test(eventObj.contacts.website))"
+                >
+                </ui-textbox>    
+                
+            </div>
+    
+        </div>
+
+
+    </div>
+</div>

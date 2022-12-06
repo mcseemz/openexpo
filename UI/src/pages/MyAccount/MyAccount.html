@@ -1,0 +1,65 @@
+<div class=" page_add_event preloader_wrapper page_my_account shl" v-if="localesLoaded">
+
+    <div class="preloader_overlay" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+       
+    <div class="content_wrapper">
+        <div class="container">
+            <div class="title_box flex">
+                <h2 class="title">{{tr('my_account')}}</h2>
+                <button class="btn btn_orange" @click="saveClick">{{tr('save')}}</button>
+            </div>
+            <div class="content_sidebar_left flex">
+                <div class="sidebar">
+                    
+                    <ul class="sidebar_menu">
+                        <li class="sidebar_menu_item">
+                        
+                            <ui-collapsible removeIcon disableRipple :open="['personal_info', 'payment_history', 'payment_methods'].includes(selectedMenu)">
+                                <div class="" slot="header">
+                                    <div class="sidebar_menu_item_title">{{tr('myacc_my_details')}}</div>
+                                    <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                                </div>
+
+                                <ul class="sidebar_menu submenu">
+                                    <li class="sidebar_menu_subitem" :class="{'active': selectedMenu == 'personal_info'}" @click="selectedMenu = 'personal_info'">
+                                        <div class="sidebar_menu_item_title">{{tr('myacc_personal_info')}}</div>
+                                    </li>
+                                </ul>
+                            </ui-collapsible>
+                            
+                        </li>
+
+                        <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'language'}">
+                            <div class="sidebar_menu_item_title"  @click="selectedMenu = 'language'">{{tr('myacc_language')}}</div>
+                        </li>
+
+                        <li v-if="sponsorshipList.length" class="sidebar_menu_item" :class="{'active': selectedMenu == 'sponsorship'}">
+                            <div class="sidebar_menu_item_title" v-if="features.sponsors"  @click="selectedMenu = 'sponsorship'">{{tr('sponsorship')}}</div>
+                        </li>
+
+                        
+                    </ul>
+                </div>
+                
+                
+                <PersonalInfo :userBranding="userBranding" :countryList="countryList" :customFields="customFields" :userObj="userObj" v-if="selectedMenu == 'personal_info' && userObj.email"></PersonalInfo>
+                <Languages :langList="langList" :userObj="userObj" v-if="selectedMenu == 'language'"></Languages>
+                <Sponsorship :sponsorshipList="sponsorshipList" v-if="selectedMenu == 'sponsorship' && features.sponsors && sponsorshipList.length"></Sponsorship>
+
+            </div>
+
+        </div>  
+    </div> 
+
+    <ui-modal ref="messageModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('validation_error')}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+</div>

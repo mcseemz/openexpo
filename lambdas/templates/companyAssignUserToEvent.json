@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "CompanyAssignUserToEvent",
+    "SubjectPart": "You've been assigned to the event",
+    "HtmlPart": "You've been assigned to the event: {{eventName}} with the role: {{role}}",
+    "TextPart": "You've been assigned to the event: {{eventName}} with the role: {{role}}"
+  }
+}

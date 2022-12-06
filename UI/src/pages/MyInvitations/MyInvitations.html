@@ -1,0 +1,120 @@
+<div class="page_wrapper myevents_page" v-if="localesLoaded">
+
+	<div class="subheader">
+		<div class="container">
+			<h2 class="title">{{tr('myinv_title')}}</h2> 
+		</div>
+	</div>
+	
+	<section class="my_events_main preloader_wrapper">
+	
+		<div class="preloader_overlay" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+	
+		<div class="container" :class="{'op_loading': preload}">
+			<div class="my_events_not_found" v-if="notFound">
+				<div class="big_text">{{tr('myinv_notfound_text')}}</div>
+			</div>
+			<div class="my_events_grid_section" v-if="!notFound">
+
+				<h2 class="main_section_title big_text" v-if="createStandInv.length">{{tr('myinv_create_stand_title')}}</h2>
+				
+				<div class="managerequests_main_section" v-if="createStandInv.length">
+					<div class="mr_items">
+						<div class="mr_invitation_item flex" :key="item.id" v-for="item in createStandInv">
+							<div class="left">
+								<p class="name" v-if="item.name"><strong>{{tr('event')}}: </strong>{{item.name}}</p>
+							</div>
+							<div class="right">
+								<span @click="acceptStand(item)" class="remove mr12">{{tr('accept')}}</span>
+								<span @click="rejectStand(item)" class="remove">{{tr('myinv_reject')}}</span>
+							</div>
+						</div>
+		
+					</div>
+			    </div>
+	
+				<h2 class="main_section_title big_text" v-if="eventPersonnelInv.length">{{tr('myinv_event_personnel_title')}}</h2>
+
+				<div class="managerequests_main_section" v-if="eventPersonnelInv.length">
+					 <div class="mr_items">
+						 <div class="mr_invitation_item flex" :key="item.id" v-for="item in eventPersonnelInv">
+							 <div class="left">
+								 <p class="name" v-if="item.name"><strong>{{tr('event')}}: </strong>{{item.name}}</p>
+								 <span class="color-secondary small_text">{{tr('myinv_role')}}: {{item.rolename}} | {{tr('myinv_position')}}: {{item.position}}</span>
+							 </div>
+							 <div class="right">
+								<span @click="accept(item)" class="remove mr12">{{tr('accept')}}</span>
+								<span @click="reject(item)" class="remove">{{tr('myinv_reject')}}</span>
+							 </div>
+						 </div>
+		 
+					 </div>
+				</div>
+
+				<h2 class="main_section_title big_text" v-if="standPersonnelInv.length">{{tr('myinv_stand_personnel_title')}}</h2>
+
+				<div class="managerequests_main_section" v-if="standPersonnelInv.length">
+					<div class="mr_items">
+						<div class="mr_invitation_item flex" :key="item.id" v-for="item in standPersonnelInv">
+							<div class="left">
+								<p class="name" v-if="item.name"><strong>{{tr('stand')}}: </strong>{{item.name}}</p>
+								<span class="color-secondary small_text">{{tr('myinv_role')}}: {{item.rolename}} | {{tr('myinv_position')}}: {{item.position}}</span>
+							</div>
+							<div class="right">
+								<span @click="accept(item)" class="remove mr12">{{tr('accept')}}</span>
+								<span @click="reject(item)" class="remove">{{tr('myinv_reject')}}</span>
+							</div>
+						</div>
+		
+					</div>
+			   </div>
+
+				<h2 class="main_section_title big_text" v-if="companyPersonnelInv.length">{{tr('myinv_company_personnel_title')}}</h2>
+
+				<div class="managerequests_main_section" v-if="companyPersonnelInv.length">
+					<div class="mr_items">
+						<div class="mr_invitation_item flex" :key="item.id" v-for="item in companyPersonnelInv">
+							<div class="left">
+								<p class="name" v-if="item.name"><strong>{{tr('company')}}: </strong>{{item.name}}</p>
+								<span class="color-secondary small_text">{{tr('myinv_role')}}: {{item.rolename}} | {{tr('myinv_position')}}: {{item.position}}</span>
+							</div>
+							<div class="right">
+								<span @click="accept(item)" class="remove mr12">{{tr('accept')}}</span>
+								<span @click="reject(item)" class="remove">{{tr('myinv_reject')}}</span>
+							</div>
+						</div>
+		
+					</div>
+			   </div>
+
+			   <h2 class="main_section_title big_text" v-if="eventVisitInv.length">{{tr('myinv_event_visitor_title')}}</h2>
+
+				<div class="managerequests_main_section" v-if="eventVisitInv.length">
+					<div class="mr_items">
+						<div class="mr_invitation_item flex" :key="item.id" v-for="item in eventVisitInv">
+							<div class="left">
+								<p class="name" v-if="item.name"><strong>{{tr('event')}}: </strong>{{item.name}}</p>
+							</div>
+							<div class="right">
+								<span @click="accept(item)" class="remove mr12">{{tr('accept')}}</span>
+								<span @click="reject(item)" class="remove">{{tr('myinv_reject')}}</span>
+							</div>
+						</div>
+		
+					</div>
+			   </div>
+	
+			</div>
+		</div>
+	</section>
+	
+	<ui-modal ref="messageModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="modalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

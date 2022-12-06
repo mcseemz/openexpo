@@ -1,0 +1,128 @@
+<section class="the_event_tab_section">
+    <div class="the_event_content">
+    	<div class="container">
+        	<div class="the_event_content_text clearfix">
+                    <div class="image_block" v-if="branding.mainContent.url">
+                       <img :src="branding.mainContent.url" alt=""> 
+                    </div>
+        			<span v-html="descriptionLong">
+                        
+                    </span>
+        	
+        			
+        	</div>
+    		
+    		<div class="images_carousel" v-if="branding.carouselArr.length > 3">
+            	<VueSlickCarousel v-bind="event_carousel_settings" ref="event_carousel" v-if="branding.carouselArr.length">
+    	      
+    	    
+    			<div v-for="item, index in branding.carouselArr" class="slide_wrap" @click="openCarouselModal(index)">
+                    <img :src="item" alt="">
+                </div>
+
+    			<template #prevArrow="arrowOption">
+    		      <div class="images_carousel_arrow arrow_left"><img src="./img/arrow_esr.svg" alt=""></div>
+    		    </template>
+
+    		    <template #nextArrow="arrowOption">
+    		      <div class="images_carousel_arrow arrow_right"><img src="./img/arrow_esr.svg" alt=""></div>
+    		    </template>
+
+    		    <template #customPaging="page">
+    		      <div class="images_carousel_dot">
+    		        
+    		      </div>
+    		    </template>
+
+    			</VueSlickCarousel>
+    		</div>
+
+            <div class="images_carousel flex" v-if="branding.carouselArr.length < 4">
+              
+            
+                <div v-for="item, index in branding.carouselArr" class="slide_wrap" @click="openCarouselModal(index)">
+                    <img :src="item" alt="">
+                </div>
+
+            </div>
+
+            <ui-modal ref="carouselModal" :key="index" class="carousel_modal" :alignTop="false" removeHeader size="fullscreen"  v-for="item, index in branding.fullCarouselArr">
+                <div class="carousel_modal_wrapper">
+                    <div class="content">
+                        <div class="image_box">
+                            <img :src="item" alt="">
+                        </div>
+                    </div>
+                </div>
+
+                <span class="status_modal_close" @click="closeCarouselModal(index)"><img src="@/img/close_medium.svg" alt=""></span>
+            </ui-modal>
+
+        </div>
+
+        <div class="speakers_section" v-if="speakersList.length">
+            <div class="container">
+                <h3 class="title">{{tr(locPrefix+'speakers')}}</h3>
+
+                <div class="user_items col4 flex">
+                    <div class="user_item" :key="speaker.id" v-for="speaker in speakersList">
+                        <div class="image_box">
+                            <img :src="getLogoLink(speaker.logo)" alt="" v-if="speaker.logo">
+                            <img src="@/img/default_avatar.svg" alt="" v-if="!speaker.logo">
+                        </div>
+                        <p class="name">{{speaker.name}} {{speaker.surname}}</p>
+                        <p class="role" v-if="speaker.position">{{speaker.position}}</p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="get_in_touch_section" v-if="type == 'stand' || (contacts && contacts.showContacts)">
+    	<div class="container flex">
+    		<div class="left">
+    			<div class="contacts">
+    				<div class="contacts_item flex" v-if="contactEmail">
+    					<div class="img_box">
+    						<img src="./img/letter.svg" alt="">
+    					</div>
+    					<p>{{contactEmail}}</p>
+    				</div>
+    				<div class="contacts_item flex" v-if="contacts && contacts.phone">
+    					<div class="img_box">
+    						<img src="./img/phone.svg" alt="">
+    					</div>
+    					<p>{{contacts.phone}}</p>
+    				</div>
+    				<div class="contact_icons flex" v-if="contacts">
+    					<a :href="contacts.website" class="contact_icons_item" v-if="contacts.website">
+                            <img src="./img/link.svg" alt="">
+                        </a>
+    					<a href="#" class="contact_icons_item" v-if="contacts.messanger">
+                            <img src="./img/messenger.svg" alt="">
+                        </a>
+    					<a :href="contacts.facebook" class="contact_icons_item" v-if="contacts.facebook">
+                            <img src="./img/facebook.svg" alt="">
+                        </a>
+    					<a :href="contacts.twitter" class="contact_icons_item" v-if="contacts.twitter">
+                            <img src="./img/twitter.svg" alt="">
+                        </a>
+    				</div>
+    			</div>
+    		</div>
+
+    	</div>
+    </div>
+	<ui-modal ref="messageModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{modalTitle}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</section>

@@ -1,0 +1,910 @@
+<div class="main preloader_wrapper">
+
+    <div class="preloader_overlay" v-show="preload">
+        <ui-progress-circular color="primary"></ui-progress-circular>
+    </div>
+
+    <div class="main_form_box">
+
+        <div class="main_section agenda_main_section" v-if="newForm">
+
+            <div style="background: yellow;" v-if="$store.getters.getAgendaError">
+                <p class="text pd_30">{{ tr(locPrefix + 'agenda_errors_text') }}</p>
+            </div>
+
+            <p class="text">{{ tr(locPrefix + 'agenda_text') }}</p>
+
+            <div class="form_input_row">
+                <ui-textbox
+                        :label="tr(locPrefix+'agenda_title_label')"
+                        :placeholder="tr(locPrefix+'agenda_title_ph')"
+                        v-model="sessionTitleInput"
+                        :maxlength="150"
+                        :invalid="sessionTitleTouched && !sessionTitleInput.length || sessionTitleInput.length > 150 ||
+                        ValidName(sessionTitleInput,customNameWanted) && sessionTitleInput.length > 1"
+                        @touch="sessionTitleTouched = true"
+                        @input="sessionTitleInputAction"
+                >
+                </ui-textbox>
+            </div>
+
+            <div class="form_input_row">
+                <ui-checkbox v-model="customNameWanted" color="accent">{{ tr('i_want_custom_url_name') }}</ui-checkbox>
+            </div>
+
+            <div class="form_input_row" v-if="customNameWanted">
+                <ui-textbox
+                        :label="tr(locPrefix+'agenda_custom_label')"
+                        :placeholder="tr(locPrefix+'agenda_custom_ph')"
+                        v-model="sessionCustomInput"
+                        :maxlength="150"
+                        :invalid="sessionCustomTouched && !sessionCustomInput.length || sessionCustomInput.length > 150 ||
+                         ValidName(sessionCustomInput,customNameWanted) && sessionCustomInput.length > 1"
+                        :help="customAgendaNameMsg"
+                        @touch="sessionCustomTouched = true"
+                        @input="customNameInput(false)"
+                >
+                </ui-textbox>
+            </div>
+
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-datepicker
+                            :placeholder="tr('select_a_date')"
+                            iconPosition="right"
+                            v-model="date.dateStart"
+                            :lang="datepicker_lang"
+                            @input="dateChange()"
+                            :minDate="minDate"
+                            :maxDate="maxDate"
+                    >
+                        <img slot="icon" src="@/img/calendar.svg" alt="">
+                        {{ tr(locPrefix + 'agenda_session_start') }}
+                    </ui-datepicker>
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-select
+                            :label="tr(locPrefix+'agenda_start_time')"
+                            :placeholder="tr(locPrefix+'time_ph')"
+                            :options="startTimeList(date.dateStart, date.dateEnd)"
+                            v-model="date.timeStart"
+                            iconPosition="right"
+                            @change="dateChange()"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+
+            </div>
+
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-datepicker
+                            :placeholder="tr('select_a_date')"
+                            iconPosition="right"
+                            v-model="date.dateEnd"
+                            :lang="datepicker_lang"
+                            :minDate="minEndDate"
+                            :maxDate="maxDate"
+
+                    >
+                        <img slot="icon" src="@/img/calendar.svg" alt="">
+                        {{ tr(locPrefix + 'agenda_session_end') }}
+                    </ui-datepicker>
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-select
+                            :label="tr(locPrefix+'agenda_end_time')"
+                            :placeholder="tr(locPrefix+'time_ph')"
+                            :options="endTimeList(date.dateStart, date.dateEnd, date.timeStart)"
+                            v-model="date.timeEnd"
+                            iconPosition="right"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+
+            </div>
+
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-select
+                            :label="tr(locPrefix+'zoom_or_twitch_label')"
+                            :options="meetingTypeList"
+                            v-model="meetingType"
+                            iconPosition="right"
+                            @change="meetingTypeSelected"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+
+                <div class="form_input_hr"
+                     v-if="meetingType && meetingType.value !== 'no_video' && agendaSessionIds(meetingType.value).length">
+                    <ui-select
+                            :label="tr(locPrefix+'same_translation_as')"
+                            :options="agendaSessionIds(meetingType.value)"
+                            :placeholder="tr('no_dependency')"
+                            v-model="sameStreamAs"
+                            iconPosition="right"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                    <div class="tooltip_same_tr">
+                        <img src="./img/info.svg"/>
+                        <ui-tooltip position="right">
+                            {{ tr(locPrefix + 'same_translation_hint') }}
+                        </ui-tooltip>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form_input_row flex" v-if="meetingType.value == 'zoom'">
+                <div class="form_input_hr">
+                    <ui-textbox
+                            :label="tr(locPrefix+'agenda_meeting_id_label')"
+                            :placeholder="tr(locPrefix+'agenda_meeting_id_ph')"
+                            v-model="zoomMeeting"
+                            type="number"
+                            @input="setZoomLink(false)"
+                            :invalid="!!+zoomMeeting && zoomMeeting.length && (!!(zoomMeeting % 1) || zoomMeeting.indexOf('.') != -1 || zoomMeeting.length > 15)"
+                    >
+                    </ui-textbox>
+                </div>
+                <div class="form_input_hr">
+                    <ui-textbox
+                            :label="tr(locPrefix+'agenda_meeting_pwd_label')"
+                            :placeholder="tr(locPrefix+'agenda_meeting_pwd_ph')"
+                            v-model="zoomPassword"
+                            @input="setZoomLink(false)"
+                            :invalid="zoomPassword.length > 50"
+                    >
+                    </ui-textbox>
+                </div>
+                <ui-alert :dismissible="false" class="mt-24">{{tr(locPrefix+'agenda_meeting_zoom_alert_msg')}}</ui-alert>                
+            </div>
+
+            <div class="form_input_row flex" v-if="meetingType.value == 'twitch'">
+                <div class="form_input_hr">
+                    <ui-textbox
+                            :label="tr(locPrefix+'agenda_tw_meeting_id_label')"
+                            :placeholder="tr(locPrefix+'agenda_tw_meeting_id_ph')"
+                            v-model="twitchMeeting"
+                            @input="setTwitchLink(false)"
+                            :invalid="twitchMeeting.length > 30"
+                    >
+                    </ui-textbox>
+                </div>
+            </div>
+
+            <div class="form_input_row flex" v-if="meetingType.value == 'youtube'">
+                <div class="form_input_hr">
+                    <ui-textbox
+                            :label="tr(locPrefix+'agenda_youtube_label')"
+                            :placeholder="tr(locPrefix+'agenda_youtube_ph')"
+                            v-model="youtubeMeeting"
+                    >
+                    </ui-textbox>
+                </div>
+            </div>
+
+            <div class="form_input_row flex" v-if="meetingType.value == 'vimeo'">
+                <div class="form_input_hr">
+                    <ui-textbox
+                            :label="tr(locPrefix+'agenda_vimeo_label')"
+                            :placeholder="tr(locPrefix+'agenda_vimeo_ph')"
+                            v-model="vimeoMeeting"
+                    >
+                    </ui-textbox>
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-textbox
+                            :label="tr(locPrefix+'agenda_vimeo_chat_label')"
+                            :placeholder="tr(locPrefix+'agenda_vimeo_chat_ph')"
+                            v-model="vimeoChat"
+                    >
+                    </ui-textbox>
+                </div>
+            </div>
+
+            <div class="form_input_row flex" v-if="meetingType.value != 'no_video'">
+
+                <div class="form_input_hr" v-if="meetingType.value == 'webinar' || meetingType.value == 'team_meeting'">
+                    <ui-select
+                            :label="tr(locPrefix+'video_profile_label')"
+                            :options="videoProfilesList"
+                            v-model="videoProfile"
+                            :placeholder="tr(locPrefix+'video_profile_label')"
+                            iconPosition="right"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+
+            </div>
+            <!--                 /* new Speakers */-->
+            <div class="speaker_main_section mb-24">
+                <div class="speaker_list">
+                    <div class="speaker_list_item flex-speaker width_100" v-for="(item,i) in userList">
+                        <div class="left mx_274 elipsis width_100" :key="i">
+                            <div class="flex-img">
+                                <div class="image_box" @mouseover="refImage = true" @mouseleave="refImage = false"
+                                     v-if="item.value.branding && item.value.branding.length > 0 && item.value.branding[0].status === 'stub'">
+                                    <span style="font-size: 10px;">...uploading</span>
+                                    <div style="width: 15px;height: 15px;">
+                                        <button @click="refreshImage" class="refresh_img_person" v-show="refImage">
+                                            <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                 width="15px" height="15px">
+                                                <path d="M 15 3 C 12.031398 3 9.3028202 4.0834384 7.2070312 5.875 A 1.0001 1.0001 0 1 0 8.5058594 7.3945312 C 10.25407 5.9000929 12.516602 5 15 5 C 20.19656 5 24.450989 8.9379267 24.951172 14 L 22 14 L 26 20 L 30 14 L 26.949219 14 C 26.437925 7.8516588 21.277839 3 15 3 z M 4 10 L 0 16 L 3.0507812 16 C 3.562075 22.148341 8.7221607 27 15 27 C 17.968602 27 20.69718 25.916562 22.792969 24.125 A 1.0001 1.0001 0 1 0 21.494141 22.605469 C 19.74593 24.099907 17.483398 25 15 25 C 9.80344 25 5.5490109 21.062074 5.0488281 16 L 8 16 L 4 10 z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                </div>
+                                <div class="image_box" v-else>
+                                    <img :src="item.value.logo" alt="" v-if="item.value.logo">
+                                    <img src="@/img/default_avatar.svg" alt="" v-if="!item.value.logo">
+                                </div>
+                                <div class="text_overflow_ellipsis width_100">
+                                    <div class="name flex flex_spc_between" @click="setModerator(item,'create')">
+                                        <div class="max_lenght_txt elipsis">
+                                            {{ item.value.name }} {{ item.value.surname }}
+                                            <ui-tooltip>
+                                                {{ item.value.name }} {{ item.value.surname }}
+                                            </ui-tooltip>
+                                        </div>
+
+                                        <div v-if="item && item.value && item.value.id && moderator && moderator.value && moderator.value.id && item.value.id === moderator.value.id"
+                                             class="flex_right">
+                                            <img src="@/img/icons/crown.svg" style="margin-right: 10px;"
+                                                 alt=""
+                                                 v-if="item && item.value && item.value.id && moderator && moderator.value && moderator.value.id && item.value.id === moderator.value.id">
+                                            <ui-tooltip
+                                                    v-if="item && item.value && item.value.id && moderator && moderator.value && moderator.value.id && item.value.id === moderator.value.id">
+                                                {{ tr('moderator_personnel_tooltip') }}
+                                            </ui-tooltip>
+                                        </div>
+                                        <div v-else class="flex_right">
+                                            <img title="not a moderator" src="@/img/icons/crown_.svg"
+                                                 style="margin-right: 10px;">
+                                        </div>
+                                    </div>
+
+                                    <div class="user-role" v-if="item.value.email" style="max-width: 120px">
+                                        {{ item.value.email }}
+                                    </div>
+                                    <div class="user-role" v-else style="height: 17px"></div>
+
+                                    <div>
+                                        <p class="user-role"><span
+                                                class="role-color">{{ item.value.position }}</span></p>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="mb_9"></div>
+                            <div class="flex jst_between">
+                                <div>
+                                    <ui-checkbox
+                                            :value="item && item.value && item.value.id  && presenters.length && presenters.length && presenters.includes(item)"
+                                            @change="presenterSelect(item,'create')">{{ tr('agenda_select') }}
+                                    </ui-checkbox>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex form_checkbox_row form_checkbox_m_row"
+                 v-if="meetingType.value == 'webinar' || meetingType.value == 'team_meeting'">
+                <ui-checkbox v-model="enableChat" color="accent">{{ tr(locPrefix + 'agenda_enable_chat') }}
+                </ui-checkbox>
+                <ui-checkbox v-model="enableQA" color="accent">{{ tr(locPrefix + 'agenda_enable_qa') }}</ui-checkbox>
+            </div>
+
+            <div class="flex form_checkbox_row form_checkbox_m_row" v-if="meetingType.value == 'vimeo'">
+                <ui-checkbox v-model="enableVimeoChat" color="accent">{{ tr(locPrefix + 'agenda_enable_chat') }}
+                </ui-checkbox>
+            </div>
+
+            <div class="form_input_row">
+                <button class="btn btn_orange" @click="addNewPersonnel">{{ tr(locPrefix + 'agenda_add_speaker') }}
+                </button>
+            </div>
+
+            <div class="form_input_row">
+                <ui-textbox
+                        :label="tr(locPrefix+'agenda_desc_label')"
+                        :placeholder="tr(locPrefix+'agenda_desc_ph')"
+                        v-model="description"
+                        :maxlength="1000"
+                        :multi-line="true"
+                        :invalid="description.length > 1000"
+                >
+                </ui-textbox>
+            </div>
+
+            <div class="form_input_row thumbnail_drop">
+                <div class="thumbnail_title">{{ tr('thumbnail') }}</div>
+                <VueUploadComponent
+                        input-id="thumbnail"
+                        ref="thumbnail"
+                        v-model="thumbnail"
+                        drop=".thumbnail_drop"
+                        :multiple="false"
+                        @input-file="inputFile"
+                        :drop-directory="false"
+                        class="upload_image_iconstyle"
+                >
+
+                    <div v-if="thumbnailPlaceholder" class="preview_image_box">
+                        <img :src="thumbnailPlaceholder"/>
+                    </div>
+
+                    <div class="placeholder_text" v-if="!thumbnailPlaceholder">
+                        <img src="@/img/file_input_icon.svg" alt="" class="file_upload_icon">
+                        <p class="file_upload_title">{{ tr(locPrefix + 'event_thumb_ph_main') }}</p>
+                        <p class="file_upload_desc">{{ tr(locPrefix + 'event_cover_ph_desc') }}</p>
+                    </div>
+
+                    <div class="icons_box" v-if="thumbnailPlaceholder">
+                        <span @click="removeThumbnail"><img src="@/img/remove_icon.svg"/></span>
+                        <span @click="editThumbnail"><img src="@/img/edit_icon.svg"/></span>
+                    </div>
+                </VueUploadComponent>
+            </div>
+
+            <div class="form_input_row">
+                <p class="form_input_row_label">
+                    {{ tr(locPrefix + 'tags_label') }}
+                </p>
+                <vue-tags-input
+                        :placeholder="tr(locPrefix+'tags_ph')"
+                        v-model="tag"
+                        :tags="tagsList"
+                        :allow-edit-tags="true"
+                        :add-on-key="[13,';',',']"
+                        @tags-changed="newTags => tagsChanged(newTags, false)"
+                />
+            </div>
+
+            <div class="form_input_row" v-if="priceTags && priceTags.length">
+                <div class="text-middle text-bold mb-16">{{ tr('pricing_tags') }}:</div>
+                <div class="pricings">
+                    <div v-for="tag in priceTags" class="parent_checkbox">
+                        <div class="pr_checkboxes">
+                            <ui-checkbox v-model="tag.selected">{{ tag.text }}
+                            </ui-checkbox>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="button_box flex">
+                <button class="btn btn_orange" @click="addSession">{{ tr(locPrefix + 'agenda_add_session') }}</button>
+            </div>
+
+        </div>
+
+        <div class="main_section agenda_main_section flex btn_action" v-if="!newForm" @click="newForm = true">
+            <button class="btn btn_oval" >+</button>  <span class="btn_oval_text">{{ tr(locPrefix + 'new_activity') }}</span>
+        </div>
+
+        <div class="main_section agenda_main_section">
+
+            <p class="main_section_title big_text" v-if="agenda.sessions.length">
+                {{ tr(locPrefix + 'agenda_sessions_added') }}
+            </p>
+
+            <div class="wrapper" v-for="(session, index) in agenda.sessions">
+                <div class="form_input_row" v-if="!session.edit ">
+
+                    <div class="ticket flex aic"
+                         :style="$store.getters.getAgendaError && session.DoesntSave? 'background-color: yelllow !important' : ''"
+                         :class="session.DoesntSave ? 'bg_yellow' : ''">
+                        <img class="thumbnail" :src="session.thumbnailPlaceholder" v-if="imageChecker(session)"/>
+                        <div @mouseover="refImage = true" @mouseleave="refImage = false"
+                             style="margin-right: 5px!important;"
+                             v-else-if="imageStub(session)"
+                        >
+                            <span style="font-size: 10px;">...uploading</span>
+                            <div style="width: 15px;height: 15px;">
+                                <button @click="refreshImage(index)"
+                                        style="background: transparent;border: none;margin-left: 10px"
+                                        v-show="refImage">
+                                    <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                         width="15px" height="15px">
+                                        <path d="M 15 3 C 12.031398 3 9.3028202 4.0834384 7.2070312 5.875 A 1.0001 1.0001 0 1 0 8.5058594 7.3945312 C 10.25407 5.9000929 12.516602 5 15 5 C 20.19656 5 24.450989 8.9379267 24.951172 14 L 22 14 L 26 20 L 30 14 L 26.949219 14 C 26.437925 7.8516588 21.277839 3 15 3 z M 4 10 L 0 16 L 3.0507812 16 C 3.562075 22.148341 8.7221607 27 15 27 C 17.968602 27 20.69718 25.916562 22.792969 24.125 A 1.0001 1.0001 0 1 0 21.494141 22.605469 C 19.74593 24.099907 17.483398 25 15 25 C 9.80344 25 5.5490109 21.062074 5.0488281 16 L 8 16 L 4 10 z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <img class="thumbnail" src="@/img/image_placeholder_img.svg" v-else/>
+                        <div class="agenda-content mx_width_card_xl mx_width_card_md mx_width_card_sm">
+                            <p class="ticket_subtitle text_eclips">{{ getTicketDate(session) }}</p>
+                            <p class="ticket_title text_eclips">{{ session.sessionTitle }}</p>
+                            <p class="ticket_descr text_eclips">{{ session.description }}</p>
+                            <div class="ticket_bottom flex">
+                                <div class="ticket_meeting_type">
+                                    <div>
+                                        <b>{{ tr(locPrefix + 'agenda_meeting_type') }}: </b>{{
+                                            session.meetingType.label
+                                        }}
+                                    </div>
+                                    <div v-if="session.playback">
+                                        <b>{{ tr('playback') }}: </b>{{ session.playback }}
+                                    </div>
+                                    <div v-if="session.records && session.records.length">
+                                        <p class="word-break">
+                                            <b>{{ tr('records') }}: </b>{{ session.records.join(', ') }}
+                                        </p>
+                                    </div>
+                                    <router-link v-if="session.id && session.meetingType.value !== 'no_video'"
+                                                 :to="'/'+routes.mymeetings+'/'+routes.mymeetings_video+'/'+session.id"
+                                                 target="_blank"
+                                                 class="semibold">Preview
+                                    </router-link>
+                                    <p class="ticket_title" v-if="$store.getters.getAgendaError && session.DoesntSave">
+                                        {{ $store.getters.getAgendaError }}</p>
+
+                                </div>
+                                <div class="ticket_actions flex">
+                                    <span @click="deleteSession(index)"><img src="@/img/trash_sec_bold.svg"
+                                                                             alt=""></span>
+                                    <span @click="editSession(index)"><img src="@/img/edit_sec.svg" alt=""></span>
+                                    <span v-if="$store.getters.getEditedItem.length && $store.getters.getEditedItem.includes(session.id)"><ui-tooltip>{{tr('dont_forget_save')}}</ui-tooltip><img src="../img/edited_dot.svg"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- EDIT AGENDA -->
+                <div class="ticket_edit_wrapper" v-if="session.edit">
+
+                    <div class="form_input_row">
+                        <ui-textbox
+                                :label="tr(locPrefix+'agenda_title_label')"
+                                :placeholder="tr(locPrefix+'agenda_title_ph')"
+                                v-model="session.sessionTitle"
+                                :maxlength="150"
+                                :invalid="!session.sessionTitle || session.sessionTitle.length > 150
+                                 || ValidName(session.sessionTitle,session.customNameWanted) && session.sessionTitle.length"
+                                @input="sessionTitleInputEdit(session)"
+                        >
+                        </ui-textbox>
+                    </div>
+
+                    <div class="form_input_row">
+                        <ui-checkbox v-model="session.customNameWanted" color="accent" @change="touchSession(session)">
+                            {{ tr('i_want_custom_url_name') }}
+                        </ui-checkbox>
+                    </div>
+
+                    <div class="form_input_row" v-if="session.customNameWanted">
+                        <ui-textbox
+                                :label="tr(locPrefix+'agenda_custom_label')"
+                                :placeholder="tr(locPrefix+'agenda_custom_ph')"
+                                v-model="session.customName"
+                                :maxlength="150"
+                                :invalid="!session.customName || session.customName.length > 150 || ValidName(session.customName,session.customNameWanted) && session.customName"
+                                @input="customNameInputEdited(true, session)"
+                        >
+                        </ui-textbox>
+                    </div>
+
+                    <div class="form_input_row flex">
+
+                        <div class="form_input_hr">
+                            <ui-datepicker
+                                    :placeholder="tr('select_a_date')"
+                                    iconPosition="right"
+                                    v-model="session.date.dateStart"
+                                    :maxDate="maxDate"
+                                    :lang="datepicker_lang"
+                                    :minDate="minDate"
+                                    @input="touchSession(session)"
+
+                            >
+                                <img slot="icon" src="@/img/calendar.svg" alt="">
+                                {{ tr(locPrefix + 'agenda_session_start') }}
+                            </ui-datepicker>
+                        </div>
+
+                        <div class="form_input_hr">
+                            <ui-select
+                                    :label="tr(locPrefix+'agenda_start_time')"
+                                    :placeholder="tr(locPrefix+'time_ph')"
+                                    :options="startTimeList(session.date.dateStart, session.date.dateEnd)"
+                                    v-model="session.date.timeStart"
+                                    iconPosition="right"
+                                    @select="touchSession(session)"
+                            >
+                                <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                            </ui-select>
+                        </div>
+
+                    </div>
+
+                    <div class="form_input_row flex">
+
+                        <div class="form_input_hr">
+                            <ui-datepicker
+                                    :placeholder="tr('select_a_date')"
+                                    iconPosition="right"
+                                    v-model="session.date.dateEnd"
+                                    :lang="datepicker_lang"
+                                    :minDate="minDate"
+                                    :maxDate="maxDate"
+                                    @input="touchSession(session)"
+                            >
+                                <img slot="icon" src="@/img/calendar.svg" alt="">
+                                {{ tr(locPrefix + 'agenda_session_end') }}
+                            </ui-datepicker>
+                        </div>
+
+                        <div class="form_input_hr">
+                            <ui-select
+                                    :label="tr(locPrefix+'agenda_end_time')"
+                                    :placeholder="tr(locPrefix+'time_ph')"
+                                    :options="endTimeList(session.date.dateStart, session.date.dateEnd, session.date.timeStart)"
+                                    v-model="session.date.timeEnd"
+                                    iconPosition="right"
+                                    @select="touchSession(session)"
+                            >
+                                <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                            </ui-select>
+                        </div>
+
+                    </div>
+
+                    <div class="form_input_row flex">
+
+                        <div class="form_input_hr">
+                            <ui-select
+                                    :label="tr(locPrefix+'zoom_or_twitch_label')"
+                                    :options="meetingTypeList"
+                                    v-model="session.meetingType"
+                                    iconPosition="right"
+                                    @select="touchSession(session)"
+                                    @change="meetingTypeSelected($event, session)"
+                            >
+                                <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                            </ui-select>
+                        </div>
+
+                        <div class="form_input_hr"
+                             v-if="session.meetingType.value !== 'no_video' && agendaSessionIds(session.meetingType.value, session.id).length">
+                            <ui-select
+                                    :label="tr(locPrefix+'same_translation_as')"
+                                    :options="agendaSessionIds(session.meetingType.value, session.id)"
+                                    :placeholder="tr('no_dependency')"
+                                    v-model="session.sameStreamAs"
+                                    iconPosition="right"
+                            >
+                                <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                            </ui-select>
+                            <div class="tooltip_same_tr">
+                                <img src="./img/info.svg"/>
+                                <ui-tooltip position="right">
+                                    {{ tr(locPrefix + 'same_translation_hint') }}
+                                </ui-tooltip>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form_input_row flex" v-if="session.meetingType.value == 'zoom'">
+                        <div class="form_input_hr">
+                            <ui-textbox
+                                    :label="tr(locPrefix+'agenda_meeting_id_label')"
+                                    :placeholder="tr(locPrefix+'agenda_meeting_id_ph')"
+                                    v-model="session.zoomMeeting"
+                                    type="number"
+                                    @input="setZoomLink(index)"
+                                    :invalid="!!+session.zoomMeeting && session.zoomMeeting.length && (!!(session.zoomMeeting % 1) || session.zoomMeeting.indexOf('.') != -1 || session.zoomMeeting.length > 15)"
+                            >
+                            </ui-textbox>
+                        </div>
+                        <div class="form_input_hr">
+                            <ui-textbox
+                                    :label="tr(locPrefix+'agenda_meeting_pwd_label')"
+                                    :placeholder="tr(locPrefix+'agenda_meeting_pwd_ph')"
+                                    v-model="session.zoomPassword"
+                                    @input="setZoomLink(index)"
+                                    :invalid="session.zoomPassword.length > 50"
+                            >
+                            </ui-textbox>
+                        </div>
+                        <ui-alert :dismissible="false" class="mt-24">{{tr(locPrefix+'agenda_meeting_zoom_alert_msg')}}</ui-alert>
+                    </div>
+
+                    <div class="form_input_row flex" v-if="session.meetingType.value == 'twitch'">
+                        <div class="form_input_hr">
+                            <ui-textbox
+                                    :label="tr(locPrefix+'agenda_tw_meeting_id_label')"
+                                    :placeholder="tr(locPrefix+'agenda_tw_meeting_id_ph')"
+                                    v-model="session.twitchMeeting"
+                                    @input="setTwitchLink(index)"
+                                    :invalid="session.twitchMeeting.length > 30"
+                            >
+                            </ui-textbox>
+                        </div>
+                    </div>
+
+                    <div class="form_input_row flex" v-if="session.meetingType.value == 'youtube'">
+                        <div class="form_input_hr">
+                            <ui-textbox
+                                    :label="tr(locPrefix+'agenda_youtube_label')"
+                                    :placeholder="tr(locPrefix+'agenda_youtube_ph')"
+                                    v-model="session.youtubeMeeting"
+                                    @input="touchSession(session)"
+                            >
+                            </ui-textbox>
+                        </div>
+                    </div>
+
+                    <div class="form_input_row flex" v-if="session.meetingType.value == 'vimeo'">
+                        <div class="form_input_hr">
+                            <ui-textbox
+                                    :label="tr(locPrefix+'agenda_vimeo_label')"
+                                    :placeholder="tr(locPrefix+'agenda_vimeo_ph')"
+                                    v-model="session.vimeoMeeting"
+                                    @input="touchSession(session)"
+                            >
+                            </ui-textbox>
+                        </div>
+
+                        <div class="form_input_hr">
+                            <ui-textbox
+                                    :label="tr(locPrefix+'agenda_vimeo_chat_label')"
+                                    :placeholder="tr(locPrefix+'agenda_vimeo_chat_ph')"
+                                    v-model="session.vimeoChat"
+                                    @input="touchSession(session)"
+                            >
+                            </ui-textbox>
+                        </div>
+                    </div>
+
+                    <div class="form_input_row flex" v-if="session.meetingType.value != 'no_video'">
+
+                        <div class="form_input_hr"
+                             v-if="session.meetingType.value == 'webinar' || session.meetingType.value == 'team_meeting'">
+                            <ui-select
+                                    :label="tr(locPrefix+'video_profile_label')"
+                                    :options="videoProfilesList"
+                                    v-model="session.profile"
+                                    :placeholder="tr(locPrefix+'video_profile_label')"
+                                    iconPosition="right"
+                            >
+                                <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                            </ui-select>
+                        </div>
+
+                    </div>
+
+                    <div class="speaker_main_section mb-24">
+                        <div class="speaker_list">
+
+                            <div class="speaker_list_item flex-speaker width_100" v-for="(item,i) in userList">
+                                <div class="left mx_274 elipsis width_100" :key="i">
+                                    <div class="flex-img">
+                                        <div class="image_box" @mouseover="refImage = true"
+                                             @mouseleave="refImage = false"
+                                             v-if="item.value.branding && item.value.branding.length > 0 && item.value.branding[0].status === 'stub'">
+                                            <span style="font-size: 10px;">...uploading</span>
+                                            <div style="width: 15px;height: 15px;">
+                                                <button @click="refreshImage" class="refresh_img_person"
+                                                        v-show="refImage">
+                                                    <svg fill="#000000" xmlns="http://www.w3.org/2000/svg"
+                                                         viewBox="0 0 30 30" width="15px" height="15px">
+                                                        <path d="M 15 3 C 12.031398 3 9.3028202 4.0834384 7.2070312 5.875 A 1.0001 1.0001 0 1 0 8.5058594 7.3945312 C 10.25407 5.9000929 12.516602 5 15 5 C 20.19656 5 24.450989 8.9379267 24.951172 14 L 22 14 L 26 20 L 30 14 L 26.949219 14 C 26.437925 7.8516588 21.277839 3 15 3 z M 4 10 L 0 16 L 3.0507812 16 C 3.562075 22.148341 8.7221607 27 15 27 C 17.968602 27 20.69718 25.916562 22.792969 24.125 A 1.0001 1.0001 0 1 0 21.494141 22.605469 C 19.74593 24.099907 17.483398 25 15 25 C 9.80344 25 5.5490109 21.062074 5.0488281 16 L 8 16 L 4 10 z"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                        <div class="image_box" v-else>
+                                            <img :src="item.value.logo" alt="" v-if="item.value.logo">
+                                            <img src="@/img/default_avatar.svg" alt="" v-if="!item.value.logo">
+                                        </div>
+                                        <div class="text_overflow_ellipsis width_100">
+                                            <div class="name flex flex_spc_between" @click="setModerator(item,'edit')">
+                                                <div class="max_lenght_txt elipsis">
+                                                    {{ item.value.name }} {{ item.value.surname }}
+                                                    <ui-tooltip>
+                                                        {{ item.value.name }} {{ item.value.surname }}
+                                                    </ui-tooltip>
+                                                </div>
+
+                                                <div v-if="item && item.value && item.value.id && session.moderator && session.moderator.value && session.moderator.value.id && item.value.id === session.moderator.value.id"
+                                                     class="flex_right">
+                                                    <img src="@/img/icons/crown.svg" style="margin-right: 10px;"
+                                                         alt=""
+                                                         v-if="item && item.value && item.value.id && session.moderator && session.moderator.value && session.moderator.value.id && item.value.id === session.moderator.value.id">
+                                                    <ui-tooltip
+                                                            v-if="item && item.value && item.value.id && session.moderator && session.moderator.value && session.moderator.value.id && item.value.id === session.moderator.value.id">
+                                                        {{ tr('moderator_personnel_tooltip') }}
+                                                    </ui-tooltip>
+                                                </div>
+                                                <div v-else class="flex_right">
+                                                    <img title="not a moderator" src="@/img/icons/crown_.svg"
+                                                         style="margin-right: 10px;">
+                                                </div>
+                                            </div>
+
+                                            <div class="user-role" v-if="item.value.email" style="max-width: 120px">
+                                                {{ item.value.email }}
+                                            </div>
+                                            <div class="user-role" v-else style="height: 17px"></div>
+
+                                            <div>
+                                                <p class="user-role"><span
+                                                        class="role-color">{{ item.value.position }}</span></p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="text"></div>
+                                    <div class="flex jst_between">
+                                        <div>
+                                            <ui-checkbox
+                                                    :value="item && item.value && item.value.id  && session.presenters.length  && session.presenters.some(pre =>pre && pre.value && pre.value.id === item.value.id)"
+                                                    @change="presenterSelect(item,'edit')">{{ tr('agenda_select') }}
+                                            </ui-checkbox>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="flex form_checkbox_row form_checkbox_m_row"
+                         v-if="session.meetingType.value == 'webinar' || session.meetingType.value == 'team_meeting'">
+                        <ui-checkbox @change="touchSession(session)" v-model="session.enableChat" color="accent">
+                            {{ tr(locPrefix + 'agenda_enable_chat') }}
+                        </ui-checkbox>
+                        <ui-checkbox @change="touchSession(session)" v-model="session.enableQA" color="accent">
+                            {{ tr(locPrefix + 'agenda_enable_qa') }}
+                        </ui-checkbox>
+                    </div>
+
+                    <div class="flex form_checkbox_row form_checkbox_m_row" v-if="session.meetingType.value == 'vimeo'">
+                        <ui-checkbox v-model="session.enableVimeoChat" color="accent">
+                            {{ tr(locPrefix + 'agenda_enable_chat') }}
+                        </ui-checkbox>
+                    </div>
+
+                    <div class="form_input_row" v-if="session.meetingType.value != 'no_video'">
+                        <button class="btn btn_orange" @click="addNewPersonnel">{{
+                                tr(locPrefix + 'agenda_add_speaker')
+                            }}
+                        </button>
+                    </div>
+
+                    <div class="form_input_row">
+                        <ui-textbox
+                                :label="tr(locPrefix+'agenda_desc_label')"
+                                :placeholder="tr(locPrefix+'agenda_desc_ph')"
+                                v-model="session.description"
+                                :maxlength="1000"
+                                :multi-line="true"
+                                :invalid="session.description.length > 1000"
+                                @input="touchSession(session)"
+                        >
+                        </ui-textbox>
+                    </div>
+
+                    <div class="form_input_row" :class="[`thumbnail_drop${index}`]">
+                        <div class="thumbnail_title">{{ tr('thumbnail') }}</div>
+                        <VueUploadComponent
+                                :input-id="'thumbnail'+index"
+                                :ref="'thumbnail'+index"
+                                v-model="session.thumbnail"
+                                :drop="'.thumbnail_drop'+index"
+                                :multiple="false"
+                                @input-file="existedFile($event, index)"
+                                :drop-directory="false"
+                                class="upload_image_iconstyle"
+                        >
+
+                            <div v-if="session.thumbnailPlaceholder" class="preview_image_box">
+                                <img :src="session.thumbnailPlaceholder"/>
+                            </div>
+
+                            <div class="placeholder_text" v-if="!session.thumbnailPlaceholder">
+                                <img src="@/img/file_input_icon.svg" alt="" class="file_upload_icon">
+                                <p class="file_upload_title">{{ tr(locPrefix + 'event_thumb_ph_main') }}</p>
+                                <p class="file_upload_desc">{{ tr(locPrefix + 'event_cover_ph_desc') }}</p>
+                            </div>
+
+                            <div class="icons_box" v-if="session.thumbnailPlaceholder">
+                                <span @click="removeThumbnail($event, session)"><img
+                                        src="@/img/remove_icon.svg"/></span>
+                                <span @click="editThumbnail($event, index)"><img src="@/img/edit_icon.svg"/></span>
+                            </div>
+                        </VueUploadComponent>
+                    </div>
+
+                    <div class="form_input_row">
+                        <p class="form_input_row_label">
+                            {{ tr(locPrefix + 'tags_label') }}
+                        </p>
+                        <vue-tags-input
+                                :placeholder="tr(locPrefix+'tags_ph')"
+                                v-model="session.tag"
+                                :tags="session.tagsList"
+                                :allow-edit-tags="true"
+                                :add-on-key="[13,';',',']"
+                                @tags-changed="newTags => tagsChanged(newTags, session)"
+                        />
+                    </div>
+
+                    <div class="form_input_row" v-if="session.priceTags && session.priceTags.length">
+                        <div class="text-middle text-bold mb-16">{{ tr('pricing_tags') }}:</div>
+                        <div class="pricings">
+                            <div v-for="tag in session.priceTags" class="parent_checkbox">
+                                <div class="pr_checkboxes">
+                                    <ui-checkbox
+                                            v-model="tag.selected"
+                                            @change="touchSession(session)">{{ tag.text }}
+                                    </ui-checkbox>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form_input_row additional_fields"
+                         v-if="session.playback || (session.records && session.records.length)">
+                        <p class="legend">{{ tr(locPrefix + 'additional_fields') }}</p>
+                        <div class="info">
+                            <p v-if="session.playback"><b>{{ tr('playback') }}:</b> {{ session.playback }}</p>
+                            <p v-if="session.records && session.records.length"><b>{{ tr('records') }}:</b>
+                                {{ session.records.join(', ') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="button_box update_button_box flex">
+                        <button class="btn btn_owhite" @click="backToAgendaList(index)">{{ tr('back') }}</button>
+                        <button class="btn btn_orange" @click="updateSession(index,session.id)">{{ tr('update') }}</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <ui-modal ref="messageAgendaModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{ tr('validation_error') }}</p>
+                <p class="modal_text" v-html="modalMsg">{{ modalMsg }}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="agendaModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ModalCreatePersonnel :mainObj="mainObj" :modalStatus="newPersonnel" :type="objectType"
+                          @closeModal="closePersonnelModal" @savePersonnel="getCurPersonnel"/>
+
+    <CroppModal ref="croppModal" :croppRatio="302/211" @cropp-finished="croppFinished"
+                @clearThumbnail="clearThumbnail"/>
+</div>

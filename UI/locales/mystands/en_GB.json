@@ -1,0 +1,12 @@
+{
+  "mystands_title": "My Stands",
+  "mystands_owner": "Owner",
+  "mystands_visitor": "Visitor",
+  "mystands_nostands_text": "There are still no stands your are going to attend",
+  "mystands_search_stands": "Search stands",
+  "mystands_accept": "Accept",
+  "mystands_refuse": "Refuse",
+  "mystands_pending_invitation": "Pending invitation",
+  "mystands_event": "Event",
+  "mystands_default_stand": "Default stand"
+}

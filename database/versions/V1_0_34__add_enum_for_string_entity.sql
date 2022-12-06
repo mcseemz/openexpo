@@ -1,0 +1,1 @@
+ALTER TYPE string_entity ADD VALUE IF NOT EXISTS 'event_invitation' AFTER 'user_invitation';

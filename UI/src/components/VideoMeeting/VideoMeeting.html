@@ -1,0 +1,552 @@
+<section class="section_video_meeting" :class="{presenters_list_exp: presentersListExpanded, 'compact-view': compactView}">
+	<div class="container pos_r flex" :class="{moderators_container: isModerator && !activityRecords}">
+
+		<div class="main flex">
+			<div class="control_right" v-if="(isPresenter || isModerator) && !activityRecords">
+				<div class="controls">
+					<div class="control_item" :class="{active: controlMenu == 'management'}" v-if="isModerator" @click="selectControlMenu('management')">
+						<img src="./img/icon_management.svg" alt="">
+						<span>{{tr('vm_management')}}</span>
+					</div>
+					<div class="control_item" :class="{clicked: sharing, disabled: !isAvaliable || !isPresenterStreamStart}" @click="shareScreenClick">
+						<img src="./img/icon_share.svg" alt="" v-show="!sharing">
+						<img src="./img/icon_share_red.svg" alt="" v-show="sharing">
+						<span>{{tr('vm_screenshare')}}</span>
+					</div>
+					<div class="control_item" :class="{clicked: mutedV}" @click="muteVideoClick">
+						<img src="./img/icon_video.svg" alt="" v-show="!mutedV">
+						<img src="./img/icon_video_red.svg" alt="" v-show="mutedV">
+						<span>{{tr('vm_cam_off')}}</span>
+					</div>
+					<div class="control_item" :class="{clicked: mutedA}" @click="muteAudioClick">
+						<img src="./img/icon_mute.svg" alt="" v-show="!mutedA">
+						<img src="./img/icon_mute_red.svg" alt="" v-show="mutedA">
+						<span>{{tr('vm_mic_off')}}</span>
+					</div>
+					<div class="control_item" v-if="false">
+						<img src="./img/icon_settings.svg" alt="">
+						<span>{{tr('vm_settings')}}</span>
+					</div>
+					<div class="control_item" v-if="false">
+						<img src="./img/icon_preview.svg" alt="">
+						<span>{{tr('vm_preview')}}</span>
+					</div>
+					<div class="control_item" :class="{active: controlMenu == 'survey'}" v-if="isPresenter && activity.visibility != 'private_meeting'" @click="selectControlMenu('survey')">
+						<img src="./img/icon_survey.svg" alt="">
+						<span>{{tr('vm_surveys')}}</span>
+					</div>
+					<div class="control_item" :class="{disabled: !isAvaliable || !isPresenterStreamStart}" @click="showQualityPanel()">
+						<img src="./img/menu.svg" alt="">
+						<span>{{tr('vm_quality')}}</span>
+					</div>
+					<div class="control_item" v-if="isModerator && activity.enableQA && activity.visibility != 'private_meeting'" :class="{active: controlMenu == 'qa'}" @click="selectControlMenu('qa')">
+						<img src="./img/icon_qa.svg" alt="">
+						<span>{{tr('vm_qa')}}</span>
+					</div>
+					<div class="control_item control_item_start_stream" :class="{disabled: isPresenterStreamStart || streamLoading}" v-if="!isPresenterStreamStart" @click="streamStartClick">
+						<img src="./img/icon_play.svg" alt="">
+						<span>{{tr('vm_start_stream')}}</span>
+					</div>
+					<div class="control_item control_item_start_stream clicked" :class="{disabled: !isPresenterStreamStart || streamLoading}" v-if="isPresenterStreamStart" @click="streamStopClick">
+						<div class="stop_stream_icon"></div>
+						<span>{{tr('vm_stop_stream')}}</span>
+					</div>
+				</div>
+
+				<div class="controls_expanded" v-if="controlMenu">
+					<div class="ce_management" v-if="controlMenu == 'management' && isPresenter">
+						<p class="ce_title">{{tr('vm_manage_presenters')}}</p>
+
+						<div class="item flex" :class="{active: managementSelected == user.id}" v-if="user.role == 'presenter' || user.role == 'moderator'" v-for="user in usersList">
+							<div class="image_box"  @click="selectManagementUser(user.id)">
+								<img v-if="usersObj[user.id].logo" :src="url64(usersObj[user.id].logo)" alt="">
+								<img v-if="!usersObj[user.id].logo" src="@/img/default_avatar.svg" alt="">
+							</div>
+							<p class="name"  @click="selectManagementUser(user.id)">{{usersObj[user.id].name}} {{usersObj[user.id].surname}}</p>
+
+							<div class="user_menu" v-if="managementSelected == user.id">
+								<div class="item volume" v-if="false">
+									<p>{{tr('vm_volume')}}</p>
+									<input type="range" v-model="usersObj[user.id].volume" class="volume_input">
+								</div>
+								<div class="item checkbox flex">
+									<p>{{tr('vm_mute')}}</p>
+									<ui-checkbox v-model="usersObj[user.id].mute" color="accent" @change="muteClick(usersObj[user.id])"></ui-checkbox>
+								</div>
+								<div class="item checkbox flex">
+									<p>{{tr('vm_disable_video')}}</p>
+									<ui-checkbox v-model="usersObj[user.id].disable_video" color="accent" @change="disableVideoClick(usersObj[user.id])"></ui-checkbox>
+								</div>
+								<div class="item checkbox flex" v-if="false">
+									<p>{{tr('vm_make_primary')}}</p>
+									<ui-checkbox v-model="usersObj[user.id].makePrimary" color="accent"></ui-checkbox>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="ce_management ce_survey flex jcsb" v-if="controlMenu == 'survey' && isPresenter">
+						<div class="top">
+							<p class="ce_title">{{tr('vm_surveys_title')}}</p>
+							<span class="submenu_close" @click="selectControlMenu()"><img src="./img/close12.svg" alt=""></span>
+							<div class="items_list quest_items">
+								<div class="quest_item" v-for="survey in surveysList">
+									<div class="qi_header" :class="{orange: (survey.status == 'pushed' && survey.poll.is_open), grey: (survey.status == 'pushed' && !survey.poll.is_open)}">
+										<span v-if="survey.status == 'pushed' && survey.poll.is_open">
+											{{tr('vm_active')}}
+										</span>
+										<span v-if="survey.status == 'pushed' && !survey.poll.is_open">
+											{{tr('vm_finished')}}
+										</span>
+									</div>
+
+									<div class="qi_center">
+										{{decodeMessage(survey.text)}}
+									</div>
+									<div class="qi_bottom flex jcsb" v-if="!(survey.status == 'pushed' && !survey.poll.is_open)">
+										<div class="qi_bottom_actions flex">
+											<div class="qi_action red" @click="stopSurvey(survey)" v-if="survey.status == 'pushed' && survey.poll.is_open">{{tr('vm_pool_stop')}}</div>
+											<div class="qi_action" @click="surveyResultShow(survey)">{{tr('vm_result')}}</div>
+										</div>
+
+										<div class="qi_action" @click="publishSurvey(survey)" v-if="survey.status != 'pushed'">{{tr('vm_pool_publish')}}</div>
+										<div class="qi_action" v-if="survey.status == 'pushed' && !survey.poll.is_open"> </div>
+										<div class="icons flex">
+											<div class="edit qi_icon" @click="editPool(survey)"><img src="./img/edit.svg" alt=""></div>
+											<div class="trash qi_icon" @click="deleteSurvey(survey)"><img src="./img/trash.svg" alt=""></div>
+										</div>
+									</div>
+
+									<div class="qi_bottom flex jcsb" v-if="survey.status == 'pushed' && !survey.poll.is_open">
+										<div class="qi_action" @click="surveyResultShow(survey)">{{tr('vm_history_result')}}</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+						<div class="bottom_create_button" @click="createSurveyClick">
+							<span>{{tr('vm_create_surveys')}}</span> <img src="./img/white_oplus.svg" alt="">
+						</div>
+					</div>
+					<div class="ce_management ce_survey flex jcsb" v-if="controlMenu == 'survey' && surveyMenu == 'result' && isPresenter">
+						<div class="top">
+							<p class="ce_title">{{tr('vm_surveys_title')}}</p>
+							<span class="submenu_close" @click="surveyMenu = ''"><img src="./img/close12.svg" alt=""></span>
+							<div class="items_list quest_items">
+								<div class="quest_item" v-if="survey.status == 'pushed' && !survey.poll.is_open" v-for="survey in surveysList">
+									<div class="qi_header grey">
+										{{tr('vm_finished')}}
+									</div>
+									<div class="qi_center">
+										{{decodeMessage(survey.text)}}
+									</div>
+									<div class="qi_bottom flex jcsb">
+										<div class="qi_action" @click="surveyResultShow(survey)">{{tr('vm_history_result')}}</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+						<div class="bottom_create_button" @click="createSurveyClick">
+							<span>{{tr('vm_create_surveys')}}</span> <img src="./img/white_oplus.svg" alt="">
+						</div>
+
+
+					</div>
+
+					<div class="ce_management ce_survey flex jcsb" v-if="controlMenu == 'qa'">
+						<div class="top">
+							<p class="ce_title">{{tr('vm_qa')}}</p>
+							<span class="submenu_close" @click="controlMenu = ''"><img src="./img/close12.svg" alt=""></span>
+							<div class="items_list quest_items">
+								<div class="quest_item" v-for="qa in qAList">
+									<div class="qi_header">
+
+									</div>
+									<div class="qi_center">
+										{{decodeMessage(qa.text)}}
+									</div>
+									<div class="qi_bottom flex jcsb">
+										<div class="qi_name">{{qa.name ? qa.name : ' '}}</div>
+										<div class="icons flex">
+											<div class="edit qi_icon" @click="acceptQa(qa)"><img src="./img/qa_accept.svg" alt=""></div>
+											<div class="trash qi_icon" @click="deleteQa(qa)"><img src="./img/qa_cancel.svg" alt=""></div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+
+					<div class="ce_management ce_survey flex jcsb" v-if="controlMenu == 'quality'">
+						<div class="top overflow-auto">
+							<p class="ce_title">{{tr('vm_stream_quality')}}</p>
+							<span class="submenu_close" @click="controlMenu = ''"><img src="./img/close12.svg" alt=""></span>
+							<div class="item">
+								<b>{{tr('vm_video')}}</b><br/>
+								<p v-for="(value, key) in videoStats"><b>{{parseKeyName(key)}}: </b>{{value}}</p>
+							</div>
+							<div class="item">
+								<b>{{tr('vm_audio')}}</b><br/>
+								<p v-for="(value, key) in audioStats"><b>{{parseKeyName(key)}}: </b>{{value}}</p>
+							</div>
+							<div class="item flex">
+								<p><b>{{tr('vm_connection')}}: </b>{{videoQuality}}</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="video_block">
+				<div id="video_box" class="video_box">
+					<video src="" id="video" v-if="!activityRecords"></video>
+					<video :src="activeRecord" id="video" v-if="activityRecords"></video>
+				</div>
+				<div id="local_video_box" class="video_box"></div>
+				<!-- <video id="local_video"></video>
+				<video id="video" ></video> -->
+				<div class="video_controls flex" :class="{jcc: !isAvaliable && !activityRecords}">
+					<div v-if="isAvaliable || activityRecords" class="left flex">
+						<span class="control_button pause" v-if="!paused" @click="pauseClick"><img src="./img/stop.svg" alt=""></span>
+						<span class="control_button pause" v-if="paused" @click="playClick"><img src="./img/play.svg" alt=""></span>
+						<span class="control_button volume">
+							<img v-if="!muted" @click="volumeClick" src="./img/speaker.svg" alt="">
+							<img v-if="muted" @click="volumeClick" src="./img/speaker-mute.svg" alt="">
+							<span class="volumebar">
+								<span class="total" id="volumeBar" @mouseup="volUp" @mousedown="volDown" @mousemove="volMove">
+									<span id="volumeProgress" class="progress"></span>
+								</span>
+							</span>
+
+						</span>
+					</div>
+					<div class="center" v-if="(visitorsCount !== false) && !activityRecords"><img src="@/img/icons/users-white.svg" alt="">:<span class="visitors_count">{{visitorsCount}}</span></div>
+					<div v-if="isAvaliable || activityRecords" class="right flex">
+						<span class="control_button full_screen" @click="toggleFullScreen"><img src="./img/full-screen.svg" alt=""></span>
+						<span class="control_button mini_screen" @click="toggleMiniScreen"><img src="./img/mini-screen.svg" alt=""></span>
+					</div>
+				</div>
+
+				<div class="stream_unavaliable" v-if="isPast && !activityRecords">
+					{{tr('vm_streamended_message')}}
+				</div>
+				<div class="stream_unavaliable" v-if="!isPast && !isAvaliable && !isPresenter && !isModerator && !activityRecords">
+					{{tr('vm_unavaliable_message')}}
+				</div>
+				<div class="stream_unavaliable stream_unavaliable_image flex" v-if="!isPast && !isAvaliable && (isPresenter || isModerator) && !isPresenterStreamStart && !activityRecords">
+					{{tr('vm_unavaliable_presenter_message')}}
+				</div>
+				<div class="stream_unavaliable" v-if="!isPast && !isAvaliable && (isPresenter || isModerator) && isPresenterStreamStart && !activityRecords">
+					{{tr('vm_loading_message')}}
+				</div>
+				<div class="stream_unavaliable" v-if="!isPast && isAvaliable && loading && !activityRecords">
+					{{tr('vm_loading_message')}}
+				</div>
+			</div>
+			<div class="chat_block" :class="{headerless: !sponsorsList || !sponsorsList.length}" v-if="(activity.enableChat || activity.enableQA) && !iframe && !activityRecords">
+				<div class="chat_header" v-if="sponsorsList && sponsorsList.length">
+					<div class="chat_sponsor_header">
+						<p>{{tr('vm_sponsored_by')}}:</p>
+						<div class="csh_carousel">
+							<VueSlickCarousel v-bind="sponsor_carousel_settings" ref="sponsor_carousel" v-if="sponsorsList.length">
+				    			<div v-for="item, index in sponsorsList" class="slide_wrap">
+				                    <img src="./img/sponsor1.svg" alt="">
+				                </div>
+
+				    			<template #prevArrow="arrowOption">
+				    		      <div class="arrow arrow_left"><img src="./img/arrow-left.svg" alt=""></div>
+				    		    </template>
+
+				    		    <template #nextArrow="arrowOption">
+				    		      <div class="arrow arrow_right"><img src="./img/arrow-right.svg" alt=""></div>
+				    		    </template>
+			    			</VueSlickCarousel>
+						</div>
+					</div>
+				</div>
+				<div class="chat_tabs" v-if="isPresenter">
+					<div class="chat_tab_item public" :class="{active: chatTab == 'public'}" @click="changeChat('public')">{{tr('vm_public_chat')}}<span class="new_marker" v-if="newPublicMessage"></span></div>
+					<div class="chat_tab_item technical" :class="{active: chatTab == 'technical'}" @click="changeChat('technical')">{{tr('vm_tech_chat')}}<span class="new_marker" v-if="newHiddenMessage"></span></div>
+				</div>
+				<!-- <div class="chat_qa_field flex" v-if="!isPresenter && activity.enableQA"> -->
+				<div class="chat_qa_field flex" v-if="chatTab == 'public' && activity.enableQA">
+					<input type="text" v-on:keyup.enter="createQA" v-model="qaInput" :placeholder="qaPlaceholder">
+					<button class="btn" @click="createQA">{{tr('vm_ask')}} <img src="./img/qa_chat_icon.svg" alt=""></button>
+				</div>
+				<div class="chat_body" :class="{chat_body_w_tabs: isPresenter}" v-if="chatTab == 'public'">
+					<div class="message" v-for="msg in chatMessages">
+						<div v-if="msg.type == 'history'">
+							<span class="name" v-if="usersObj[msg.userid]">{{usersObj[msg.userid].name}} {{usersObj[msg.userid].surname}}: </span>
+							<span class="name" v-if="!usersObj[msg.userid]">{{msg.username || tr('vm_visitor')}}: </span>
+							<span class="message_text">{{decodeMessage(msg.text)}} <div class="delete_icon" :class="{showed: msg.deleting}" @click="deleteMessage(msg)" v-if="isPresenter || isModerator"><img v-if="msg.deleting" src="@/img/preload.png"><img v-if="!msg.deleting" src="./img/trash.svg" alt=""></div></span>
+						</div>
+
+						<div class="survey_message" v-if="msg.type == 'poll'">
+							<div class="cs_title">{{decodeMessage(msg.text)}}</div>
+							<div class="cs_items">
+								<label class="cs_item flex" :class="{active: (msg.answer == index+1) && msg.poll.is_open, orange: isWinner(msg, index)}" :for="msg.timestamp+'_'+index" v-for="(option, index) in msg.poll.options">
+									<input type="radio" :disabled="msg.voted || msg.poll.voted" :id="msg.timestamp+'_'+index" v-model="msg.answer" @change="forceUpdate" :value="index+1" v-if="msg.poll.is_open">
+									<span class="left">
+										<span class="radio_circle" v-if="msg.poll.is_open">
+											<span class="check_arrow"></span>
+										</span>
+										<span class="radio_value">{{decodeMessage(option)}}</span>
+									</span>
+									<span class="right" v-if="msg['votes_'+(index+1)] || !msg.poll.is_open">({{msg['votes_'+(index+1)] ? msg['votes_'+(index+1)] : 0}})</span>
+								</label>
+							</div>
+							<div class="cs_left_message" v-if="!msg.poll.is_open">{{tr('vm_survey_ended_chat')}}</div>
+							<button class="btn btn_orange" v-if="!msg.voted && !msg.poll.voted && msg.poll.is_open" @click="sendPoolVote(msg)" :class="{disabled: !msg.answer}">{{tr('send')}}</button>
+							<div class="cs_voted_text" v-if="(msg.voted || msg.poll.voted) && msg.poll.is_open">{{tr('vm_already_voted')}}</div>
+						</div>
+					</div>
+				</div>
+				<div class="chat_body" :class="{chat_body_w_tabs: isPresenter}" v-if="chatTab == 'technical'">
+					<div class="message" v-for="msg in chatHiddenMessages">
+						<div v-if="msg.type == 'history'">
+							<span class="name" v-if="usersObj[msg.userid]">{{usersObj[msg.userid].name}} {{usersObj[msg.userid].surname}}: </span>
+							<span class="name" v-if="!usersObj[msg.userid]">{{msg.username || tr('vm_visitor')}}: </span>
+							<span class="message_text">{{decodeMessage(msg.text)}} <div class="delete_icon" :class="{showed: msg.deleting}" @click="deleteMessage(msg)"><img v-if="msg.deleting" src="@/img/preload.png"><img v-if="!msg.deleting" src="./img/trash.svg" alt=""></div></span>
+						</div>
+
+						<div class="survey_message" v-if="msg.type == 'poll'">
+							<div class="cs_title">{{decodeMessage(msg.text)}}</div>
+							<div class="cs_items">
+								<label class="cs_item flex" :class="{active: msg.answer == index+1, orange: isWinner(msg, index)}" :for="msg.timestamp+'_'+index" v-for="(option, index) in msg.poll.options">
+									<input type="radio" :disabled="msg.voted || msg.poll.voted" :id="msg.timestamp+'_'+index" v-model="msg.answer" :value="index+1" v-if="msg.poll.is_open">
+									<span class="left">
+										<span class="radio_circle" v-if="msg.poll.is_open">
+											<span class="check_arrow"></span>
+										</span>
+										<span class="radio_value">{{decodeMessage(option)}}</span>
+									</span>
+									<span class="right" v-if="msg['votes_'+(index+1)] || !msg.poll.is_open">({{msg['votes_'+(index+1)] ? msg['votes_'+(index+1)] : 0}})</span>
+								</label>
+							</div>
+							<div class="cs_left_message" v-if="!msg.poll.is_open">{{tr('vm_survey_ended_chat')}}</div>
+							<button class="btn btn_orange" v-if="!msg.voted && !msg.poll.voted && msg.poll.is_open" @click="sendPoolVote(msg)">{{tr('send')}}</button>
+							<div class="cs_voted_text" v-if="(msg.voted || msg.poll.voted) && msg.poll.is_open">{{tr('vm_already_voted')}}</div>
+						</div>
+
+						<div class="survey_message" v-if="msg.type == 'qna'">
+							<div class="name">{{tr('vm_qa')}}</div>
+							<div class="cs_title">{{decodeMessage(msg.text)}}</div>
+							<div class="cs_left_message">by {{msg.username}}</div>
+						</div>
+					</div>
+				</div>
+				<!-- <div class="chat_bottom flex" :class="{disabled: !isAvaliable}"> -->
+				<div class="chat_bottom flex" v-if="(isPresenter || isModerator || activity.enableChat) && streamStartedForViewers">
+					<input :placeholder="tr('vm_message_ph')" @keyup.enter="sendChatMessage" v-model="chatMessageValue" type="text" class="chat_input">
+					<span class="chat_send_message" @click="sendChatMessage">
+						<img src="./img/send.svg" alt="" v-if="chatTab == 'technical'">
+						<img src="./img/send_orange.svg" alt="" v-if="chatTab == 'public'">
+					</span>
+				</div>
+				<div class="chat_bottom flex unavailable" v-if="!streamStartedForViewers">
+					{{tr('vm_chat_unavailable')}}
+				</div>
+			</div>
+
+			<button
+				class="btn btn_orange join-stream-btn mt-4"
+				:class="{'no-chat': !activity.enableChat && !activity.enableQA}"
+				:style="eventBackgroundStyle"
+				@click="goToStream()">{{tr('se_join_stream')}}
+			</button>
+
+			<div class="chat_block video_records headerless" v-if="!iframe && activityRecords">
+				<div class="chat_tabs">
+					<div class="chat_tab_item active">{{tr('vm_records_list')}}</div>
+				</div>
+				<div class="video_list">
+					<div class="video_list_item" :class="{active: activeRecord == record}" @click="setActiveRecord(record)" v-for="(record, index) in signedActivityRecords">
+						{{activityName}} - {{index+1}}
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<div class="container presenters-info" v-if="!iframe" :class="{moderators_container: isModerator && !activityRecords}">
+		<div class="center_bottom flex">
+			<div class="left">{{activityName}}</div>
+			<div class="center flex" v-if="activity.meetingType == 'webinar' && activity.attendees && activity.attendees.length">
+				{{tr('vm_featuring')}}:
+				<div class="image_box" v-for="user in activity.attendees">
+					<img v-if="user.logo" :src="url64(user.logo)" alt="">
+					<img v-if="!user.logo" src="@/img/default_avatar.svg" alt="">
+				</div>
+			</div>
+			<div class="right" :class="{rotated: presentersListExpanded}" @click="presentersListExpanded = !presentersListExpanded"><img src="./img/arrow-down.svg" alt=""></div>
+		</div>
+	</div>
+	<div class="section_presenters" v-if="presentersListExpanded">
+		<div class="container">
+			<p class="section_presenters_title">{{tr('vm_presenters_title')}}:</p>
+			<div class="presenter_items flex">
+				<div class="item flex" v-for="user in activity.attendees">
+					<div class="image_box">
+						<img v-if="user.logo" :src="urlAvatarBig(user.logo)" alt="" class="obj_fit_cover">
+						<img v-if="!user.logo" src="@/img/default_avatar.svg" alt="">
+					</div>
+					<div class="content">
+						<p class="name">{{user.name}} {{user.surname}}</p>
+						<p class="position">{{user.position}}</p>
+					</div>
+					<div class="social flex">
+						<a :href="user.address.facebook" class="social_item" v-if="user.address.facebook">
+							<img src="@/img/socials/Facebook.svg" alt="">
+						</a>
+						<a :href="user.address.twitter" class="social_item" v-if="user.address.twitter">
+							<img src="@/img/socials/Twitter.svg" alt="">
+						</a>
+						<a :href="user.address.linkedin" class="social_item" v-if="user.address.linkedin">
+							<img src="@/img/socials/Linkedin.svg" alt="">
+						</a>
+						<a :href="user.address.instagram" class="social_item" v-if="user.address.instagram">
+							<img src="@/img/socials/Instagram.svg" alt="">
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<p class="section_presenters_title" v-if="activity.description">{{tr('vm_description_title')}}:</p>
+			<p class="description" v-if="activity.description">
+				{{activity.description}}
+			</p>
+		</div>
+	</div>
+
+	<ui-modal ref="createSurveyModal" class="videomeeting_modal createsurvey_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('vm_create_surveys')}}</p>
+                <div class="form_section">
+                	<p class="form_title">{{tr('vm_survey_formtitle')}}</p>
+                	<ui-textbox
+                        :placeholder="tr('vm_survey_question_ph')"
+                        v-model="editSurvey.question"
+                    >
+                    </ui-textbox>
+                </div>
+                <div class="form_section">
+                	<p class="form_title">{{tr('vm_survey_answers_title')}}</p>
+                	<ui-textbox
+                        :placeholder="tr('vm_survey_answer_ph')+ ' 1'"
+                        v-model="editSurvey.answers[0]"
+                    >
+                    </ui-textbox>
+                    <ui-textbox
+                        :placeholder="tr('vm_survey_answer_ph')+ ' 2'"
+                        v-model="editSurvey.answers[1]"
+                    >
+                    </ui-textbox>
+                    <ui-textbox
+                        :placeholder="tr('vm_survey_answer_ph')+ ' 3 '+tr('vm_survey_optional_ph')"
+                        v-model="editSurvey.answers[2]"
+                    >
+                    </ui-textbox>
+                    <ui-textbox
+                        :placeholder="tr('vm_survey_answer_ph')+ ' 4 '+tr('vm_survey_optional_ph')"
+                        v-model="editSurvey.answers[3]"
+                    >
+                    </ui-textbox>
+                </div>
+                <div class="form_section">
+                	<p class="form_title">{{tr('vm_survey_settings')}}</p>
+
+                	<ui-checkbox id="reqDemoTermsCheckbox" v-model="editSurvey.public" color="accent">
+                        <span>{{tr('vm_survey_set_public')}}</span>
+                    </ui-checkbox>
+                </div>
+                <button class="btn btn_orange" @click="createSurvey">{{tr('vm_create_surveys')}}</button>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="createSurveyModalClose"><img src="./img/close12.svg" alt=""></span>
+    </ui-modal>
+
+
+    <ui-modal ref="resultSurveyModal" class="videomeeting_modal createsurvey_modal resultsurvey_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper" v-if="resultSurvey">
+            <div class="content">
+                <p class="modal_title">{{tr('vm_survey_result')}}</p>
+                <div class="result_survey_text">{{decodeMessage(resultSurvey.text)}}</div>
+
+                <div class="result_survey_list">
+                	<div class="result_survey_item" v-for="item, index in resultSurvey.answers">
+                		<div class="text flex">
+                			<div class="left">{{decodeMessage(item.text)}}</div>
+                			<div class="right">{{item.precent}}%({{item.votes}})</div>
+                		</div>
+                		<div class="bar">
+                			<div class="filled" :class="{orange: item.winner}" :style="{width: item.precent+'%'}"></div>
+                		</div>
+                	</div>
+                </div>
+
+                <div class="result_survey_bottom">
+                	{{resultSurveyCount}} {{tr('vm_participants')}}
+                </div>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="resultSurveyModalClose"><img src="./img/close12.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="messageModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('validation_error')}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+		<div class="video-quality-panel" :class="{'opened': showQuality}">
+			<div class="quality-content">
+				<p class="title">{{tr('vm_stream_quality')}}</p>
+				<span class="close" @click="hideQualityPanel"><img src="./img/close12.svg" alt=""></span>
+				<div class="flex jcsb" v-if="publishStream">
+					<div class="item">
+						<b>{{tr('vm_outbound')}} {{tr('vm_video')}}</b><br/>
+						<p v-for="(value, key) in videoStats"><b>{{parseKeyName(key)}}: </b>{{value}}</p>
+					</div>
+					<div class="item">
+						<b>{{tr('vm_outbound')}} {{tr('vm_audio')}}</b><br/>
+						<p v-for="(value, key) in audioStats"><b>{{parseKeyName(key)}}: </b>{{value}}</p>
+					</div>
+				</div>
+				<div class="flex jcsb" v-if="conferenceStream">
+					<div class="item">
+						<b>{{tr('vm_inbound')}} {{tr('vm_video')}}</b><br/>
+						<p v-for="(value, key) in inboundVideoStats"><b>{{parseKeyName(key)}}: </b>{{value}}</p>
+					</div>
+					<div class="item">
+						<b>{{tr('vm_inbound')}} {{tr('vm_audio')}}</b><br/>
+						<p v-for="(value, key) in inboundAudioStats"><b>{{parseKeyName(key)}}: </b>{{value}}</p>
+					</div>
+				</div>
+				<div class="flex jcsb" v-if="shareStream">
+					<div class="item">
+						<b>{{tr('vm_share')}} {{tr('vm_video')}}</b><br/>
+						<p v-for="(value, key) in sharedVideoStats"><b>{{parseKeyName(key)}}: </b>{{value}}</p>
+					</div>
+					<div class="item">
+						<b>{{tr('vm_share')}} {{tr('vm_audio')}}</b><br/>
+						<p v-for="(value, key) in sharedAudioStats"><b>{{parseKeyName(key)}}: </b>{{value}}</p>
+					</div>
+				</div>
+				<div class="item flex jcc">
+					<p><b>{{tr('vm_connection')}}: </b>{{videoQuality}}</p>
+				</div>
+				<div class="item flex jcc">
+					<p><b>{{tr('vm_media_profile')}}: </b>{{activity.profile || 'webinar'}}</p>
+				</div>
+			</div>
+		</div>
+</section>

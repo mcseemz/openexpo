@@ -1,0 +1,36 @@
+<div class="page_wrapper myevents_page">
+
+	<div class="container testapisecrion">
+	
+		<div class="form_input_row ">
+
+	        <ui-textbox 
+	            label="Test" 
+	            type="text"
+	            placeholder="url" 
+	            v-model="url"
+	        >
+	        </ui-textbox>    
+	    
+	    </div>
+
+	    <div class="form_input_row ">
+
+	        <ui-textbox 
+	            label="Body" 
+	            type="text"
+	            placeholder="body" 
+	            v-model="bodyVal"
+	            multiLine
+	        >
+	        </ui-textbox>    
+	    
+	    </div>
+	    <div class="button_box">
+	    	<button class="btn btn_orange" @click="send">Get</button>
+	    	<button class="btn btn_orange" @click="post">Post</button>
+	    	<button class="btn btn_orange" @click="put">Put</button>
+	    	<button class="btn btn_orange" @click="sendDelete">Delete</button>
+	    </div>
+	</div>
+</div>

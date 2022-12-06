@@ -1,0 +1,94 @@
+ <!-- STEP 3 -->
+<div class="content_wrapper">
+    <div class="container">
+        <div class="title_box">
+            <h2 class="title">{{eventObj.eventName}}</h2>
+            <p class="text">London, UK</p>
+        </div>
+        <div class="content_sidebar_left flex">
+            <div class="sidebar">
+                
+                <ul class="sidebar_menu">
+                    <li class="sidebar_menu_item">
+                        <div class="sidebar_menu_item_title" @click="$emit('my-event')">Basic Information</div>
+                    </li>
+                    <li class="sidebar_menu_item">
+                        
+                        <ui-collapsible removeIcon disableRipple :open="['customize', 'event_page', 'contact_info', 'privacy_settings'].includes(selectedMenu)">
+                            <div class="" slot="header">
+                                <div class="sidebar_menu_item_title">Details</div>
+                                <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                            </div>
+
+                            <ul class="sidebar_menu submenu">
+                                <li class="sidebar_menu_subitem" :class="{'active': selectedMenu == 'customize'}" @click="selectedMenu = 'customize'">
+                                    <div class="sidebar_menu_item_title">Customize</div>
+                                </li>
+                                <li class="sidebar_menu_subitem" :class="{'active': selectedMenu == 'event_page'}" @click="selectedMenu = 'event_page'">
+                                    <div class="sidebar_menu_item_title">Event Page</div>
+                                </li>
+                                <li class="sidebar_menu_subitem" :class="{'active': selectedMenu == 'contact_info'}" @click="selectedMenu = 'contact_info'">
+                                    <div class="sidebar_menu_item_title">Contact Info</div>
+                                </li>
+                                <li class="sidebar_menu_subitem" :class="{'active': selectedMenu == 'privacy_settings'}" @click="selectedMenu = 'privacy_settings'">
+                                    <div class="sidebar_menu_item_title">Privacy Settings</div>
+                                </li>
+                            </ul>
+                        </ui-collapsible>
+                        
+                    </li>
+                    <!-- <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'tickets'}" @click="selectedMenu = 'tickets'">
+                        <div class="sidebar_menu_item_title">Tickets</div>
+                    </li> -->
+                    <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'personnel'}" @click="selectedMenu = 'personnel'">
+                        <div class="sidebar_menu_item_title">Personnel</div>
+                    </li>
+                    <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'downloadables'}" @click="selectedMenu = 'downloadables'">
+                        <div class="sidebar_menu_item_title">Downloadables</div>
+                    </li>
+                    <li class="sidebar_menu_item">
+
+                        <ui-collapsible removeIcon disableRipple :open="['invitations', 'manage_requests'].includes(selectedMenu)">
+                            <div class="" slot="header">
+                                <div class="sidebar_menu_item_title">Stands</div>
+                                <img src="./img/dropdown_icon.svg" alt="" class="icon">
+                            </div>
+
+                            <ul class="sidebar_menu submenu">
+                                <li class="sidebar_menu_subitem" :class="{'active': selectedMenu == 'invitations'}" @click="selectedMenu = 'invitations'">
+                                    <div class="sidebar_menu_item_title">Invitations</div>
+                                </li>
+                                <li class="sidebar_menu_subitem" :class="{'active': selectedMenu == 'manage_requests'}" @click="selectedMenu = 'manage_requests'">
+                                    <div class="sidebar_menu_item_title">Manage Requests</div>
+                                </li>
+                            </ul>
+                        </ui-collapsible>
+
+                    </li>
+                    <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'agenda'}" @click="selectedMenu = 'agenda'">
+                        <div class="sidebar_menu_item_title">Agenda</div>
+                    </li>
+                    <!-- <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'share_event'}" @click="selectedMenu = 'share_event'">
+                        <div class="sidebar_menu_item_title">Share Event</div>
+                    </li>
+                    <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'premium'}" @click="selectedMenu = 'premium'">
+                        <div class="sidebar_menu_item_title">Premium</div>
+                    </li>
+                    <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'premium'}" @click="test">
+                        <div class="sidebar_menu_item_title">Premium</div>
+                    </li> -->
+                </ul>
+            </div>
+            
+			<Customize v-if="selectedMenu == 'customize'"></Customize>
+			<EventPage v-if="selectedMenu == 'event_page'"></EventPage>
+			<ContactInfo v-if="selectedMenu == 'contact_info'"></ContactInfo>
+			<PrivacySettings v-if="selectedMenu == 'privacy_settings'"></PrivacySettings>
+			<!-- <Tickets v-if="selectedMenu == 'tickets'"></Tickets> -->
+
+			<Invitations v-if="selectedMenu == 'invitations'"></Invitations>
+
+        </div>
+
+    </div>  
+</div> 

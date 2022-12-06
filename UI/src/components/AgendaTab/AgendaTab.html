@@ -1,0 +1,93 @@
+<div class="agenda_tab_section">
+    <div class="new_agenda_tab_section" v-if="!agendaOpened">
+        <div class="container">
+
+            <div class="new_agenda_tab_content" :class="{centered: agendaDates.length < 3}" v-if="agendaDates.length && alq" >
+
+                <VueSlickCarousel v-bind="agenda_carousel_settings" ref="agenda_carousel" v-if="agendaDates.length && alq">
+
+
+                <div class="agenda_heads_item" v-if="agendaLists[date].items.length" :class="{active: activeAgenda == index}" @click="selectAgenda(index)" v-for="date, index in agendaDates">
+                    <p>{{agendaLists[date].sDay}}, {{agendaLists[date].sDate}} {{agendaLists[date].sFullMonth}} {{agendaLists[date].sYear}}</p>
+                </div>
+
+
+                <template #prevArrow="arrowOption">
+                  <svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1.18429 13.1359C0.698112 13.5863 0.669113 14.3455 1.11951 14.8317C1.54621 15.2923 2.2501 15.3425 2.73639 14.9636L2.81534 14.8964L9.29626 8.89238C9.78426 8.44028 9.80774 7.68378 9.36651 7.2024L9.29684 7.13233L2.81592 1.1203C2.33004 0.669575 1.57078 0.698072 1.12005 1.18395C0.693053 1.64425 0.696156 2.34992 1.11079 2.80616L1.1837 2.87981L6.24075 7.57133C6.48368 7.7967 6.49792 8.17633 6.27254 8.41926L6.24046 8.45132L1.18429 13.1359Z" fill="#386D7D"/>
+                    </svg>
+                </template>
+
+                <template #nextArrow="arrowOption">
+                   <svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1.18429 13.1359C0.698112 13.5863 0.669113 14.3455 1.11951 14.8317C1.54621 15.2923 2.2501 15.3425 2.73639 14.9636L2.81534 14.8964L9.29626 8.89238C9.78426 8.44028 9.80774 7.68378 9.36651 7.2024L9.29684 7.13233L2.81592 1.1203C2.33004 0.669575 1.57078 0.698072 1.12005 1.18395C0.693053 1.64425 0.696156 2.34992 1.11079 2.80616L1.1837 2.87981L6.24075 7.57133C6.48368 7.7967 6.49792 8.17633 6.27254 8.41926L6.24046 8.45132L1.18429 13.1359Z" fill="#386D7D"/>
+                    </svg>
+                </template>
+
+                <template #customPaging="page">
+                  <div class="event_carousel_dot">
+
+                  </div>
+                </template>
+
+            </VueSlickCarousel>
+
+            <div class="agenda_content" v-for="date, index in agendaDates" v-show="activeAgenda == index">
+                <h2 class="title">{{agendaLists[date].sDay}}, {{agendaLists[date].sDate}} {{agendaLists[date].sFullMonth}} {{agendaLists[date].sYear}}<br></h2>
+                <div class="agenda_list" >
+                    <div class="timeline">
+                        <div class="item" v-for="item in agendaLists[date].timeline">
+                            <span class="time">0{{item}}:00 AM</span><div class="line"></div>
+                        </div>
+                    </div>
+                    <div class="agenda_list_item" :class="{live: is_live(item)}" v-for="item in orderedAgendaLists(date)">
+                        <div class="left">
+                            <p>{{item.date.timeStart.value}}</p>
+                            <p>{{item.date.timeEnd.value}}</p>
+                        </div>
+                        <div class="right">
+                            <div class="agenda_live">{{tr('live')}}</div>
+                            <div class="top">
+                                <div class="agenda_title">{{item.sessionTitle}}</div>
+                            </div>
+                            <div class="middle">
+                                {{item.description}}
+                            </div>
+                            <div class="bottom">
+                                <div class="bottom_left mb-10">
+                                    <div class="button_box flex" v-if="item.meetingType != 'no_video'">
+                                        <router-link :to="'/'+routes.mymeetings+'/'+routes.mymeetings_video+'/'+item.id" class="agenda_call_to_action" v-if="item.meetingType != 'webinar' && item.meetingType != 'team_meeting' && (eventObj.letmein || showTickets) && item.allowed">{{tr(locPrefix+'agenda_calltoaction')}}</router-link>
+                                        <p class="agenda_call_to_action" @click="callToActionClick(item)" v-if="(item.meetingType == 'webinar' || (item.meetingType == 'team_meeting' && isPresenter(item))) && (eventObj.letmein || showTickets) && item.allowed">{{tr(locPrefix+'agenda_calltoaction')}}</p>
+                                        <div v-if="!item.allowed">{{tr('no_ticket_user_view_live')}}</div>
+                                        <!-- <p class="agenda_call_to_action" v-if="is_past(item)">{{tr(locPrefix+'agenda_past')}}</p>
+                                        <p class="agenda_call_to_action" v-if="is_future(item)">{{tr(locPrefix+'agenda_future')}}</p> -->
+                                    </div>
+                                </div>
+                                <div class="bottom_right" v-if="item && item.attendees && item.attendees.length">
+                                    <div class="attendee_item" v-if="attendee" v-for="attendee in item.attendees">
+                                        <div class="image_box">
+                                            <img v-if="attendee.logo" :src="getLogoLink(attendee.logo)" alt="">
+                                        </div>
+                                        <p class="name">{{attendee.name}} {{attendee.surname}}</p>
+                                    </div>
+                                </div>
+                                <div class="bottom_right" v-if="!(item.attendees && item.attendees.length) && ! item.presenter && item.presenter.id">
+                                    <div class="image_box">
+                                        <img v-if="item.presenter.logo" :src="item.presenter.logo" alt="">
+                                    </div>
+                                    <p class="name">{{item.presenter.name}} {{item.presenter.surname}}</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+      <div v-if="agendaOpened && currentActivity" @click="backClick" class="back-button"> <img src="../../img/static-pages/arrow-or.png">Back</div>
+    </div>
+    <VideoMeeting ref="videoMeeting" v-if="agendaOpened && currentActivity" :tiersList="tiersList ? tiersList : []" :mainObj="type == 'stand' ? standObj : eventObj" :activity="currentActivity"></VideoMeeting>
+</div>

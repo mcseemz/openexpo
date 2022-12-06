@@ -1,0 +1,192 @@
+<div class="main sbr articles_item_editor preloader_wrapper">
+    <div class="preloader_overlay" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+    <div class="main_section invitations_main_section" v-show="!statusEdited" v-if="newForm">
+        <h3 class="big_text form_section_title"><img src="./img/basic_info_icon.svg" alt="" class="form_section_title_icon">{{tr('adev_article_editor')}}</h3>
+
+        <div class="form_input_row mt-24">
+            <ui-textbox
+                :label="tr('adev_article_title_label')"
+                :placeholder="tr('adev_article_title_ph')"
+                class="ngl"
+                v-model="articleData.articleTitle"
+                :invalid="!!(articleTouched && !articleData.articleTitle)"
+                v-on:touch.passive="articleTouched = true"
+            >
+            </ui-textbox>
+        </div>
+
+        <p class="main_section_title big_text">
+            {{tr('adev_article_cover')}}
+        </p>
+
+        <div class="form_input_row event_main_droparea ">
+            <VueUploadComponent
+            ref="event_main_upload"
+            v-model="articleData.articleBranding.articleCover.new"
+            drop=".event_main_droparea"
+            :multiple="false"
+            @input-file="inputFile"
+            class="upload_image_iconstyle ngl"
+            :drop-directory="false"
+            >
+                <div v-if="coverUrl" class="preview_image_box">
+                    <img :src="coverUrl" alt="" class="">
+                </div>
+                <div v-if="!coverUrl" class="placeholder_text">
+                    <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                    <p class="file_upload_title">{{tr('adev_article_cover_ph_main')}}</p>
+                    <p class="file_upload_desc">{{tr('adev_event_cover_ph_desc')}}</p>
+                </div>
+
+                <div class="icons_box" v-if="coverUrl">
+                    <span @click="removeImage"><img src="../img/remove_icon.svg" alt=""></span>
+                    <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                </div>
+
+            </VueUploadComponent>
+
+        </div>
+
+
+        <p class="main_section_title big_text">
+            {{tr('adev_article_thumbnail')}}
+        </p>
+
+        <div class="form_input_row event_banner_droparea ">
+            <VueUploadComponent
+            input-id="bannerInpt"
+            ref="event_banner_upload"
+            v-model="articleData.articleBranding.articleBanner.new"
+            drop=".event_banner_droparea"
+            :multiple="false"
+            @input-file="inputBannerFile"
+            @input-filter="inputBannerFilter"
+            class="upload_image_iconstyle ngl"
+            :drop-directory="false"
+            >
+                <div v-if="bannerUrl" class="preview_image_box">
+                    <img :src="bannerUrl" alt="" class="">
+                </div>
+                <div v-if="!bannerUrl" class="placeholder_text">
+                    <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                    <p class="file_upload_title">{{tr('adev_event_banner_ph_main')}}</p>
+                    <p class="file_upload_desc">{{tr('adev_event_banner_ph_desc')}}</p>
+                </div>
+
+                <div class="icons_box" v-if="bannerUrl">
+                    <span @click="removeImage('banner')"><img src="../img/remove_icon.svg" alt=""></span>
+                    <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                </div>
+
+            </VueUploadComponent>
+
+        </div>
+
+		<div class="form_input_row" :key="EditorKey">
+            <Editor
+                :label="tr('adev_article_content_label')"
+                placeholder="placeholder"
+                v-model="articleContent"
+                @didCreateEditor="didCreateEditor"
+                @postWasUpdated="savePost"
+                :cardOptions="cardOptions"
+                :cards="cards"
+                :enableEditing="true"
+                ref="editorComponent">
+                <EditorToolbar />
+            </Editor>
+		</div>
+
+        <div class="form_input_row">
+            <ui-textbox
+                :label="tr('adev_article_description')"
+                :placeholder="tr('adev_article_description_ph')"
+                v-model="articleData.articleDescription"
+                :maxlength="200"
+                :multi-line="true"
+                :autosize="false"
+                class="ngl"
+                :invalid="articleDescTouched && (!articleData.articleDescription.length || articleData.articleDescription.length > 200)"
+                v-on:touch.passive="articleDescTouched = true"
+                >
+            </ui-textbox>
+
+        </div>
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr">
+                <ui-datepicker
+                    :placeholder="tr('select_a_date')"
+                    iconPosition="right"
+                    v-model="publishDate"
+                    class="ngl"
+                    :lang="datepicker_lang"
+                >
+                    <img slot="icon" src="../img/calendar.svg" alt="">
+                    {{tr('adev_article_publish_date')}}
+                </ui-datepicker>
+            </div>
+
+             <div class="form_input_hr">
+                <ui-select
+                    :label="tr('adev_article_publish_time')"
+                    :placeholder="tr('adev_time_ph')"
+                    :options="timeList"
+                    v-model="publishTime"
+                    class="ngl"
+                    iconPosition="right"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+        </div>
+
+        <div class="form_input_row">
+            <p class="form_input_row_label">
+                {{tr('tags')}}
+            </p>
+            <vue-tags-input
+                :placeholder="tr('adev_tags_article')"
+                v-model="tag"
+                :tags="tags"
+                class="ngl"
+                :allow-edit-tags="true"
+                :add-on-key="[13,';',',']"
+                @tags-changed="newTags => tags = newTags"
+            />
+        </div>
+
+	</div>
+
+    <div class="main_section contact_info_main_section" v-show="!statusEdited" v-if="newForm">
+
+        <div class="button_row_end flex">
+            <button class="btn btn_owhite" @click="send('draft')">{{tr('adev_article_add_article_draft')}}</button>
+            <button class="btn btn_orange" @click="send('published')">{{tr('adev_article_add_article_publish')}}</button>
+        </div>
+
+    </div>
+
+    <div class="main_section agenda_main_section flex btn_action" v-if="!newForm" @click="newForm = true">
+        <button class="btn btn_oval">+</button>
+        <span class="btn_oval_text">{{ tr('adev_new_article') }}</span>
+    </div>
+
+    <ArticlesList :articleData="articleData" :type="'all'" :event_id="eventObj.id" :added="added" @statusShow="statusContent"
+                  @formStatus="setFormStatus"  ></ArticlesList>
+
+    <ui-modal ref="articleModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{modalTitle}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="modalClose"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+
+</div>

@@ -1,0 +1,8 @@
+<div class="content_wrapper register_page_section">
+    <div class="container">
+        <h2 class="title">{{tr('adev_login_title')}}</h2>
+        <div class="container flex registration_form_container">
+            <RegistrationForm v-if="!userData" :customMsg="tr('adev_auth_create_event_text')" :withoutFox="true" :triggerLoginEvent="true" v-on:login="afterLoginAction"></RegistrationForm>  
+        </div>  
+    </div>  
+</div>  

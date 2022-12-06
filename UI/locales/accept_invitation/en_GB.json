@@ -1,0 +1,20 @@
+{
+  "ai_personnel_accept_title": "Invitation accepted",
+  "ai_personnel_accept_text": "Your invitation to the company is accepted",
+  "ai_event_personnel_accept_text": "Now you are part of event team",
+  "ai_stand_personnel_accept_text": "Now you are part of stand team",
+  "ai_personnel_reject_title": "Activity rejected",
+  "ai_personnel_reject_text": "Your activity is rejected",
+  "ai_gohome_button_text": "Go home",
+  "ai_accept_title": "Congrats",
+  "ai_accept_text": "Your stand has been created",
+  "ai_accept_button_text": "Customize my stand page",
+  "ai_invalid_title": "Sorry",
+  "ai_404_invalid_text": "Sorry, we cannot find such invitation. It might be recalled, or you already accepted or rejected it.",
+  "ai_invalid_text": "your invitation not found",
+  "ai_invalid_button_text": "Go to my stands",
+  "ai_registet_msg": "Please sign in or register to accept stand invitation",
+  "ai_gocompany_button_text": "Go to my company",
+  "ai_goevent_button_text": "Go to my events",
+  "ai_gostand_button_text": "Go to my stands"
+}

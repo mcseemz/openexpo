@@ -1,0 +1,44 @@
+<div class="page_wrapper myevents_page mymeetings_page preloader_wrapper" v-if="localesLoaded">
+
+	<div class="preloader_overlay fixed preload_overlay_white" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+	<div class="subheader">
+		<div class="container flex">
+			<h2 class="title">{{tr('my_meetings')}}</h2> 
+			<div class="left flex">
+				
+				<div class="subnavigation" v-if="selectedMenu == 'meetings'">
+					<a href="#" class="subnav_buttons" v-bind:class="{ active: filter == 'all' }" @click="filter = 'all'"><span>{{tr('all')}}</span></a>
+					<a href="#" class="subnav_buttons" v-bind:class="{ active: filter == 'coming' }" @click="filter = 'coming'"><span>{{tr('coming')}}</span></a>
+					<a href="#" class="subnav_buttons" v-bind:class="{ active: filter == 'past' }" @click="filter = 'past'"><span>{{tr('past')}}</span></a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="content_wrapper">
+	    <div class="container">
+	        <div class="content_sidebar_left flex">
+	            <div class="sidebar">
+	                
+	                <ul class="sidebar_menu">
+
+	                    <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'meetings'}">
+	                        <div class="sidebar_menu_item_title"  @click="selectedMenu = 'meetings'">{{tr('mymeet_meetings')}}</div>
+	                    </li>
+	                    <li class="sidebar_menu_item" :class="{'active': selectedMenu == 'calendar'}">
+	                        <div class="sidebar_menu_item_title"  @click="selectedMenu = 'calendar'">{{tr('mymeet_calendar')}}</div>
+	                    </li>
+	                    
+	                </ul>
+	            </div>
+	            
+	            <Meetings :gridPreload="gridPreload" :comingMeetings="comingMeetings" :pastMeetings="pastMeetings" :tabFilter="filter" v-if="selectedMenu == 'meetings'" v-on:reload-meetings="reloadMeetings"></Meetings>
+	            <Calendar :comingMeetings="comingMeetings" :pastMeetings="pastMeetings" :tabFilter="filter" v-if="selectedMenu == 'calendar'"></Calendar>
+
+	        </div>
+
+	    </div>  
+	</div> 
+
+</div>

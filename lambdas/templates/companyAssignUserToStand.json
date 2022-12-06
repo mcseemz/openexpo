@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "CompanyAssignUserToStand",
+    "SubjectPart": "You've been assigned to the stand",
+    "HtmlPart": "You've been assigned to the stand: {{standName}} with the role: {{role}}",
+    "TextPart": "You've been assigned to the stand: {{standName}} with the role: {{role}}"
+  }
+}

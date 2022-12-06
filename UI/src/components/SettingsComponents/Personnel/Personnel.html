@@ -1,0 +1,484 @@
+<div class="main users_main preloader_wrapper">
+
+    <div class="preloader_overlay preloader_transparent" v-show="preload">
+        <ui-progress-circular color="primary"></ui-progress-circular>
+    </div>
+
+    <div class="main_form_box" v-if="assignUserForm">
+        <div v-if="assignUserForm && !preload" class="main_section">
+
+            <p class="main_section_title big_text">
+                {{ tr(locPrefix + 'personnel_user') }}
+            </p>
+
+            <p class="text" v-if="companyUserList.length">{{ tr(locPrefix + 'personnel_select_user_text') }} <a
+                    v-on:click.prevent="newCompanyUserForm = true"
+                    href="#">{{ tr(locPrefix + 'personnel_invite_more_text') }}</a></p>
+            <p class="text" v-if="!companyUserList.length">{{ tr(locPrefix + 'personnel_no_avaliable_personnel') }}</p>
+
+            <div class="form_input_row" v-if="companyUserList.length">
+
+                <ui-select
+                        label=" "
+                        :placeholder="tr(locPrefix+'personnel_select_user_ph')"
+                        :options="companyUserList"
+                        v-model="selectedCompanyUser"
+                        iconPosition="right"
+                        class="select_empty_label select_fw"
+                >
+                    <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                </ui-select>
+
+            </div>
+
+            <div class="button_row_end flex">
+                <button class="btn btn_orange" v-if="!companyUserList.length" @click="newCompanyUserForm = true">
+                    {{ tr(locPrefix + 'personnel_invite_users') }}
+                </button>
+            </div>
+
+        </div>
+
+        <div v-if="assignUserForm && !preload" class="main_section">
+
+            <p class="main_section_title big_text">
+                {{ tr(locPrefix + 'personnel_role') }}
+            </p>
+
+            <p class="text">{{ tr(locPrefix + 'personnel_assign_role_text') }}</p>
+
+            <div class="form_input_row">
+
+                <ui-select
+                        label=" "
+                        :placeholder="tr(locPrefix+'personnel_assign_role_ph')"
+                        :options="roles"
+                        v-model="newUserRole"
+                        iconPosition="right"
+                        class="select_empty_label select_fw"
+                >
+                    <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                </ui-select>
+
+            </div>
+
+            <div class="button_row_sb flex">
+                <button class="btn btn_owhite" @click="assignUserForm = false">{{ tr('back') }}</button>
+                <button class="btn btn_orange" :class="{disabled: !companyUserList.length}" @click="send(false)">
+                    {{ tr(locPrefix + 'personnel_add_user') }}
+                </button>
+            </div>
+        </div>
+
+        <div v-if="newUserForm && !preload && companyInvitationsList.length"
+             class="main_section managerequests_main_section">
+
+            <p class="main_section_title big_text">
+                {{ tr(locPrefix + 'mycomp_users_pending_title') }}
+            </p>
+            <div class="mr_items">
+                <div class="mr_item flex" :key="item.id" v-for="item in companyInvitationsList">
+                    <div class="left">
+                        <p class="name">{{ item.email_to }}</p>
+                        <a href="#" class="small_text">{{ tr(locPrefix + 'mycomp_users_role_label') }}:
+                            {{ getCompanyRoleById(item.role) }} | {{ tr(locPrefix + 'mycomp_users_job_position') }}:
+                            {{ item.position }}</a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <!--    /* content personnel*/-->
+    <div v-if="!newUserForm && !assignUserForm && (userList.length || invitationsList.length) && !preload"
+         class="main_section fw_main_section personnel_main_section">
+        <div class="form_input_row flex flex-pers">
+            <div class="left flex">
+                <div class="form_input_hr">
+                    <ui-textbox
+                            :placeholder="tr(locPrefix+'personnel_search_ph')"
+                            v-model="search"
+                            class="ui-search-input ui-search-input-pr"
+                    >
+                        <img slot="icon" src="@/img/search_icon.svg" alt="">
+                    </ui-textbox>
+                </div>
+
+                <div class="form_input_qr">
+                    <ui-select
+                            :label="tr(locPrefix+'personnel_roles_label')"
+                            :placeholder="tr(locPrefix+'personnel_roles_all')"
+                            :options="[{label: tr(locPrefix+'personnel_roles_all'), value: ''}, ...roles]"
+                            v-model="role"
+                            iconPosition="right"
+                            class="ui-select-labelin"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+
+                <div class="form_input_qr">
+                    <ui-select
+                            :label="tr('order_by')"
+                            :placeholder="tr('alphabetical_name')"
+                            :options="orderByList"
+                            v-model="orderBy"
+                            iconPosition="right"
+                            class="ui-select-labelin"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+            </div>
+
+            <!-- <span class="icon_w_link" @click="addNewUser">{{tr(locPrefix+'personnel_add_personnel')}}</span>-->
+
+            <span class="icon_w_link" @click="addNewPersonnel">{{ tr(locPrefix + 'personnel_add_personnel') }}</span>
+
+        </div>
+
+        <div class="form_input_row form_checkbox_row flex" style="display: none;">
+            <span class="text">
+               {{ tr(locPrefix + 'personnel_assign_text') }}
+            </span>
+
+            <button v-if="companyUserList.length" class="btn btn_orange" @click="assignUser">
+                {{ tr(locPrefix + 'personnel_assign_btn') }}
+            </button>
+            <span>
+                <button v-if="!companyUserList.length"
+                        class="btn btn_orange disabled">{{ tr(locPrefix + 'personnel_assign_btn') }}</button>
+                <ui-tooltip>{{ tr(locPrefix + 'personnel_assign_nousers') }}</ui-tooltip>
+            </span>
+        </div>
+        <!--            /* Personnel List*/-->
+        <div class="user_list">
+            <div class="user_list_item flex-user" v-for="(item,ind) in filteredUserList" style="align-items: start">
+                <div class="left mx_274" @mouseover="prcName(item)" :key="leftKey">
+                    <div  style="display: flex; justify-content: space-between">
+                        <div class="flex-img">
+                            <div class="image_box" @mouseover="refImage = true" @mouseleave="refImage = false"
+                                 v-if="item.branding && item.branding.length > 0 && item.branding[0].status === 'stub'">
+                                <span style="font-size: 10px;">...uploading</span>
+                                <div  style="width: 15px;height: 15px;">
+                                    <button @click="refreshImage" class="refresh_img_person"  v-show="refImage" >
+                                        <svg fill="#000000" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 30 30" width="15px" height="15px"><path d="M 15 3 C 12.031398 3 9.3028202 4.0834384 7.2070312 5.875 A 1.0001 1.0001 0 1 0 8.5058594 7.3945312 C 10.25407 5.9000929 12.516602 5 15 5 C 20.19656 5 24.450989 8.9379267 24.951172 14 L 22 14 L 26 20 L 30 14 L 26.949219 14 C 26.437925 7.8516588 21.277839 3 15 3 z M 4 10 L 0 16 L 3.0507812 16 C 3.562075 22.148341 8.7221607 27 15 27 C 17.968602 27 20.69718 25.916562 22.792969 24.125 A 1.0001 1.0001 0 1 0 21.494141 22.605469 C 19.74593 24.099907 17.483398 25 15 25 C 9.80344 25 5.5490109 21.062074 5.0488281 16 L 8 16 L 4 10 z"/></svg>
+                                    </button>
+                                </div>
+
+                            </div>
+                            <div class="image_box" v-else>
+                                <img :src="item.logo" alt="" v-if="item.logo">
+                                <img src="@/img/default_avatar.svg" alt="" v-if="!item.logo">
+                            </div>
+                            <div class="text_overflow_ellipsis">
+                                <p class="name flex">{{ item.name }} {{ item.surname }}
+                                    <img title="Public" v-if="item.public" src="@/img/icons/users.svg" alt="">
+                                    <span><img title="Public" v-if="!item.public" src="@/img/icons/users-counter.svg"
+                                               alt="">
+                                <ui-tooltip v-if="!item.public">{{
+                                        tr('not_active_personnel_tooltip')
+                                    }}</ui-tooltip></span>
+                                </p>
+                                <p class="user-role" v-if="item.email">{{ item.email }}</p>
+
+                            </div>
+                        </div>
+                        <div class="ticket_personnel" >
+                            <!--    /* false need to be change when backend will be ready , require key price and value id Number */-->
+                            <img src="./img/ticket_active.png" alt="" width="24px" height="24px" v-if="item.price && item.email"  @click="editPerson(item)">
+                            <img src="./img/ticket.png" alt="" v-else width="24px" height="24px" v-else-if="!item.price && item.email"  @click="editPerson(item)">
+                            <ui-tooltip v-if="mainObj && mainObj.pricing && mainObj.pricing.length || eventObj && eventObj.pricing && eventObj.pricing.length">
+                                {{ item.price && item.email ?  Pricing[0] : tr(locPrefix +'no_assigned_ticket')}}
+                            </ui-tooltip>
+                        </div>
+                    </div>
+                    <div  class="flex js_btw_end">
+
+                        <div class="text flex disp_in_block">
+
+                            <p class="user-role">{{ tr(locPrefix + 'mycomp_users_job_position') }}: <span
+                                    class="role-color">{{ item.position }}</span></p>
+                            <p class="user-role">{{ tr(locPrefix + 'personnel_role') }}: <span
+                                    class="role-color">{{ getRoleById(item.role) }}</span></p>
+
+
+                        </div>
+
+                        <div class="right flex">
+                            <b class="blink_me" v-if="item.copied">{{tr('personel_link_copied')}}</b>
+                            <span class="icon_box flex" v-if="item.directLinkManage" @click="copyURL(item.directLinkVisit,ind)" >
+
+                                <ui-tooltip >{{ tr('direct_link_visit') }}</ui-tooltip>
+                                 <img src="./img/link_manage.png" height="20px" width="20px" alt="" class="visit_icon" />
+                            </span>
+                            <span class="icon_box flex" v-if="item.directLinkVisit" @click="copyURL( item.directLinkManage,ind)" >
+                                <ui-tooltip >{{ tr('direct_link_manage') }}</ui-tooltip>
+                                <img src="./img/link_edit.png" height="24px" width="24px" alt="" class="manage_icon" />
+                            </span>
+                            <span class="icon_box flex" @click="editPerson(item)"><img src="@/img/edit_sec.svg" alt=""></span>
+                            <span class="icon_box flex" @click="removePerson(item.id)"><img src="@/img/trash_sec_bold.svg"
+                                                                                            alt=""></span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="right ">
+
+
+                    <div class="flex">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div v-if="invitationsList.length" class="main_section managerequests_main_section">
+
+            <p class="main_section_title big_text">
+                {{ tr(locPrefix + 'mycomp_users_pending_title') }}
+            </p>
+            <div class="mr_items">
+                <div class="mr_invitation_item flex" :key="item.id" v-for="item in invitationsList">
+                    <div class="left">
+                        <p class="name">{{ item.email_to }}</p>
+                        <a href="#" class="small_text">{{ tr(locPrefix + 'mycomp_users_role_label') }}:
+                            {{ getRoleById(item.role) }} | {{ tr(locPrefix + 'mycomp_users_job_position') }}:
+                            {{ item.position }}</a>
+                    </div>
+                    <div class="right">
+                        <span class="remove" @click="cancelInvitation(item.id)">{{ tr('cancel') }}</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="personnel_empty flex"
+         v-if="!newUserForm && !assignUserForm && !userList.length && !invitationsList.length && !preload">
+        <div class="image_box"><img src="@/img/illustration_add user.png.webp" alt=""></div>
+        <p class="big_text">{{ tr(locPrefix + 'personnel_no_personnel') }}</p>
+        <p class="small_text">{{ tr(locPrefix + 'personnel_start_adding') }}</p>
+        <button class="btn btn_orange" @click="addNewUser">{{ tr(locPrefix + 'personnel_add_now') }}</button>
+    </div>
+                           <!--    /* Modal Create and Edit Personnel*/-->
+    <div  :id="modalStatus ? 'modalKeeper' : ''" @click="notClose(modKeeper)" class="person_modal">
+        <ui-modal ref="addNewPersonnel" class="status_modal status_modal_personnel" removeHeader size="auto" :class="modalclose ? 'disabled_modal':''">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <div v-if="!preload" class="main_section invitations_main_section">
+                    <p class="big_text_personnel" v-if="!editedModal">
+                        {{ tr(locPrefix + 'personnel_add_personnel') }}</p>
+                    <p class="big_text_personnel" v-else>{{ tr(locPrefix + 'personnel_edit_personnel') }}</p>
+
+                    <div class="upload-user-img avatar_droparea">
+                        <div >
+                             <VueUploadComponent
+                                input-id="logoInpt"
+                                ref="personnel_logo"
+                                v-model="personnel.logo.new"
+                                drop=".avatar_droparea"
+                                :multiple="false"
+                                @input-file="inputLogoFile"
+                                class="personnel_avatar"
+                                :drop-directory="false"
+                        >
+
+                            <div class="personnel_content flex">
+                                <div class="image_box">
+                                    <img v-if="logoUrl" :src="logoUrl" alt="" class="personnel_image">
+                                </div>
+                            </div>
+                            <div v-if="!logoUrl" class="placeholder_text">
+                                <img src="@/img/image_placeholder_img.svg" class="file_upload_icon">
+                                <p class="file_upload_title">{{ tr('event_personnel_ph') }}</p>
+                                <p class="file_upload_desc">{{ tr('event_cover_ph_desc') }}</p>
+                            </div>
+
+                            <div class="icons_box personel_ava_icons" v-if="logoUrl">
+                                <div class="remove_icon">
+                                    <span><img src="@/img/remove_icon.svg" @click="clearImageKey"/></span>
+                                </div>
+                                <span><img src="@/img/edit_icon.svg"/></span>
+                            </div>
+
+                        </VueUploadComponent>
+                        </div>
+                    </div>
+
+                    <div class="flex-personnel-input">
+
+                        <div class="form_input_row form_input_personnel" :class="emailFilled ? 'filled_email' : ''">
+                            <ui-textbox
+                                    :label="tr('email')"
+                                    :placeholder="tr(locPrefix+'mycomp_users_email_ph')"
+                                    v-model.trim.lazy="companyEmailAddresses"
+                                    class="personnel-input"
+                                    :invalid="!isEmailValid"
+                                    v-on:touch.passive="companyEmailTouched = true"
+                                    v-if="!emailFilled"
+                                    :disabled="modalclose"
+                                    @change="validateEmail(companyEmailAddresses)"
+                            >
+                            </ui-textbox>
+                            <span class="personnel-input" v-else> {{companyEmailAddresses}} </span>
+                        </div>
+
+
+
+                        <div class="form_input_row form_input_personnel">
+                            <ui-textbox
+                                    :label="tr('_name')"
+                                    :placeholder="tr('enter_name')"
+                                    v-model="companyNameUser"
+                                    :disabled="modalclose"
+                            >
+                            </ui-textbox>
+                        </div>
+
+
+                        <div class="form_input_hr form_input_personnel">
+                            <ui-textbox
+                                    :label="tr(locPrefix+'mycomp_users_job_label')"
+                                    :placeholder="tr(locPrefix+'mycomp_users_job_ph')"
+                                    v-model="companyJobPosition"
+                                    :maxlength="30"
+                                    :invalid="(companyJobPositionTouched && !companyJobPosition.length) || (!!companyJobPosition.length && ( companyJobPosition.length > 30 ||
+                                /[<>$;.,'\\\/\(\)\{\}]/.test(companyJobPosition) ))"
+                                    v-on:touch.passive="companyJobPositionTouched = true"
+                                    :disabled="modalclose"
+                            >
+                            </ui-textbox>
+                        </div>
+
+                        <div class="form_input_hr form_input_personnel">
+                            <ui-select
+                                    :label="tr(locPrefix+'mycomp_users_role_label')"
+                                    :placeholder="tr(locPrefix+'mycomp_users_role_ph')"
+                                    :options="roles"
+                                    v-model="companyNewUserRole"
+                                    iconPosition="right"
+                                    :disabled="modalclose"
+                            >
+                                <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                            </ui-select>
+                        </div>
+                    </div>
+
+                    <div class="form_input_row">
+                        <p class="form_input_row_label tag_style">
+                            {{ tr(locPrefix + 'tags_label') }}
+                        </p>
+                        <vue-tags-input
+                                :placeholder="tr(locPrefix+'tags_ph')"
+                                v-model="tag"
+                                :tags="tags"
+                                :allow-edit-tags="true"
+                                :add-on-key="[13,';',',']"
+                                @tags-changed="newTags => tagsChanged(newTags, false)"
+                                :disabled="modalclose"
+                        />
+                    </div>
+
+                    <div v-if="editedModal" class="form_input_personnel" >
+                        <div style="height: 27px">
+                            <label class="typo__label form_input_row_label tag_style" > {{ tr('personel_pricing') }}
+                            </label>
+                            <label class="typo__label form_input_row_label tag_style tooltip_ticket_tr" >
+                                <img src="@/pages/MyMeetings/img/info.svg" class=""/><ui-tooltip>{{ tr(locPrefix + 'personnel_assign_ticket') }}</ui-tooltip>
+                            </label>
+                        </div>
+
+                        <div style="height: 50px" v-if="Pricing">
+                            <multiselect :options="value"  :value="Pricing" :max-height="150"
+
+                                         @select="onSelect($event)" @open="getTags()"
+                                         @tag="addTag($event)" @remove="onTouch()"
+                                         ref="Vueselect" :disabled="!companyEmailAddresses.length"
+                                         tag-placeholder="Press enter or comma to create a tag"
+                            >
+                                <template slot="option" slot-scope="props">
+                                    <div class="option__desc">
+                                        <span class="option__title">{{ props.option.name }}</span>
+                                    </div>
+                                </template>
+                            </multiselect>
+                        </div>
+
+                    </div>
+
+                    <div class="form_input_row" v-if="priceTags && priceTags.length">
+                        <div class="text-middle text-bold mb-16">{{ tr('pricing_tags') }}:</div>
+                        <div class="pricings">
+                            <ui-checkbox v-model="tag.selected" v-for="tag in priceTags" :key="tag.text">
+                                {{ tag.text }}
+                            </ui-checkbox>
+                        </div>
+                    </div>
+
+                    <div class="flex form_checkbox_row form_checkbox_m_row">
+                        <ui-checkbox v-model="updateUserPublic" color="accent" :disabled="companyEmailAddresses === '' || modalclose"
+                        >{{ tr(locPrefix + 'personnel_ispublic') }}
+                        </ui-checkbox>
+                    </div>
+
+                    <div class="button_row_sb flex">
+                        <button class="btn btn_owhite" @click="addPerson" v-if="!editedModal" :disabled="modalclose"> {{ tr('add_person') }}
+                        </button>
+                        <button class="btn btn_owhite" @click="saveEditedPerson" v-else> {{ tr('edit_person') }}
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="closeNewPersonnel"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+    </div>
+
+    <ui-modal ref="messageUsersModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title" >{{tr('confirm_remove')}}</p>
+                <div class="d-flex">
+                    <button class="btn btn_orange btn_size d-flex ma-3" @click="ConfItem()" > {{ tr('yes_remove') }}
+                    </button>
+                    <button class="btn btn_owhite btn_size d-flex ma-3"  @click="canselRem()"> {{ tr('cancel_remove') }}
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="usersModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="croppModal" dismissOn="close-button" class="status_modal cropp_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <clipper-fixed
+                        ref="croppBox"
+                        :src="logoUrlForCropp"
+                        :ratio="1"
+                        v-if="logoUrlForCropp"
+                        :round="true"
+                ></clipper-fixed>
+                <p class="text">
+                    {{ tr('myacc_scale_message') }}
+                </p>
+                <div class="button_box flex">
+                    <button class="btn btn_owhite btn_size" @click="backCropp">{{ tr('back') }}</button>
+                    <button class="btn btn_orange btn_size" @click="saveCropp">{{ tr('save') }}</button>
+                </div>
+            </div>
+        </div>
+    </ui-modal>
+</div>

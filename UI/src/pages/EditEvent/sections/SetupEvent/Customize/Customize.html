@@ -1,0 +1,221 @@
+<div class="main_sections_wrapper">
+
+    <div class="main_section event_datetime_section">
+
+
+        <p class="main_section_title big_text">
+            {{tr('adev_event_date_time_title')}}
+        </p>
+
+        <div class="form_input_row">
+            <ui-select
+                :label="tr('adev_timezone_label')"
+                :placeholder="tr('adev_timezone_ph')"
+                :options="timeZoneList"
+                v-model="eventData.timezone"
+                iconPosition="right"
+                @change="timezoneChanged"
+            >
+                <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+            </ui-select>
+        </div>
+        <div class="form_input_row">
+            <a class="adev_desc_link" href="https://www.timeanddate.com/worldclock/converter.html?iso=20201018T120000" target="_blank">{{tr('adev_check_timezone')}}</a>
+        </div>
+
+        <div class="form_input_row flex" v-if="!item.toDelete" v-for="(item, index) in dayList">
+
+            <div class="form_input_hr">
+                <ui-datepicker
+                    :placeholder="tr('select_a_date')"
+                    iconPosition="right"
+                    v-model="item.edtDateVal"
+                    :lang="datepicker_lang"
+                    @input="calcDate(item)"
+                    :minDate="minFromDate"
+                    :maxDate="maxFromDate"
+                >
+                    <img slot="icon" src="../img/calendar.svg" alt="">
+                    {{tr('date')}}
+                </ui-datepicker>
+            </div>
+
+            <div class="form_input_qr">
+                <ui-select
+                    :label="tr('adev_from')"
+                    :placeholder="dayList[0].timeFrom.label"
+                    :options="timeList"
+                    v-model="item.timeFrom"
+                    iconPosition="right"
+                    @change="calcDate(item)"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+            <div class="form_input_qr">
+                <ui-select
+                    :label="tr('adev_to')"
+                    :placeholder="dayList[0].timeTo.label"
+                    :options="endTimeList(item.timeFrom)"
+                    v-model="item.timeTo"
+                    iconPosition="right"
+                    @change="calcDate(item)"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+            <span class="icon_w_link" v-if="false" @click="addDay"><img src="../img/callendar_filled.svg" alt="">{{tr('adev_add_day')}}</span>
+            <span class="icon_w_link" @click="removeDay(index)"><img src="../img/callendar_filled.svg" alt="">{{tr('adev_remove_day')}}</span>
+
+        </div>
+
+        <div class="button_box flex">
+            <button class="btn btn_orange" @click="addDay">{{tr('adev_add_day')}}</button>
+        </div>
+
+    </div>
+    <a class="main_sections_anchor" id="customize"></a>
+    <div class="main_section event_datetime_section">
+        <h3 class="big_text form_section_title"><img src="../img/basic_info_icon.svg" alt="" class="form_section_title_icon">{{tr('visuals')}}</h3>
+        <p class="form_section_text"></p>
+        <p class="main_section_title flex big_text">
+            {{tr('adev_event_cover')}}
+            <span class="question_icon">?<span class="tooltip_image_box"><img src="@/img/template_cover_tooltip.jpg" alt=""></span></span>
+        </p>
+
+        <div class="form_input_row event_main_droparea">
+            <VueUploadComponent
+            ref="event_main_upload"
+            v-model="eventBranding.templateCover.new"
+            drop=".event_main_droparea"
+            :multiple="false"
+            @input-file="inputFile"
+            class="upload_image_iconstyle"
+            :drop-directory="false"
+            >
+                <div v-if="coverUrl" class="preview_image_box">
+                    <img :src="coverUrl" alt="" class="">
+                </div>
+                <div v-if="!coverUrl" class="placeholder_text">
+                    <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                    <p class="file_upload_title">{{tr('adev_event_cover_ph_main')}}</p>
+                    <p class="file_upload_desc">{{tr('adev_event_cover_ph_desc')}}</p>
+                </div>
+
+                <div class="icons_box" v-if="coverUrl">
+                    <span @click="removeImage"><img src="../img/remove_icon.svg" alt=""></span>
+                    <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                </div>
+
+            </VueUploadComponent>
+
+        </div>
+
+    </div>
+
+    <div class="main_section event_datetime_section">
+        <p class="main_section_title flex big_text">
+            {{tr('adev_event_banner')}}
+            <span class="question_icon">?<span class="tooltip_image_box"><img src="@/img/banner_tooltip.jpg" alt=""></span></span>
+        </p>
+
+        <div class="form_input_row event_banner_droparea ">
+            <VueUploadComponent
+            input-id="bannerInpt"
+            ref="event_banner_upload"
+            v-model="eventBranding.templateBanner.new"
+            drop=".event_banner_droparea"
+            :multiple="false"
+            @input-file="inputBannerFile"
+            @input-filter="inputBannerFilter"
+            class="upload_image_iconstyle"
+            :drop-directory="false"
+            >
+                <div v-if="bannerUrl" class="preview_image_box">
+                    <img :src="bannerUrl" alt="" class="">
+                </div>
+                <div v-if="!bannerUrl" class="placeholder_text">
+                    <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                    <p class="file_upload_title">{{tr('adev_event_banner_ph_main')}}</p>
+                    <p class="file_upload_desc">{{tr('adev_event_banner_ph_desc')}}</p>
+                </div>
+
+                <div class="icons_box" v-if="bannerUrl">
+                    <span @click="removeImage('banner')"><img src="../img/remove_icon.svg" alt=""></span>
+                    <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                </div>
+
+            </VueUploadComponent>
+
+        </div>
+
+    </div>
+
+    <div class="main_section event_datetime_section">
+        <p class="main_section_title flex big_text">
+            {{tr('adev_event_logo')}}
+            <span class="question_icon">?<span class="tooltip_image_box"></span></span>
+        </p>
+
+        <div class="form_input_row flex logo_droparea">
+
+            <div class="image_preview logo_preview">
+                <VueUploadComponent
+                    input-id="logoInpt"
+                    ref="treee"
+                    v-model="eventBranding.logo.new"
+                    drop=".logo_droparea"
+                    :multiple="false"
+                    @input-file="inputLogoFile"
+                    @input-filter="inputFilter"
+                    class="upload_image_iconstyle"
+                    :drop-directory="false"
+                    >
+                    <div v-if="logoUrl" class="preview_image_box">
+                        <img :src="logoUrl" alt="" class="">
+                    </div>
+                    <div v-if="!logoUrl" class="placeholder_text">
+                        <img src="../img/image_placeholder_img.svg" alt="" class="file_upload_icon">
+                        <p class="file_upload_title">{{tr('adev_event_logo_ph_main')}}</p>
+                        <p class="file_upload_desc">{{tr('adev_event_logo_ph_desc')}}</p>
+                    </div>
+
+                    <div class="icons_box" v-if="logoUrl">
+                        <span @click="removeImage('logo')"><img src="../img/remove_icon.svg" alt=""></span>
+                        <span @click="editImage"><img src="../img/edit_icon.svg" alt=""></span>
+                    </div>
+
+                </VueUploadComponent>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="main_section flex">
+        <!-- <button class="btn btn_md btn_white btn_remove"><img src="../img/trash.svg" alt="">{{tr('adev_remove_event')}}</button> -->
+    </div>
+
+    <ui-modal ref="croppModal" dismissOn="close-button" class="status_modal cropp_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <clipper-fixed
+                    ref="croppBox"
+                    :src="coverUrlForCropp"
+                    :ratio="croppRatio"
+                    v-if="coverUrlForCropp"
+                ></clipper-fixed>
+                <p class="text">
+                    {{tr('adev_scale_message')}}
+                </p>
+                <div class="button_box flex">
+                    <button class="btn btn_owhite" @click="backCropp">{{tr('back')}}</button>
+                    <button class="btn btn_orange" @click="saveCropp">{{tr('save')}}</button>
+                </div>
+            </div>
+        </div>
+    </ui-modal>
+
+</div>

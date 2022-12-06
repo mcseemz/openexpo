@@ -1,0 +1,60 @@
+{
+  "faq_tabs": [
+    {
+      "tab_title" : "Getting Started",
+      "svg_icon" : "<svg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M28.2783 13.2929C28.6689 12.9024 29.302 12.9024 29.6926 13.2929C30.053 13.6534 30.0808 14.2206 29.7757 14.6129L29.6926 14.7071L16.7016 27.6981C16.3411 28.0586 15.7738 28.0863 15.3816 27.7813L15.2873 27.6981L10.2929 22.7036C9.90237 22.3131 9.90237 21.68 10.2929 21.2894C10.6534 20.9289 11.2206 20.9012 11.6129 21.2062L11.7071 21.2894L15.6409 25.2229C15.8362 25.4181 16.1527 25.4181 16.348 25.2229L28.2783 13.2929Z' fill='#70B9C3'/></svg>",
+
+      "tab_items" : [
+        {
+          "item_title" : "How does an online exhibition work?",
+          "item_text" : "Exhibitions are one of the most effective ways of promoting your products and brands to your targeted audience. An online exhibition works in the same way. You can promote your product or services to lots of potential clients who can also influence your industry.<br><br>Unlike an offline exhibition, we don’t close our doors. With the opportunity for a year-round attendance, you are assured of generating sales leads from your virtual stand for a long period of time."
+        },
+        {
+          "item_title" : "Why choose an online event over an offline event?",
+          "item_text" : "Having an online event gives you a wider reach than hosting an offline event. You may be able to expand your audience to cover different regions, cities, and even countries, which gives your brand a global presence.<br><br> An online event takes away all the challenges that you may experience while traveling for events. You may not have to worry too much about setting up the event place and other logistics issues as an online expo offers you an event befitting of your brand at a minimal cost."
+        },
+        {
+          "item_title" : "What is the cost to register for a booth?",
+          "item_text" : "Our platform allows event organizers to create events for free and to secure as many stands as they wish. All we require is to get our commission on the ticket sales. Therefore, there is no cost in creating an event on our platform."
+        },
+        {
+          "item_title" : "What will I benefit from hosting my events on your platform?",
+          "item_text" : "Our exhibition attracts thousands of guests all year round. With our high traffic of potential customers, your event tickets will be sold out within the shortest possible time.<br><br> Regardless of your professional background, we will give you a guide that can help you host your event, even if you have never planned an event before.<br><br> Our platform is very easy to navigate, with features that can easily attract visitors and potential customers, thereby drawing more traffic to your direction too.<br><br> We always strive to give your online event a perfect touch."
+        },
+        {
+          "item_title" : "Does your platform have easy features?",
+          "item_text" : "Our exhibition platform is designed to assist anyone who wants to create an event online so you can be able to reach many visitors and potential customers who may not be able to attend your offline event.<br><br> Our platform has amazing features which include B2B Matchmaking, wherein people get connected with your page with just a few clicks. This is an easy way of advertising and selling your products online, where thousands of visitors are searching for products to buy."
+        },
+        {
+          "item_title" : "Do I need to register an account?",
+          "item_text" : "For the sake of ensuring maximum security, you are required to register an account by providing your email and a secured password."
+        },
+        {
+          "item_title" : "Are my personal details secure with you?",
+          "item_text" : "Of course, your personal details are safe with us. Our platform is secure and well encrypted with modern technology.<br><br> We value and respect your privacy. Your private information is never shared, and your credit card is 100% safe and secure with us. Also, we use SSL security to ensure all our customer's private information is encrypted.<br><br> We do not store your credit card information, and it will be used only once. Then your credit card information will be purged.<br><br>Our platform is also user-friendly, compatible with any smart electronic device such as desktop PC, mobile phone, laptop, and tablet."
+        },
+        {
+          "item_title" : "What type of event can I host on your platform?",
+          "item_text" : "We understand how difficult planning events can be, especially if you desire to deliver top-notch experiences. Don’t worry; we have you covered in whatever event you wish to host.<br><br> Our platform is designed to accommodate events like conferences, seminars, product launches, congresses, networking sessions, and tradeshows. We have flexible and easy-to-use marketing tools on our platform."
+        },
+        {
+          "item_title" : "How do I create an event?",
+          "item_text" : "To create your event on our platform, first, you need to register an account on the platform. To create your Openexpo account, start by clicking on the sign-up page and ensuring that you provide your email and a secure password.<br><br> Once you are done, you can then click on the register icon. You may need to verify your account and then proceed to set up your events.<br><br> You can do this on your Openexpo dashboard by providing an event description, start and end date, and also stating your event category and location."
+        },
+        {
+          "item_title" : "How many attendees can participate in my online event?",
+          "item_text" : "Our platform can occupy as many attendees as possible. In giving your event a wider reach, we ensure your event can accommodate thousands of attendees.<br><br> You can engage your attendees and make your events a worthwhile experience through our reliable online event management platform."
+        },
+        {
+          "item_title" : "How do I search for an event on your platform?",
+          "item_text" : "To search for an event on our platform, please navigate to our home page, locate the search bar below the featured image.<br><br> Type in your preferred event name and event category. Hit the orange search button, and you're good to go.<br><br> Everything you need to be part of that event will be displayed immediately if the event is in our directory. So easy, right? Yes! We guess."
+        },
+        {
+          "item_title" : "How can I receive payment from my event attendees?",
+          "item_text" : "All payments will be sent via bank transfer at the end of every event, just like Airbnb. We also send notification of every payment from an attendee.<br><br> You can, in turn, send a receipt/invoice directly to the customer’s email address. Our platform accepts all types of credit cards."
+        }
+      ]
+    }
+
+  ]
+}

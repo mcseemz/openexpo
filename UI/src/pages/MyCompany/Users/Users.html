@@ -1,0 +1,267 @@
+<div class="main users_main preloader_wrapper">
+    <div class="preloader_overlay preloader_transparent" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+    
+    <div v-if="newUserForm && !preload" class="main_section invitations_main_section">
+        <p class="main_section_title big_text">{{tr('mycomp_users_invite_user')}}</p>
+
+        <div class="form_input_row ">
+            <ui-textbox 
+                :placeholder="tr('mycomp_users_email_ph')" 
+                v-model="email_addresses"
+                class="ui-email-input"
+                :invalid="(emailTouched && !email_addresses.length) || (!!email_addresses.length && !validateEmail(email_addresses))"
+                v-on:touch.passive="emailTouched = true"
+            >
+                <img slot="icon" src="../img/envelope_thin.svg" alt="">
+            </ui-textbox>  
+        </div>
+
+        <div class="form_input_row">
+            <ui-textbox 
+                :placeholder="tr('mycomp_users_email_body_ph')" 
+                v-model="mailtext"
+                :multi-line="true"
+                :autosize="false"
+                :invalid="mailtextTouched && !mailtext.length"
+                v-on:touch.passive="mailtextTouched = true"
+                >
+            </ui-textbox>
+
+        </div>
+
+        
+    
+    </div>
+
+    <div v-if="newUserForm && !preload" class="main_section">
+      
+        <p class="main_section_title big_text">
+            {{tr('mycomp_users_role')}} *
+        </p>
+
+        <p class="text">{{tr('mycomp_users_assign_text')}}</p>
+
+        <div class="form_input_row flex">
+
+            <div class="form_input_hr">
+                <ui-select
+                    :label="tr('mycomp_users_role_label')"
+                    :placeholder="tr('mycomp_users_role_ph')" 
+                    :options="roles"
+                    v-model="newUserRole"
+                    iconPosition="right"
+                >
+                <!-- class="select_empty_label" -->
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>  
+            </div>
+
+            <div class="form_input_hr">
+                <ui-textbox 
+                    :label="tr('mycomp_users_job_label')"
+                    :placeholder="tr('mycomp_users_job_ph')" 
+                    v-model="jobPosition"
+                    :maxlength="30"
+                    :invalid="(jobPositionTouched && !jobPosition.length) || (!!jobPosition.length && ( jobPosition.length > 30 ||
+                    /[<>$;.,'\\\/\(\)\{\}]/.test(jobPosition) ))"
+                    v-on:touch.passive="jobPositionTouched = true"
+                >
+                </ui-textbox>  
+            </div>
+            
+        </div>
+
+        <!-- <p class="main_section_title big_text">
+            Job position
+        </p> -->
+
+        <!-- <div class="form_input_row flex">
+
+
+            
+        </div> -->
+
+        <div class="button_row_sb flex">
+            <button class="btn btn_owhite" @click="backClick">{{tr('back')}}</button>
+            <button class="btn btn_orange" @click="send">{{tr('mycomp_users_send_invitation')}}</button>
+        </div>
+
+    </div>
+
+    <div v-if="!newUserForm && usersList.length && !preload" class="main_section fw_main_section users_main_section">
+        <div class="form_input_row flex">
+        
+            <div class="form_input_hr">
+                <ui-textbox 
+                    :placeholder="tr('mycomp_users_search_ph')" 
+                    v-model="search"
+                    class="ui-search-input"
+                >
+                    <img slot="icon" src="../img/search_icon.svg" alt="">
+                </ui-textbox>
+            </div>
+
+            <div class="form_input_qr">
+                <ui-select
+                    :label="tr('mycomp_users_roles_label')"
+                    :placeholder="tr('mycomp_users_roles_all')"
+                    :options="[{label: tr('mycomp_users_roles_all'), value: ''}, ...roles]"
+                    v-model="role"
+                    iconPosition="right"
+                    class="ui-select-labelin"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+            <div class="form_input_qr">
+                <ui-select
+                    :label="tr('order_by')"
+                    :placeholder="tr('alphabetical_name')"
+                    :options="orderByList"
+                    v-model="orderBy"
+                    iconPosition="right"
+                    class="ui-select-labelin"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+            <span class="icon_w_link" @click="addNewUser"><img src="../img/people_icon.svg" alt="">{{tr('mycomp_users_add_new')}}</span>
+            
+        </div>
+      
+        <div class="user_items col3 flex">
+            <div class="user_item" :key="user.id+'_'+index" v-for="user, index in filteredUsersList" v-if="usersList.length && user.userObj && !preload">
+                <img title="Public" class="user_item_public_icon" v-if="user.public" src="@/img/icons/users.svg" alt="">
+                <div class="image_box">
+                    <img :src="user.userBranding.logo.url" alt="" v-if="user.userBranding && user.userBranding.logo.url">
+                    <img src="../img/default_avatar.svg" alt="" v-if="!user.userBranding || !user.userBranding.logo.url">
+                </div>
+                <p class="name">{{user.userObj.name}} {{user.userObj.surname}}</p>
+                <p class="role" v-if="user.position">{{user.position}}</p>
+                <p class="role" v-if="user.role">{{tr('mycomp_users_role_label')}}: {{getRoleById(user.role)}}</p>
+                <p class="role" v-if="user.email">{{tr('email')}}: {{user.email}}</p>
+                <div class="user_action_icons flex">
+                    <span class="icon_box flex" @click="openDeleteModal(user)"><img src="../img/trash_sec_bold.svg" alt=""></span>
+                    <span class="icon_box flex" @click="editPerson(user)"><img src="../img/edit_sec.svg" alt=""></span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div v-if="!newUserForm && invitationsList.length && !preload" class="main_section managerequests_main_section">
+            
+        <h3 class="">{{tr('mycomp_users_pending_title')}}</h3>
+        <!-- <div class="mr_items" v-if="invitations && invitations.length"> -->
+        <div class="mr_items">
+            <!-- <div class="mr_item flex" :key="item.id" v-for="item in invitations">
+                <div class="left">
+                    <p class="name">Company Name | Contact person</p>
+                    <p class="name">{{item.email_to}}</p>
+                    <a href="#" class="small_text">{{tr('adev_see_apply_form')}}</a>
+                </div>
+                <div class="right">
+                    <span class="remove" @click="remove(item.id)">{{tr('remove')}}</span>
+                </div>
+            </div> -->
+            <div class="mr_item flex" :key="item.id" v-for="item in invitationsList">
+                <div class="left">
+                    <p class="name">{{item.email_to}}</p>
+                    <a href="#" class="small_text">{{tr('mycomp_users_role_label')}}: {{getRoleById(item.role)}} | {{tr('mycomp_users_job_position')}}: {{decodeURI(item.position)}}</a>
+                </div>
+                <div class="right">
+                    <span class="remove" @click="cancelInvitation(item.id)">{{tr('cancel')}}</span>
+                </div>
+            </div>
+
+        </div>
+      
+    </div>
+
+    <div class="personnel_empty flex" v-if="!newUserForm && !usersList.length && !preload">
+        <div class="image_box"><img src="../../../img/illustration_add user.png.webp" alt=""></div>
+        <p class="big_text">{{tr('mycomp_users_no_personnel')}}</p>
+        <p class="small_text">{{tr('mycomp_users_start_adding')}}</p>
+        <button class="btn btn_orange" @click="addNewUser">{{tr('mycomp_users_add_now')}}</button>
+    </div>
+
+    <ui-modal ref="editModal" class="status_modal meeting_info_modal" removeHeader size="auto">
+        <div class="info_modal_header">
+            <h3 class="modal_title">{{tr('mycomp_updateusers')}}</h3>
+        </div>
+        <div class="info_modal_content">
+            <div class="form_input_row">
+                <ui-select
+                    :label="tr('mycomp_users_role_label')"
+                    :placeholder="tr('mycomp_users_role_ph')" 
+                    :options="roles"
+                    v-model="newUserRoleUpdate"
+                    iconPosition="right"
+                    class="select_fw"
+                >
+                    <img slot="icon" src="../img/hsb_dropdown.svg" alt="">
+                </ui-select>  
+            </div>
+            <div class="form_input_hr">
+                <ui-textbox 
+                    :label="tr('mycomp_users_job_label')"
+                    :placeholder="tr('mycomp_users_job_ph')" 
+                    v-model="newJobPosition"
+                    :maxlength="30"
+                    :invalid="!newJobPosition.length || (!!newJobPosition.length && ( newJobPosition.length > 30 ||
+                    /[<>$;.,'\\\/\(\)\{\}]/.test(newJobPosition) ))"
+                >
+                </ui-textbox>  
+            </div>
+            <div class="button_box"><button class="btn btn_orange" @click="updateUser(userForUpdate)">{{tr('update')}}</button></div>
+        </div>
+
+
+        <span class="status_modal_close" @click="editModalClose"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="deleteModal" class="status_modal meeting_info_modal" removeHeader size="auto">
+        <div class="info_modal_header">
+            <h3 class="modal_title">{{tr('mycomp_users_delete_user')}}</h3>
+        </div>
+        <div class="info_modal_content">
+            <div class="form_input_row">
+                <ui-textbox 
+                    :label="tr('mycomp_reason_label')"
+                    :placeholder="tr('mycomp_reason_ph')" 
+                    v-model="deleteReason"
+                >
+                </ui-textbox>
+            </div>
+            <div class="button_box"><button class="btn btn_orange" :class="{disabled: !deleteReason.length}" @click="deleteUser(userForDelete.id, deleteReason)">{{tr('mycomp_users_delete')}}</button></div>
+        </div>
+
+
+        <span class="status_modal_close" @click="deleteModalClose"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="messageUsersModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('validation_error')}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="usersModalClose"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="successUsersModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{tr('mycomp_successmodal_title')}}</p>
+                <p class="modal_text">{{tr('mycomp_successmodal_msg')}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="successModalClose"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

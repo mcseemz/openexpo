@@ -1,0 +1,121 @@
+<div class="page_wrapper static_nik_page" v-if="localesLoaded">
+
+	<!-- Hero -->
+    <div class="page-hero_wrapper">
+        <div class="page-hero content-wrapper">
+            <div class="breadcrumbs">
+                <ul class="breadcrumbs_list">
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('home')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'+routes.all_features" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('openexpo_features')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray ">
+                        <span class="breadcrumbs_link breadcrumbs_link--gray breadcrumbs_link--active">{{tr('page_advanced_search_title')}}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="hero_content">
+                <div class="hero_content_inner">
+                    <div class="hero_content_text hero_content_text--mr">
+                        <p class="hero_subtitle hero_subtitle--gray">{{tr('advanced_search_subtitle')}}</p>
+                        <h1 class="hero_title hero_title--gray ">{{tr('advanced_search_title')}}</h1>
+                        <p class="hero_text hero_text--gray">{{tr('advanced_search_text')}}</p>
+                        <div class="hero--btns">
+                            <router-link :to="'/'+routes.addevent" class="primary-btn">{{tr('create_event_btn')}}</router-link>
+                            <button @click="requestDemoClick" class="primary-btn primary-btn--reverse">{{tr('request_a_demo_btn')}}</button>
+                        </div>
+                    </div>
+                    <div class="hero_content_img">
+                        <img class="hero_img--people" src="@/img/static-pages/advanced-search/hero.jpg" alt="Advanced search at Openexpo!">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="page-main_wrapper">
+        <main class="page-main">
+            <!-- 1 -->
+            <article class="article-block article-block--m100 article-block--blue">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/advanced-search/1.jpg" alt="Quick search with tons of functionality">
+                    </div>
+                    <div class="article_header_content article_header_content-ml">
+                        <h2 class="article-title article-title-m0" v-html="tr('advanced_search_quicksearch_title')"></h2>
+                        <p class="article_text">{{tr('advanced_search_quicksearch_text')}}</p>
+                        <ul class="unordered_list">
+                            <li class="unordered_item">{{tr('advanced_search_quicksearch_text_tab1')}}</li>
+                            <li class="unordered_item">{{tr('advanced_search_quicksearch_text_tab2')}}</li>
+                            <li class="unordered_item">{{tr('advanced_search_quicksearch_text_tab3')}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 2 -->
+            <article class="article-block article-block--m100 article-block--white">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_header_content article_header_content-mr">
+                        <h2 class="article-title article-title-m0" v-html="tr('advanced_search_find_anything_title')"></h2>
+                        <p class="article_text">{{tr('advanced_search_find_anything_text')}}</p>
+                        <ul class="unordered_list">
+                            <li class="unordered_item">{{tr('advanced_search_find_anything_text_tab1')}}</li>
+                            <li class="unordered_item">{{tr('advanced_search_find_anything_text_tab2')}}</li>
+                            <li class="unordered_item">{{tr('advanced_search_find_anything_text_tab3')}}</li>
+                        </ul>
+                    </div>
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/advanced-search/2.jpg" alt="Find anything that interests you on the event!">
+                    </div>
+                </div>
+                <div class="article--litle-list content-wrapper article--litle-list--mt">
+                    <div class="article--little_item">
+                        <a href="#" class="article--little_link">
+                            <div class="article--little_img_wrapper">
+                                <img src="@/img/static-pages/advanced-search/l1.png" alt="People Search" class="article--little_img">
+                            </div>
+                            <div class="article--little_text_wrapper">
+                                <p class="article--little_title" v-html="tr('advanced_search_people_search_title')"></p>
+                                <p class="article--little_text">{{tr('advanced_search_people_search_text')}}</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="article--little_item">
+                        <a href="#" class="article--little_link">
+                            <div class="article--little_img_wrapper">
+                                <img src="@/img/static-pages/advanced-search/l2.png" alt="Stand Search" class="article--little_img">
+                            </div>
+                            <div class="article--little_text_wrapper">
+                                <p class="article--little_title" v-html="tr('advanced_search_stand_search_title')"></p>
+                                <p class="article--little_text">{{tr('advanced_search_stand_search_text')}}</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="article--little_item">
+                        <a href="#" class="article--little_link">
+                            <div class="article--little_img_wrapper">
+                                <img src="@/img/static-pages/advanced-search/l3.png" alt="Tag Search" class="article--little_img">
+                            </div>
+                            <div class="article--little_text_wrapper">
+                                <p class="article--little_title" v-html="tr('advanced_search_tage_search_title')"></p>
+                                <p class="article--little_text">{{tr('advanced_search_tage_search_text')}}</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 5 -->
+            <OtherFeatures></OtherFeatures>
+
+            <!-- 6 -->
+            <StaticBottomSection></StaticBottomSection>
+        </main>
+    </div>
+
+    <RequestDemo ref="request_demo"></RequestDemo>
+</div>

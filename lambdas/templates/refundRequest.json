@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "refundRequest",
+    "SubjectPart": "User requested a refund on the event '{{eventName}}'",
+    "HtmlPart": "Event: {{eventId}}, start date: {{startDate}}, status: {{eventStatus}}, pricing: {{pricingCost}} {{pricingCurrency}}, \nrelationship id: {{relationshipId}}, tier: {{tier}} ({{tierName}}), sponsorship type: {{entity}}, sponsor name: {{entityName}} ({{entityId}}), initiated by user: {{initiatorId}} ({{initiatorSide}}) \n User email: {{userEmail}}\n Event link:{{eventLink}}",
+    "TextPart": "Event: {{eventId}}, start date: {{startDate}}, status: {{eventStatus}}, pricing: {{pricingCost}} {{pricingCurrency}}, \nrelationship id: {{relationshipId}}, tier: {{tier}} ({{tierName}}), sponsorship type: {{entity}}, sponsor name: {{entityName}} ({{entityId}}), initiated by user: {{initiatorId}} ({{initiatorSide}}) \n User email: {{userEmail}}\n Event link:{{eventLink}}"
+  }
+}

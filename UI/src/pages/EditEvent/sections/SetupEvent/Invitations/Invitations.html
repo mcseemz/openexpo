@@ -1,0 +1,91 @@
+<div class="main preloader_wrapper">
+    <div class="preloader_overlay preload_overlay_white preload_overlay_semitrans" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+    <div class="main_form_box">
+	    <div class="main_section invitations_main_section">
+	      	<p class="text">{{tr('adev_inv_text')}}</p>
+	      	
+            <div class="form_input_row ">
+                <ui-textbox 
+                    :placeholder="tr('adev_inv_email_ph')" 
+                    v-model="email_addresses"
+                    class="ui-email-input"
+                    :invalid="addressTouched && !emailsValidation"
+                    v-on:touch.passive="addressTouched = true"
+                >
+                    <img slot="icon" src="../img/envelope_thin.svg" alt="">
+                </ui-textbox>  
+            </div>
+			
+			<div class="form_input_row">
+                <ui-textbox 
+                    :placeholder="tr('adev_inv_email_body_ph')" 
+                    v-model="mailtext"
+                    :multi-line="true"
+                    :autosize="false"
+                    >
+                </ui-textbox>
+			</div>
+
+            <div class="button_row_end flex">
+            	<button class="btn btn_orange" @click="send">{{tr('adev_send_invitation')}}</button>
+            </div>
+	    
+		</div>
+    </div>
+
+    <div class="main_form_box">
+
+        <div class="main_section managerequests_main_section">
+            
+            <p class="text">{{tr('adev_man_req_tab_text')}}</p>
+            <div class="form_input_row form_input_row_hqq flex">
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        :placeholder="tr('adev_search_companies')" 
+                        v-model="search"
+                        class="ui-search-input"
+                        :invalid="search.length > 100"
+                    >
+                        <img slot="icon" src="@/img/search_icon.svg" alt="">
+                    </ui-textbox>
+                </div>
+                <div class="form_input_qr">
+                    <ui-select
+                        :label="tr('status')"
+                        :placeholder="tr('all')"
+                        :options="statusList"
+                        v-model="status"
+                        iconPosition="right"
+                        class="ui-select-labelin"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+                <div class="form_input_qr">
+                    <ui-select
+                        :label="tr('order_by')"
+                        :placeholder="tr('select')"
+                        :options="orderByList"
+                        v-model="orderBy"
+                        iconPosition="right"
+                        class="ui-select-labelin"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+            </div>
+            <div class="mr_items" v-if="invitations && invitations.length">
+                <div class="mr_invitation_item flex" :key="item.id" v-for="item in invitations">
+                    <div class="left">
+                        <p class="name">{{item.email_to}}</p>
+                    </div>
+                    <div class="right">
+                        <span class="remove" @click="remove(item.id)">{{tr('remove')}}</span>
+                    </div>
+                </div>
+            </div>
+          
+        </div>
+
+    </div>
+</div>

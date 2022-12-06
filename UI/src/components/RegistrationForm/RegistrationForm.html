@@ -1,0 +1,476 @@
+<div class="register_form preloader_wrapper" :class="{withoutFox: withoutFox}" :lang="getLocaleName">
+    <!-- SIGN IN -->
+    <div class="main_section preloader_wrapper" v-if="!signedIn && currentForm === 'signinForm' && !userLoggedIn">
+        <div class="preloader_overlay preload_overlay_white" v-show="preload">
+            <ui-progress-circular color="primary"></ui-progress-circular>
+        </div>
+        <p class="reg_form_title">
+            {{ tr('sign_in') }}
+        </p>
+        <p class="reg_form_step" v-if="eventObj">
+            {{ tr('auth_step') }} 1 {{ tr('auth_of') }} 2
+        </p>
+        <p class="reg_form_text">
+            {{ customMsg ? customMsg : tr('auth_signin_text') }}
+        </p>
+        <div class="reg_form_row">
+            <div v-if="errorEmail" style="height: 0px">
+                <span class="error-email-txt">{{ tr('auth_error_email') }}</span>
+            </div>
+
+            <ui-textbox
+                    :label="tr('email')"
+                    :placeholder="tr('auth_email_placeholder2')"
+                    type="email"
+                    name="email"
+                    :class="{ errorEmail: errorEmail}"
+                    v-model="login"
+                    @keydown-enter="signIn"
+                    :disabled="fixed_email"
+            >
+            </ui-textbox>
+        </div>
+        <div class="reg_form_row reg_form_mb16">
+            <ui-textbox
+                    :label="tr('password')"
+                    :placeholder="tr('auth_pwd_placeholder')"
+                    type="password"
+                    v-model="password"
+                    @keydown-enter="signIn"
+            >
+            </ui-textbox>
+        </div>
+
+        <div class="reg_form_row flex jcsb" v-if="!onlySignIn">
+            <!-- <ui-checkbox v-model="rememberCheck">
+                {{tr('auth_rememberme')}}
+            </ui-checkbox> -->
+            <span></span>
+            <span class="reg_form_link" @click="goToResetPass">{{ tr('auth_i_forgot_pwd') }}</span>
+        </div>
+        <div class="reg_form_row button_row">
+            <button class="btn btn_orange" @click="signIn">{{ tr('sign_in') }}</button>
+        </div>
+        <div class="reg_form_row reg_form_mb16" v-if="!onlySignIn">
+            <p class="text">
+                {{ tr('auth_dont_have_account') }} <span class="reg_form_link"
+                                                         @click="goToRegister">{{ tr('register') }}</span>
+            </p>
+        </div>
+        <div v-if="!withoutSocials" class="reg_form_row reg_form_mb16">
+            <p class="text">
+                {{ tr('or') }}
+            </p>
+        </div>
+        <div class="reg_form_row reg_form_fw_button">
+            <button @click="signInWithEmailOnly" class="btn btn-google"><img src="@/img/email.svg"
+                                                                             alt="">{{ tr('auth_signin_email_only') }}
+            </button>
+        </div>
+        <div v-if="!withoutSocials" class="reg_form_row reg_form_fw_button">
+            <button @click="signInGoogle" class="btn btn-google"><img src="@/img/google-icon.svg"
+                                                                      alt="">{{ tr('auth_signin_google') }}
+            </button>
+        </div>
+        <div v-if="!withoutSocials" class="reg_form_row reg_form_fw_button">
+            <button @click="signInLinkedin" class="btn btn-linkedin"><img src="./img/Linkedin.svg"
+                                                                          alt="">{{ tr('auth_signin_linkedin') }}
+            </button>
+        </div>
+    </div>
+    <!-- RESET PASSWORD -->
+    <div class="main_section preloader_wrapper" v-if="!signedIn && currentForm === 'resetPassForm' && !userLoggedIn">
+        <div class="preloader_overlay preload_overlay_white" v-show="preload">
+            <ui-progress-circular color="primary"></ui-progress-circular>
+        </div>
+        <p class="reg_form_title">
+            {{ tr('auth_reset_password') }}
+        </p>
+        <p class="reg_form_text" v-if="forgotCodeSent">
+            {{ tr('auth_reset_code_sent') }}
+        </p>
+        <div class="reg_form_row" v-if="!forgotCodeSent">
+            <div v-if="errorEmail" style="height: 0px">
+                <span class="error-email-txt">{{ tr('auth_error_email') }}</span>
+            </div>
+            <ui-textbox
+                    :label="tr('email')"
+                    :placeholder="tr('auth_email_placeholder2')"
+                    :class="{ errorEmail: errorEmail}"
+                    type="email"
+                    v-model="login"
+                    @keydown-enter="forgotPassword"
+            >
+            </ui-textbox>
+        </div>
+        <div class="reg_form_row" v-if="forgotCodeSent">
+            <ui-textbox
+                    :label="tr('auth_code')"
+                    :placeholder="tr('auth_code')"
+                    type="text"
+                    v-model="forgotCode"
+                    @keydown-enter="forgotPasswordSubmit"
+            >
+            </ui-textbox>
+        </div>
+        <div class="reg_form_row reg_form_mb16" v-if="forgotCodeSent">
+            <ui-textbox
+                    :label="tr('password')"
+                    :placeholder="tr('auth_pwd_placeholder')"
+                    type="password"
+                    v-model="password"
+                    @input="passValidation(password)"
+                    @keydown-enter="forgotPasswordSubmit"
+            >
+            </ui-textbox>
+        </div>
+        <div class="reg_form_row pwd_validation_box flex reg_form_mb16" v-if="forgotCodeSent">
+            <div class="left">
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.length), 'err': (pwd_validation.dirty && !pwd_validation.length) }">
+                    {{ tr('auth_valid_char') }}</p>
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.upper), 'err': (pwd_validation.dirty && !pwd_validation.upper) }">
+                    {{ tr('auth_valid_upper') }}</p>
+            </div>
+            <div class="right">
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.number), 'err': (pwd_validation.dirty && !pwd_validation.number) }">
+                    {{ tr('auth_valid_num') }}</p>
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.special), 'err': (pwd_validation.dirty && !pwd_validation.special) }">
+                    {{ tr('auth_valid_special') }}</p>
+            </div>
+        </div>
+
+        <div class="reg_form_row reg_form_mb16" v-if="!forgotCodeSent">
+            <p class="text">
+                {{ tr('auth_already_have_an_account') }} <span class="reg_form_link"
+                                                               @click="goToSignin">{{ tr('sign_in') }}</span>
+            </p>
+        </div>
+        <div class="reg_form_row button_row">
+            <button v-if="!forgotCodeSent" class="btn btn_orange" @click="forgotPassword">{{ tr('auth_reset') }}
+            </button>
+            <button v-if="forgotCodeSent" class="btn btn_orange" @click="forgotPasswordSubmit">
+                {{ tr('auth_update_password') }}
+            </button>
+        </div>
+
+    </div>
+    <!-- CREATE NEW PASSWORD -->
+    <div class="main_section preloader_wrapper" v-if="!signedIn && currentForm === 'newPasswordRequired'">
+        <div class="preloader_overlay preload_overlay_white" v-show="preload">
+            <ui-progress-circular color="primary"></ui-progress-circular>
+        </div>
+        <p class="reg_form_title">
+            {{ tr('auth_create_new_password') }}
+        </p>
+        <div class="reg_form_row reg_form_mb16">
+            <ui-textbox
+                    :label="tr('password')"
+                    :placeholder="tr('auth_pwd_placeholder')"
+                    type="password"
+                    v-model="newPassword"
+                    @input="passValidation(newPassword)"
+                    @keydown-enter="newPasswordRequiredSubmit"
+            >
+            </ui-textbox>
+        </div>
+        <div class="reg_form_row pwd_validation_box flex reg_form_mb16">
+            <div class="left">
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.length), 'err': (pwd_validation.dirty && !pwd_validation.length) }">
+                    {{ tr('auth_valid_char') }}</p>
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.upper), 'err': (pwd_validation.dirty && !pwd_validation.upper) }">
+                    {{ tr('auth_valid_upper') }}</p>
+            </div>
+            <div class="right">
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.number), 'err': (pwd_validation.dirty && !pwd_validation.number) }">
+                    {{ tr('auth_valid_num') }}</p>
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.special), 'err': (pwd_validation.dirty && !pwd_validation.special) }">
+                    {{ tr('auth_valid_special') }}</p>
+            </div>
+        </div>
+
+        <div class="reg_form_row button_row">
+            <button class="btn btn_orange" @click="newPasswordRequiredSubmit">{{ tr('auth_update_password') }}</button>
+        </div>
+
+    </div>
+    <!-- REGISTER -->
+    <div class="main_section preloader_wrapper"
+         v-if="!onlySignIn && !signedIn && currentForm === 'registerForm' && !user && !userLoggedIn">
+        <div class="preloader_overlay preload_overlay_white" v-show="preload">
+            <ui-progress-circular color="primary"></ui-progress-circular>
+        </div>
+        <p class="reg_form_title">
+            {{ tr('register') }}
+        </p>
+        <p class="reg_form_text">
+            {{ customMsg ? customMsg : tr('auth_register_text') }}
+        </p>
+        <div class="reg_form_row">
+            <div v-if="errorEmail" style="height: 0px">
+                <span class="error-email-txt">{{ tr('auth_error_email') }}</span>
+            </div>
+            <ui-textbox
+                    :label="tr('email')"
+                    :placeholder="tr('auth_email_placeholder2')"
+                    :class="{ errorEmail: errorEmail}"
+                    type="text"
+                    v-model="reg_login"
+                    :disabled="fixed_email"
+            >
+            </ui-textbox>
+        </div>
+
+        <div class="reg_form_row reg_form_mb16">
+            <ui-textbox
+                    :label="tr('password')"
+                    :placeholder="tr('auth_pwd_placeholder')"
+                    type="password"
+                    v-model="reg_password"
+                    @input="passValidation(reg_password)"
+            >
+            </ui-textbox>
+        </div>
+        <div class="reg_form_row pwd_validation_box flex reg_form_mb16">
+            <div class="left">
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.length), 'err': (pwd_validation.dirty && !pwd_validation.length) }">
+                    {{ tr('auth_valid_char') }}</p>
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.upper), 'err': (pwd_validation.dirty && !pwd_validation.upper) }">
+                    {{ tr('auth_valid_upper') }}</p>
+            </div>
+            <div class="right">
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.number), 'err': (pwd_validation.dirty && !pwd_validation.number) }">
+                    {{ tr('auth_valid_num') }}</p>
+                <p class="validation_item"
+                   v-bind:class="{ ok: (pwd_validation.dirty && pwd_validation.special), 'err': (pwd_validation.dirty && !pwd_validation.special) }">
+                    {{ tr('auth_valid_special') }}</p>
+            </div>
+        </div>
+        <div class="reg_form_row">
+            <ui-textbox
+                    :label="tr('repeat_password')"
+                    :placeholder="tr('auth_repeat_pwd_placeholder')"
+                    type="password"
+                    v-model="reg_password_repeat"
+            >
+            </ui-textbox>
+        </div>
+        <div class="reg_form_row button_row">
+            <button class="btn btn_orange" @click="submit()">{{ tr('register') }}</button>
+        </div>
+        <div class="reg_form_row reg_form_mb16">
+            <p class="text">
+                {{ tr('auth_already_have_an_account') }} <span class="reg_form_link"
+                                                               @click="goToSignin">{{ tr('sign_in') }}</span>
+            </p>
+        </div>
+        <div v-if="!withoutSocials" class="reg_form_row reg_form_mb16">
+            <p class="text">
+                {{ tr('or') }}
+            </p>
+        </div>
+        <div v-if="!withoutSocials" class="reg_form_row reg_form_fw_button">
+            <button @click="signInGoogle" class="btn btn-google"><img src="@/img/google-icon.svg"
+                                                                      alt="">{{ tr('auth_signin_google') }}
+            </button>
+        </div>
+        <div v-if="!withoutSocials" class="reg_form_row reg_form_fw_button">
+            <button @click="signInLinkedin" class="btn btn-linkedin"><img src="./img/Linkedin.svg"
+                                                                          alt="">{{ tr('auth_signin_linkedin') }}
+            </button>
+        </div>
+    </div>
+    <!-- VERIFY EMAIL -->
+    <div class="main_section preloader_wrapper"
+         v-if="!onlySignIn && !signedIn && currentForm === 'registerForm' && user && !userLoggedIn">
+        <div class="preloader_overlay preload_overlay_white" v-show="preload">
+            <ui-progress-circular color="primary"></ui-progress-circular>
+        </div>
+        <p class="reg_form_title">
+            {{ tr('auth_thanks_for_registration') }}
+        </p>
+        <p class="reg_form_text">
+            {{ tr('auth_verify_email_address') }}
+        </p>
+        <div class="reg_form_row button_row">
+            <button class="btn btn_orange" @click="goToSignin">{{ tr('sign_in') }}</button>
+        </div>
+    </div>
+    <!-- CUSTOM FIELDS -->
+    <div class="main_section preloader_wrapper"
+         v-if="currentForm === 'customFields' && userData && parsedCustomField.length">
+        <div class="preloader_overlay preload_overlay_white" v-show="preload">
+            <ui-progress-circular color="primary"></ui-progress-circular>
+        </div>
+
+        <p class="reg_form_title">
+            {{ tr('register') }}
+        </p>
+        <p class="reg_form_step" v-if="!userLoggedIn">
+            {{ tr('auth_step') }} 2 {{ tr('auth_of') }} 2
+        </p>
+        <p class="reg_form_text">
+            {{ tr('auth_fields_text') }}
+        </p>
+
+        <div class="reg_form_row" v-for="field in userFields">
+
+            <ui-textbox
+                    v-if="field.type == 'text'"
+                    :label="field.name"
+                    :placeholder="field.name"
+                    type="text"
+                    v-model="userData.customFields[field.fieldname]"
+                    @input="forceUpdate"
+            >
+            </ui-textbox>
+            <ui-select
+                    v-if="field.type == 'select'"
+                    :label="field.name"
+                    :options="field.options"
+                    placeholder="Select..."
+                    v-model="userData.customFields[field.fieldname]"
+                    iconPosition="right"
+                    @input="forceUpdate"
+            >
+                <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+            </ui-select>
+            <ui-select
+                    v-if="field.type == 'multiselect'"
+                    :label="field.name"
+                    :multiple="true"
+                    :options="field.options"
+                    placeholder="Select..."
+                    v-model="userData.customFields[field.fieldname]"
+                    iconPosition="right"
+                    @input="forceUpdate"
+            >
+                <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+            </ui-select>
+        </div>
+
+
+        <div class="reg_form_row button_row">
+            <button class="btn btn_orange" @click="saveProfileFields">{{ tr('register') }}</button>
+        </div>
+
+    </div>
+    <!-- PASSWORDLESS LOGIN -->
+    <div class="main_section preloader_wrapper" v-if="currentForm === 'passwordless' && !userLoggedIn">
+        <div class="preloader_overlay preload_overlay_white" v-show="preload">
+            <ui-progress-circular color="primary"></ui-progress-circular>
+        </div>
+        <p class="reg_form_title">{{ tr('sign_in') }}</p>
+        <p class="reg_form_text">{{ tr('auth_email_text') }}</p>
+        <div class="reg_form_row">
+            <ui-textbox
+                    :label="tr('email')"
+                    :placeholder="tr('auth_email_placeholder2')"
+                    type="text"
+                    v-model="emailForCode"
+                    @keydown-enter="sendOneTimeCode"
+            />
+        </div>
+        <div class="reg_form_row button_row mb-48">
+            <button class="btn btn_orange" @click="sendOneTimeCode">{{ tr('auth_onetime_code') }}</button>
+        </div>
+        <div class="reg_form_row reg_form_fw_button">
+            <button @click="signInWithEmailAndPass" class="btn btn-google"><img src="@/img/email.svg"
+                                                                                alt="">{{ tr('auth_signin_email_pass') }}
+            </button>
+        </div>
+        <div v-if="!withoutSocials" class="reg_form_row reg_form_fw_button">
+            <button @click="signInGoogle" class="btn btn-google"><img src="@/img/google-icon.svg"
+                                                                      alt="">{{ tr('auth_signin_google') }}
+            </button>
+        </div>
+        <div v-if="!withoutSocials" class="reg_form_row reg_form_fw_button">
+            <button @click="signInLinkedin" class="btn btn-linkedin"><img src="./img/Linkedin.svg"
+                                                                          alt="">{{ tr('auth_signin_linkedin') }}
+            </button>
+        </div>
+    </div>
+    <!-- PASSWORDLESS SECOND STEP -->
+    <div class="main_section preloader_wrapper" v-if="currentForm === 'passwordlessSecondStep' && !userLoggedIn">
+        <div class="preloader_overlay preload_overlay_white" v-show="preload">
+            <ui-progress-circular color="primary"></ui-progress-circular>
+        </div>
+        <p class="reg_form_title">{{ tr('sign_in') }}</p>
+        <p class="reg_form_text">{{ tr('auth_signin_text') }}</p>
+        <div class="reg_form_row relative">
+            <ui-textbox
+                    ref="codeFromEmail"
+                    :label="tr('auth_enter_code')"
+                    :placeholder="tr('auth_enter_code_ph')"
+                    type="text"
+                    v-model="codeFromEmail"
+                    @keydown-enter="confirmOneTimeCode"
+            />
+            <div class="code-time color-grey text-10" v-if="getExpiredTime">{{ getExpiredTime }}</div>
+        </div>
+        <div class="reg_form_row button_row mb-36 resend-code">
+            <span class="color-orange text-small" @click="sendOneTimeCode">{{ tr('resend_code') }}</span>
+        </div>
+        <div class="reg_form_row button_row mb-48">
+            <button class="btn btn_orange" @click="confirmOneTimeCode">{{ tr('sign_in') }}</button>
+        </div>
+        <div class="reg_form_row reg_form_fw_button">
+            <button @click="signInWithEmailAndPass" class="btn btn-google"><img src="@/img/email.svg"
+                                                                                alt="">{{ tr('auth_signin_email_pass') }}
+            </button>
+        </div>
+        <div v-if="!withoutSocials" class="reg_form_row reg_form_fw_button">
+            <button @click="signInGoogle" class="btn btn-google"><img src="@/img/google-icon.svg"
+                                                                      alt="">{{ tr('auth_signin_google') }}
+            </button>
+        </div>
+        <div v-if="!withoutSocials" class="reg_form_row reg_form_fw_button">
+            <button @click="signInLinkedin" class="btn btn-linkedin"><img src="./img/Linkedin.svg"
+                                                                          alt="">{{ tr('auth_signin_linkedin') }}
+            </button>
+        </div>
+    </div>
+
+    <ui-modal ref="regSBModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{ currentForm == 'registerForm' ? 'Registration error' : 'Login error' }}</p>
+                <p class="modal_text" v-html="modalMsg">{{ modalMsg }}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="regSBModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="errorModal" class="status_modal fields_error_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_text">{{ tr('se_fill_all_custom_fields') }}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="closeErrorModal"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="errorCodeModal" class="status_modal fields_error_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_text">{{ errorMessage }}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="closeErrorCodeModal"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>
+
+

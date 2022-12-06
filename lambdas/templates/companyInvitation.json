@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "CompanyInvitation",
+    "SubjectPart": "Invitation to join the company",
+    "HtmlPart": "You are invited to join a company: {{company}}<br/><br/>Message: {{text}}<br/><br/>Accept:{{url}}",
+    "TextPart": "You are invited to join a company: {{company}}<br/><br/>Message: {{text}}<br/><br/>Accept:{{url}}"
+  }
+}

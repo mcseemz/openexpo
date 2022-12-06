@@ -1,0 +1,42 @@
+{
+  "name": "tex-cw-lambdas",
+  "private": true,
+  "version": "6.13.20",
+  "description": "Lambdas related to Cloudwatch events.",
+  "repository": {
+    "type": "git",
+    "serverType": "stash",
+    "url": "https://tbd.com"
+  },
+  "author": {
+    "name": "mcseemz+github@gmail.com"
+  },
+  "bugs": {
+    "type": "jira",
+    "url": "https://tbd.com",
+    "project": "Openexpo",
+    "component": "rest-api-lambdas"
+  },
+  "engines": {
+    "node": ">= 4.2.3",
+    "npm": ">= 2.14"
+  },
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint --ignore-path .gitignore .",
+    "aws": "babel-node scripts/deploy",
+    "deploy": "npm run dist && npm run aws",
+    "dist": "npm run clean && npm run build && npm run dependencies && npm run compress",
+    "build": "babel src --out-dir dist",
+    "clean": "rm -fr dist && rm -fr dist.zip",
+    "dependencies": "cp ./package.json ./dist/package.json && npm --only=production --prefix ./dist install ./dist",
+    "compress": "zip -r dist.zip dist",
+    "test": "npm run lint && nyc --reporter=text ava",
+    "test:watch": "ava --watch"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "mime-types": "2.1.27",
+    "slugify": "1.4.5"
+  }
+}

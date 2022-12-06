@@ -1,0 +1,65 @@
+<div class="tabs_ourstaff">
+    <div class="container">
+        <h2 class="title">{{tr('ss_staff_title')}}</h2>
+
+        <p class="text">{{tr('ss_staff_text_1string')}}</p>
+        <p class="text">{{tr('ss_staff_text_2string')}}</p>
+
+        <!-- <div class="filter_box">
+            <div class="form_input_row flex">
+                <div class="form_input_qr">
+                    <ui-select
+                        :label="tr('order_by')"
+                        :placeholder="tr('alphabetical_name')"
+                        :options="companyFilterList"
+                        v-model="companyFilter"
+                        iconPosition="right"
+                        class="ui-select-labelin"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+
+                <div class="form_input_qr">
+                    <ui-select
+                        :label="tr('ss_staff_departments_label')"
+                        :placeholder="tr('ss_staff_departments_ph')"
+                        :options="companyFilterList"
+                        v-model="companyFilter"
+                        iconPosition="right"
+                        class="ui-select-labelin"
+                    >
+                        <img slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+            </div>
+        </div> -->
+        <div class="staff_items flex">
+            <div class="staff_item" v-for="item in personnelsList">
+                <div class="top flex">
+                    <div class="image_box">
+                        <img :src="'https://'+configs.binary+'/'+item.branding[0].url" v-if="item.branding && item.branding.length" alt="">
+                        <img src="@/img/default_avatar.svg" alt="" v-if="!item.branding || !item.branding.length">
+                    </div>
+                    <div class="info_box">
+                        <p class="name">{{item.name}} {{item.surname}}</p>
+                        <p class="role">{{item.position}}</p>
+                        <p class="company">{{company.name}}</p>
+                    </div>
+                    <div class="social_box">
+                        <a :href="company.address.facebook" v-if="company.address && company.address.facebook" class="social_link fb" target="_blank"><img src="./img/fb.svg" alt=""></a>
+                        <a :href="company.address.twitter" v-if="company.address && company.address.twitter" class="social_link tw" target="_blank"><img src="./img/tw.svg" alt=""></a>
+                        <a :href="company.address.linkedin" v-if="company.address && company.address.linkedin" class="social_link in" target="_blank"><img src="./img/in.svg" alt=""></a>
+                    </div>
+                </div>
+                <div class="bottom flex">
+                    <button class="btn btn_orange" @click="openScheduleMeetingModal(item)">{{tr('ss_staff_schedule_meeting')}}</button>
+                    <router-link :to="'/'+routes.chat+'/'+routes.stand+'/'+standObj.id+'/presenter/'+item.id" class="btn btn_owhite">{{tr('ss_staff_start_chat')}}</router-link>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <StaffScheduleMeeting ref="staffScheduleMeeting" :person="scheduleMeetingPerson" :standObj="standObj" :eventObj="eventObj" ></StaffScheduleMeeting>
+
+</div>

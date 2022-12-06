@@ -1,0 +1,20 @@
+<div class="main_sections_wrapper">
+
+    <div class="main_section event_datetime_section customize_custom_fields_row">
+        <h3 class="big_text form_section_title">{{tr('adev_user_customfields_title')}}</h3>
+        <p class="form_section_text">{{tr('adev_user_customfields_text')}}</p>
+
+        <div class="form_checkbox_row flex flex_wrap ">
+            <ui-checkbox 
+            v-for="field in customFields"
+            v-model="field.value" 
+            color="accent" 
+            :checked="field.value"
+            >
+                {{field.label}}
+            </ui-checkbox>
+        </div>
+
+    </div>
+    
+</div>

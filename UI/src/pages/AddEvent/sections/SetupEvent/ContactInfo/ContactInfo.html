@@ -1,0 +1,121 @@
+<div class="main">
+    <div class="main_form_box">
+        <div class="main_section contact_info_main_section">
+      
+            <p class="main_section_title big_text">
+                Company Contact
+            </p>
+
+       
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        label="Email address*" 
+                        type="email"
+                        placeholder="Ex. you@example.com" 
+                        v-model="emailVal"
+                    >
+                    </ui-textbox>    
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        label="Phone number" 
+                        type="tel"
+                        placeholder="Ex. 666 666 666" 
+                        v-model="phoneVal"
+                    >
+                    </ui-textbox>    
+                </div>
+                
+            </div>
+
+            <div class="form_checkbox_row">
+                <ui-checkbox v-model="showContactCheck" color="accent">
+                    I would like to show my contact information as email and phone on my event page
+                </ui-checkbox>
+            </div>
+    
+        </div>
+
+        <div class="main_section contact_info_main_section">
+      
+            <p class="main_section_title big_text">
+                Social Network
+            </p>
+
+       
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        label="Facebook" 
+                        type="text"
+                        placeholder="facebook.com/" 
+                        v-model="fb"
+                    >
+                    </ui-textbox>    
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        label="Linkedin" 
+                        type="text"
+                        placeholder="linkedin.com/" 
+                        v-model="lin"
+                    >
+                    </ui-textbox>    
+                </div>
+                
+            </div>
+
+            <div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        label="Twitter" 
+                        type="text"
+                        placeholder="@" 
+                        v-model="tw"
+                    >
+                    </ui-textbox>    
+                </div>
+
+                <div class="form_input_hr">
+                    <ui-textbox 
+                        label="Instagram" 
+                        type="text"
+                        placeholder="instagram.com/" 
+                        v-model="inst"
+                    >
+                    </ui-textbox>    
+                </div>
+                
+            </div>
+    
+        </div>
+
+        <div class="main_section contact_info_main_section">
+      
+            <p class="main_section_title big_text">
+                Website
+            </p>
+
+       
+            <div class="form_input_row">
+
+                <ui-textbox 
+                    type="text"
+                    placeholder="http://" 
+                    v-model="website"
+                >
+                </ui-textbox>    
+                
+            </div>
+    
+        </div>
+
+
+    </div>
+</div>

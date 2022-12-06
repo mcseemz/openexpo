@@ -1,0 +1,144 @@
+<div class="page_wrapper static_nik_page" v-if="localesLoaded">
+
+	<!-- Hero -->
+    <div class="page-hero_wrapper">
+        <div class="page-hero content-wrapper">
+            <div class="breadcrumbs">
+                <ul class="breadcrumbs_list">
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('home')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'+routes.all_features" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('openexpo_features')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray ">
+                        <span class="breadcrumbs_link breadcrumbs_link--gray breadcrumbs_link--active">{{tr('page_inhouse_broadcast_title')}}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="hero_content hero_content--center--90">
+                <div class="hero_content_inner hero_content_inner--center">
+                    <div class="hero_content_text hero_content_text--center ">
+
+                        <p class="hero_subtitle hero_subtitle--gray">{{tr('inhouse_broadcast_subtitle')}}</p>
+                        <h1 class="hero_title hero_title--gray">{{tr('inhouse_broadcast_title')}}</h1>
+                        <p class="hero_text w70--center hero_text--gray">{{tr('inhouse_broadcast_text')}}</p>
+
+                        <div class="hero_content_img hero_content_img--w68 hero_content_img--top-m30">
+                            <img class="hero_img--people" src="@/img/static-pages/inhouse-broadcast/hero.jpg" alt="In-House video broadcast with Openexpo!">
+                        </div>
+
+                        <div class="hero--btns hero--btns--center hero--btns--m30">
+                            <router-link :to="'/'+routes.addevent" class="primary-btn">{{tr('create_event_btn')}}</router-link>
+                            <button @click="requestDemoClick" class="primary-btn primary-btn--reverse">{{tr('request_a_demo_btn')}}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="page-main_wrapper">
+        <main class="page-main">
+            <!-- 1 -->
+            <article class="article-block article-block--m100 article-block--blue">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/inhouse-broadcast/multiple-presenters@2x.png" alt="Multiple presenters">
+                    </div>
+                    <div class="article_header_content article_header_content-ml">
+                        <h2 class="article-title article-title-m0" v-html="tr('multiple_presenters_on_video_title')"></h2>
+                        <p class="article_text">{{tr('multiple_presenters_on_video_text')}}</p>
+                        <ul class="unordered_list">
+                            <li class="unordered_item">{{tr('multiple_presenters_on_video_tab1')}}</li>
+                            <li class="unordered_item">{{tr('multiple_presenters_on_video_tab2')}}</li>
+                            <li class="unordered_item">{{tr('multiple_presenters_on_video_tab3')}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 2 -->
+            <article class="article-block article-block--m100 article-block--white">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_header_content article_header_content-mr">
+                        <h2 class="article-title article-title-m0" v-html="tr('always_in_control_title')"></h2>
+                        <p class="article_text">{{tr('always_in_control_text')}}</p>
+                        <ul class="unordered_list">
+                            <li class="unordered_item">{{tr('always_in_control_tab1')}}</li>
+                            <li class="unordered_item">{{tr('always_in_control_tab2')}}</li>
+                            <li class="unordered_item">{{tr('always_in_control_tab3')}}</li>
+                        </ul>
+                    </div>
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/inhouse-broadcast/management@2x.png" alt="Always in control!">
+                    </div>
+                </div>
+            </article>
+
+            <!-- 3 -->
+            <article class="article-block article-block--m100 article-block--blue">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/inhouse-broadcast/chat-for-everyone@2x.png" alt="Chat for everyone and Q&A feature for presenters!">
+                    </div>
+                    <div class="article_header_content article_header_content-ml">
+                        <h2 class="article-title article-title-m0" v-html="tr('chat_for_everyone_title')"></h2>
+                        <p class="article_text">{{tr('chat_for_everyone_text1')}}</p>
+                        <p class="article_text">{{tr('chat_for_everyone_text2')}}</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 4 -->
+            <article class="article-block article-block--m100 article-block--white">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_header_content article_header_content-mr">
+                        <h2 class="article-title article-title-m0" v-html="tr('screen_sharing_title')"> </h2>
+                        <p class="article_text">{{tr('screen_sharing_text1')}}</p>
+                        <p class="article_text">{{tr('screen_sharing_text2')}}</p>
+                    </div>
+                    <div class="article_img_wrapper">
+                    </div>
+                </div>
+            </article>
+
+            <!-- 5 -->
+            <article class="article-block article-block--m100 article-block--blue">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/inhouse-broadcast/small-broadcast@2x.png" alt="Go anywhere and never loose track of the broadcast">
+                    </div>
+                    <div class="article_header_content article_header_content-ml">
+                        <h2 class="article-title article-title-m0" v-html="tr('go_anywhere_title')"></h2>
+                        <p class="article_text">{{tr('go_anywhere_text1')}}</p>
+                        <p class="article_text">{{tr('go_anywhere_text2')}}</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 6 -->
+            <article class="article-block article-block--m100 article-block--white">
+                <div class="article_header article_header--center content-wrapper">
+                    <div class="article_header_content article_header_content-mr">
+                        <h2 class="article-title article-title-m0" v-html="tr('let_visitors_know_title')"></h2>
+                        <p class="article_text">{{tr('let_visitors_know_text1')}}</p>
+                        <p class="article_text">{{tr('let_visitors_know_text2')}}</p>
+                    </div>
+                    <div class="article_img_wrapper">
+                        <img class="article_img" src="@/img/static-pages/inhouse-broadcast/who-is-on-screen@2x.png" alt="Let viewers know who is on screen!">
+                    </div>
+                </div>
+            </article>
+
+            <!-- 5 -->
+            <OtherFeatures></OtherFeatures>
+
+            <!-- 6 -->
+            <StaticBottomSection></StaticBottomSection>
+        </main>
+    </div>
+
+    <RequestDemo ref="request_demo"></RequestDemo>
+</div>

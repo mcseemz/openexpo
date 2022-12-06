@@ -1,0 +1,22 @@
+{
+  "virtual_film_festival_subtitle": "Virtual festival platform",
+  "virtual_film_festival_title": "Host a virtual festival with Openexpo!",
+  "virtual_film_festival_text": "Whether you are hosting a <span class\"orange\">film</span> festival or any other kind of festival, you came to the right place. Our platform gives one all kinds of customisations and fun and simple interaction!",
+  "make_your_festival_unique_title": "Make your festival <span class=\"orange\">unique!</span>",
+  "add_cinemas_to_your_event_title": "Add <span class=\"orange\">cinemas</span> to your event!",
+  "adding_cinemas_to_your_event_title": "Adding <span class=\"orange\">‘cinemas’</span> to your event!",
+  "adding_cinemas_to_your_event_text": "Our platform allows you to stream numerous movies in different schedules per so called cinema.",
+  "adding_cinemas_to_your_event_tab1": "You can find all films in the “Our cinemas Tab”",
+  "adding_cinemas_to_your_event_tab2": "Discuss the films or chat directly with representatives",
+  "adding_cinemas_to_your_event_tab3": "From here you can either schedule meeting or start chat with them",
+  "create_schedule_for_cinema_title": "<span class=\"orange\">Create schedule</span> for each cinema",
+  "create_schedule_for_cinema_text": "Creating a schedule for a virtual cinema is important, attendees would be able to track the workshops, streamed videos or presentations",
+  "create_schedule_for_cinema_tab1": "Select start date for session",
+  "create_schedule_for_cinema_tab2": "Add description",
+  "create_schedule_for_cinema_tab3": "Add speakers to the agenda",
+  "add_videos_youtube_title": "<span class=\"orange\">Add videos</span> from Youtube or Vimeo to your agenda",
+  "add_videos_youtube_text": "A number of festival creators store their videos on services like Youtube or Vimeo. We make it possible to add a link to the vimeo video,so it can become part of the streaming schedule.",
+  "add_videos_youtube_tab1": "Use Youtube or Vimeo as the video source",
+  "add_videos_youtube_tab2": "Broadcast yourself through In-House video or Twitch",
+  "add_videos_youtube_tab3": "Add multiple sources in one video"
+}

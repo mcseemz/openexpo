@@ -1,0 +1,227 @@
+<div>
+<ui-modal ref="registerModal" class="empty_modal with_fox header_padding" removeHeader size="auto">
+    <div class="status_modal_wrapper">
+        <RegistrationForm v-if="!userData"></RegistrationForm>
+    </div>
+
+    <span class="status_modal_close with_fox" @click="closeRegisterModal"><img src="@/img/close_medium.svg" alt=""></span>
+</ui-modal>
+<header class="header" :lang="getLocaleName" :class="{no_shadow: headerType == 'event_visitor'}">
+
+	<div class="header_mobile_overlay" v-if="mobileVisible" @click="mobileVisible = false">
+
+	</div>
+	<div class="container">
+		<div class="header_wrapper flex">
+
+			<div v-if="ready" class="header_left flex">
+				<Logo :dateData="dateData" v-if="!changedLogo && headerType != 'event_visitor'"></Logo>
+
+				<span v-if="headerType == 'event_visitor' && !changedLogo" @click="refreshPage" class="logo">
+                    <h2>Openexpo</h2>
+				</span>
+				<span to="/" @click="refreshPage" class="logo" v-if="changedLogo && logoType != 'stand'">
+					<img :src="changedLogo" class="logo_img">
+				</span>
+				<router-link :to="'/'+routes.event+'/'+logoEventId" class="logo" v-if="changedLogo && logoType == 'stand'">
+					<img :src="changedLogo" class="logo_img">
+				</router-link>
+				<!-- <div class="header_search search_input_block">
+					<input type="search" class="search_input" placeholder="Search for events">
+					<a href="#" class="search_btn"><img src="./img/search_icon.svg" alt=""></a>
+				</div> -->
+				<div class="header_event_icon_box" v-if="headerType == 'event_visitor'">
+					<div class="live_event" v-if="isLive && headerTypeData && headerType == 'event_visitor'">
+						{{tr('live')}}
+					</div>
+					<div v-if="visitorsCount && headerTypeData && headerType == 'event_visitor'" class="header_counter pa_horizontal_10">
+						<img src="@/img/visitor.svg" alt=""><span>: {{visitorsCount}}</span>
+					</div>
+				</div>
+
+				<!-- <div class="liveMarker" v-if="!isLive">{{tr('se_event_live')}}</div> -->
+			</div>
+
+			<HeaderSearch :pageType="pageType" :pageId="pageId" :pageName="pageName"></HeaderSearch>
+
+			<div v-if="headerType == 'event_visitor' && false" class="header_center flex">
+				<span>{{headerTypeData.name}}</span>
+			</div>
+			<div class="header_mobile_button" @click="mobileVisible = true">
+				<div class="hamblock"></div>
+				<div class="hamblock"></div>
+				<div class="hamblock"></div>
+			</div>
+			<div v-if="ready" class="header_right flex" :class="{mobile_visible: mobileVisible}">
+				<!-- <ui-progress-linear color="black" v-show="isLoading || !userFetched"></ui-progress-linear> -->
+				<span class="header_mobile_close" v-if="mobileVisible" @click="mobileVisible = false"><img src="@/img/close_medium.svg" alt=""></span>
+				<nav class="nav" v-show="!isLoading && userFetched">
+					<ul class="nav_menu">
+						<li class="nav_menu_item dropdown_menu_item">
+							<span id="nav_addevent" v-if="!mobileVisible" class="nav_menu_link dropdown" @mouseover="dropdownMouseOver">{{tr('header_product')}}</span>
+							<span id="nav_addevent" v-if="mobileVisible" class="nav_menu_link dropdown" @click="dropDownHidden = !dropDownHidden">{{tr('header_product')}}</span>
+							<div class="dropdown-content-wrapper" :class="{'dropdown-menu--hidden': dropDownHidden}">
+	                            <div class="dropdown-menu content-wrapper">
+	                                <div class="dropdown-main" v-if="!mobileVisible">
+	                                    <p class="dropdown_item" @mouseover="currentProductMenu = 'features'"><router-link :to="'/'+routes.all_features" data-id="1" class="dropdown_item-name " :class="{'dropdown_item-name--active': currentProductMenu == 'features'}">{{tr('features')}}</router-link></p>
+	                                    <p class="dropdown_item" @mouseover="currentProductMenu = 'solutions'" ><router-link :to="'/'+routes.solutions" data-id="2" class="dropdown_item-name" :class="{'dropdown_item-name--active': currentProductMenu == 'solutions'}">{{tr('solutions')}}</router-link></p>
+	                                </div>
+	                                <div class="dropdown-main" v-if="mobileVisible">
+	                                    <p class="dropdown_item" :class="{'dropdown_item-name--active': currentProductMenu == 'features'}" @click="currentProductMenu = 'features'">{{tr('features')}}</p>
+	                                    <p class="dropdown_item" :class="{'dropdown_item-name--active': currentProductMenu == 'solutions'}" @click="currentProductMenu = 'solutions'" >{{tr('solutions')}}</p>
+	                                </div>
+	                                <div class="dropdown-items">
+	                                    <ul class="dropdown_submenu" data-menu-id="1" v-if="currentProductMenu == 'features'">
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.agenda" class="dropdown_submenu_link">{{tr('agenda_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.advanced_search" class="dropdown_submenu_link">{{tr('advanced_search_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.advanced_sponsorship" class="dropdown_submenu_link">{{tr('advanced_sponsorships_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.chat_at_the_event" class="dropdown_submenu_link">{{tr('chat_at_the_event_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.content_of_the_event" class="dropdown_submenu_link">{{tr('content_of_the_event_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.custom_field" class="dropdown_submenu_link">{{tr('custom_field_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.event_customisation" class="dropdown_submenu_link">{{tr('event_customisation_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.event_permissions_management" class="dropdown_submenu_link">{{tr('event_permissions_management_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.inhouse_broadcast" class="dropdown_submenu_link">{{tr('inhouse_broadcast_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.booths_and_stands" class="dropdown_submenu_link">{{tr('booths_and_stands_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.setup_meetings" class="dropdown_submenu_link">{{tr('setup_meetings_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.feature+'/'+routes.streaming_integrations" class="dropdown_submenu_link">{{tr('streaming_integrations_page_title')}}</router-link>
+	                                        </li>
+	                                    </ul>
+	                                    <ul v-if="currentProductMenu == 'solutions'" class="dropdown_submenu" data-menu-id="2">
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.solutions+'/'+routes.virtual_workshop" class="dropdown_submenu_link">{{tr('virutal_workshop_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.solutions+'/'+routes.virtual_conference" class="dropdown_submenu_link">{{tr('virutal_conference_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.solutions+'/'+routes.advanced_webinar" class="dropdown_submenu_link">{{tr('advanced_webinar_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.solutions+'/'+routes.online_exhibition" class="dropdown_submenu_link">{{tr('virtual_online_exhibition_page_title')}}</router-link>
+	                                        </li>
+	                                        <li class="dropdown_submenu_item">
+	                                            <router-link :to="'/'+routes.solutions+'/'+routes.virtual_festival" class="dropdown_submenu_link">{{tr('virtual_film_festival_page_title')}}</router-link>
+	                                        </li>
+	                                    </ul>
+	                                </div>
+	                            </div>
+	                        </div>
+						</li>
+						<li v-if="!signedIn || !userData" class="nav_menu_item">
+							<router-link id="nav_addevent" :to="'/'+routes.addevent" class="nav_menu_link">{{tr('add_your_event')}}</router-link>
+						</li>
+						<li v-if="!signedIn || !userData" class="nav_menu_item">
+							<router-link id="nav_howitworks" :to="'/'+routes.howitworks" class="nav_menu_link"><span>{{tr('how_it_works')}}</span></router-link>
+						</li>
+						<li v-if="signedIn && userData" class="nav_menu_item nav_menu_chat">
+							<router-link id="nav_mychats" :to="'/'+routes.mychats" class="nav_menu_link" :class="{marked: unreadNum}" :title="tr('my_chats')" :alt="tr('my_chats')"><span><img src="@/img/message.svg" width="42" height="32" :alt="tr('my_chats')"></span></router-link>
+						</li>
+						<!-- <li v-if="signedIn" class="nav_menu_item">
+							<router-link :to="routes.chat" class="nav_menu_link"><span>{{tr('chat')}}</span></router-link>
+						</li> -->
+						<li v-if="signedIn && userData" class="nav_menu_item nav_menu_meeting">
+							<router-link id="nav_mymeetings" :to="'/'+routes.mymeetings" class="nav_menu_link" :title="tr('my_meetings')" :alt="tr('my_meetings')"><span><img src="@/img/calendar.svg" width="30" height="18" :alt="tr('my_meetings')"></span></router-link>
+						</li>
+					</ul>
+				</nav>
+				<div class="header_account" v-show="!isLoading && userFetched">
+					<button class="btn btn_orange" v-if="!signedIn || !userData" id="header_signin" v-on:click="openRegisterModal">
+					{{tr('sign_in')}}</button>
+					<div class="header_profile" v-if="signedIn && userData">
+						<img class="header_profile_img" v-if="userData.userBranding.logo.url" :src="userData.userBranding.logo.url" alt="">
+						<img class="header_profile_img" width="32" height="32" v-if="!userData.userBranding.logo.url" src="../../img/default_avatar.svg" alt="">
+						<div class="dropdown_wrapper">
+							<div class="header_profile_dropdown">
+								<div class="top flex">
+									<div class="image_box">
+										<img v-if="userData.userBranding.logo.url" :src="userData.userBranding.logo.url" alt="">
+										<img v-if="!userData.userBranding.logo.url" src="../../img/default_avatar.svg" alt="">
+									</div>
+									<div class="text_box">
+										<p class="name">{{userData.name}} {{userData.surname}}</p>
+										<p class="mail">{{userData.email}}</p>
+									</div>
+								</div>
+								<router-link :to="'/'+routes.myaccount" id="my_account" class="header_profile_menu_item">{{tr('my_account')}}</router-link>
+								<router-link :to="'/'+routes.mycompany" id="my_company" class="header_profile_menu_item s" v-if="userData.company">{{tr('my_company')}}</router-link>
+								<router-link v-if="signedIn && userData" id="nav_mystands" :to="'/'+routes.mystands" class="header_profile_menu_item"><span>{{tr('my_stands')}}</span></router-link>
+								<router-link v-if="signedIn && userData" id="nav_myevents" :to="'/'+routes.myevents" class="header_profile_menu_item"><span>{{tr('header_my_events_organizer')}}</span></router-link>
+								<router-link v-if="signedIn && userData" id="nav_myinvitations" :to="'/'+routes.myinvitations" class="header_profile_menu_item"><span>{{tr('my_invitations')}}</span></router-link>
+								<router-link v-if="signedIn && userData" id="nav_myevents" :to="'/'+routes.myevents+'/'+routes.myevents_vistors" class="header_profile_menu_item"><span>{{tr('header_my_events_visitor')}}</span></router-link>
+
+								<router-link v-if="signedIn && userData" id="nav_addevent" :to="'/'+routes.addevent" class="header_profile_menu_item"><span>{{tr('add_your_event')}}</span></router-link>
+								<router-link v-if="signedIn && userData" id="nav_howitworks" :to="'/'+routes.howitworks" class="header_profile_menu_item"><span>{{tr('how_it_works')}}</span></router-link>
+								<div class="header_profile_menu_item" id="logout" @click="logout">{{tr('logout')}}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+</header>
+
+<div class="notification_bar"
+	v-if="!notificationClose && ((eventObj && eventObj.letmein) ||  (headerTypeData && headerTypeData.letmein)) && activity">
+	<div class="container flex">
+		<div class="left flex">
+			<p class="notification_name" v-if="activityName">{{activityName}}</p>
+		</div>
+		<div class="right flex">
+			<p class="notification_soon" v-if="activityMinutesToStart && activityMinutesToStart !== 0">
+				{{tr('notification_live_in_left')}} {{activityMinutesToStart}} {{tr('notification_live_in_right')}}</p>
+			<p class="notification_live flex" v-if="activityMinutesToStart === 0"><img src="@/img/live_streaming.svg"
+					alt=""><span>{{tr('live')}}</span></p>
+			<div class="persons flex"
+				v-if="activity && activity.value && activity.value.attendees && activity.value.attendees.length">
+				<span>{{tr('vm_featuring')}}:</span>
+				<div class="image_box" v-for="user in activity.value.attendees">
+					<img v-if="user.logo" :src="url64(user.logo)" alt="">
+					<img v-if="!user.logo" src="@/img/default_avatar.svg" alt="">
+				</div>
+			</div>
+			<button class="btn btn_orange" @click="tuneIn" :disabled="!activity.allowed">{{activity.allowed ?
+				tr('tune_in') : tr('no_ticket')}}</button>
+
+			<img src="@/img/close.svg" alt="" class="notification_close" @click="notificationClose = true">
+		</div>
+	</div>
+</div>
+<div class="notification_bar announcement_bar "
+	v-if="!announcementClose && ((eventObj && eventObj.letmein) ||  (headerTypeData && headerTypeData.letmein)) && (announcement)">
+	<div class="container flex">
+		<div class="left flex">
+			<p class="notification_name">{{announcement ? announcement.message : ''}}</p>
+		</div>
+		<div class="right flex">
+			<p class="notification_soon">{{localaziedAnnouncementTime}}</p>
+			<img src="@/img/close.svg" alt="" class="notification_close" @click="announcementClose = true">
+		</div>
+	</div>
+</div>
+</div>

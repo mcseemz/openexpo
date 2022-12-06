@@ -1,0 +1,63 @@
+<div class="stands_tab_section s">
+    <section v-if="standsList && standsList.length" class="event_stands_new">
+        <div class="container_big container">
+            <div class="search_filter_n" v-if="false">
+                <div class="top">
+                    <div class="search_input_block">
+                        <input v-on:keyup.enter="searchAction" type="search" v-model="searchVal" class="search_input" :placeholder="tr('se_search_stands_ph')">
+                        <span @click="searchAction" class="search_btn"><img src="../../../img/search_icon.svg" alt=""></span>
+                    </div>
+                    <div class="filter_trigger">
+                        <span class="icon">+</span>
+                        <span>{{tr('add_filter')}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="event_grid_new">
+                <div @click="openModal(stand)" class="item" v-if="standsListFiltered && standsListFiltered.length" v-for="stand in standsListFiltered">
+                    <div class="image_box" :class="{'image_placeholder': !stand.templateCoverUrl }">
+                        <img class="item_image" :src="stand.templateCoverUrl" alt="">
+                    </div>
+                    <div class="text_box">
+                        <p class="name">{{stand.name}}</p>
+                    </div>
+
+                    <div v-if="stand.tags.indexOf('is:featured') !== -1" class="featured_box">
+                        <img src="@/img/ICON_Trending.svg" alt="">
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="more_button_block flex" v-if="!showMoreClicked && featuredStandsListFiltered && featuredStandsListFiltered.length > 8">
+                <button class="btn btn_md btn_white" @click="showMoreAction">{{tr('show_more_stands')}}</button>
+            </div>
+
+        </div>
+    </section>
+    <ui-modal ref="standModal" class="stand_modal" removeHeader>
+        <div class="stand_modal_wrapper">
+            <div class="stand_modal_item" v-if="currentStand">
+                <div class="image_box">
+                    <img v-if="currentStand.templateCoverBigUrl" :src="currentStand.templateCoverBigUrl" alt="">
+                    <router-link :to="'/'+routes.stand+'/'+currentStand.id" class="btn btn_white">{{tr('learn_more')}}</router-link>
+                </div>
+                <div class="content">
+                    <p class="item_title">{{currentStand.name}}</p>
+                    <p class="item_description">{{currentStand.description_short}}</p>
+                    <div class="button_box" v-if="eventObj.letmein">
+                        <router-link :to="'/'+routes.chat+'/'+routes.stand+'/'+currentStand.id" v-if="eventObj.letmein" class="btn btn_white">{{tr('se_start_chat')}}</router-link>
+                    </div>
+                </div>
+                <div v-if="currentStand.tags.indexOf('is:featured') !== -1" class="featured_box">
+                    <img src="@/img/ICON_Trending.svg" alt="">
+                </div>
+                <span class="status_modal_close" @click="modalClose">
+                    <img src="../../../img/close_medium.svg" alt="">
+                </span>
+            </div>
+
+        </div>
+    </ui-modal>
+</div>

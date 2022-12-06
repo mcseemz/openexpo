@@ -1,0 +1,184 @@
+<section class="my_events_main preloader_wrapper">
+	
+	<div class="preloader_overlay" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+	<div class="container" :class="{'op_loading': preload}">
+		<div class="my_events_not_found" v-if="notFound">
+			<img src="../img/illustration_calendar.svg" alt="">
+			<div class="big_text">{{tr('mychats_nochats_text')}}</div>
+			<router-link :to="'/'+routes.discover" class="btn btn_orange btn_md">
+				{{tr('mychats_search_events')}}
+			</router-link>
+		</div>
+		<div class="my_events_grid_section" v-if="!notFound">
+			
+			<div class="my_events_search_block events_search_block">
+				<div class="events_search">
+					<div class="events_search_left flex">
+						<div class="search_input_block">
+							<input type="search" v-model="searchString" class="search_input" :placeholder="tr('mychats_search_ph')">
+							<a href="#" class="search_btn"><img src="../../../img/search_icon.svg" alt=""></a>
+						</div>	
+					</div>
+
+					<div class="events_search_right flex">
+						<div class="events_search_date">
+							<ui-datepicker
+				                :placeholder="tr('select_a_date')"
+				                iconPosition="right"
+				                v-model="date_val"
+				                :lang="datepicker_lang"
+				            >
+				            	<img slot="icon" src="../../../img/dropdown_arrow.svg" alt="">
+				            	{{tr('date')}}
+				            </ui-datepicker>
+						</div>
+					</div>
+				</div>
+				<div class="events_search_filter_items" v-if="expand_filter">
+					<div class="filter_item">
+						<div class="text">
+							<div class="item_title">{{tr('order_by')}}:</div>
+							<div class="item_text">{{tr('order_by')}}</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div>
+					<div class="filter_item">
+						<div class="text">
+							<div class="item_title">{{tr('event_type')}}</div>
+							<div class="item_text">{{tr('event_type')}}</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div>
+					
+				</div>
+			</div>
+
+			
+			<h2 v-if="!notFound" class="title with_descr">{{tr('events')}}</h2>
+
+			<p v-if="!notFound" class="title_description">{{tr('my_events_standowner_event_description')}}</p>
+
+			<div v-if="!notFound" class="event_grid_new">
+        		<div class="item" v-if="event.standFrom" v-for="event in filteredEventsList" :key="event.id">
+					<router-link :to="'/'+routes.chat+'/'+routes.event+'/'+event.id+'/'+routes.stand+'/'+event.standFrom.value" class="item" :style="{ pointerEvents: (!event.standFrom || !event.standFrom.value) ?'none':'all' }" >
+						<div class="image_box" :class="{'image_placeholder': !event.templateCoverUrl }">
+							<img class="item_image" :src="event.templateCoverUrl" alt="">
+							<div class="hover_box">
+								<div class="hover_top">
+									<div class="follow" style="opacity: 0">
+										<div class="icon_box"><img src="@/img/ICON_Follow.svg" alt=""></div>
+										<span>{{tr('follow')}}</span>
+									</div>
+								</div>
+								<div class="hover_text">{{event.description_short}}</div>
+								
+								<div disabled="(!event.standFrom || !event.standFrom.id)" class="button_box">
+									<button class="btn btn_tr">{{tr('mychats_start_chat')}}</button>
+								</div>
+							</div>
+						</div>
+						<div class="text_box">
+							<p class="name">{{event.name}}</p>
+							<p class="price" v-if="eventUnreadMessages(event.id)">{{eventUnreadMessages(event.id)}}</p>
+						</div>
+						<div class="date">
+							<div class="icon_box"><img src="@/img/ICON_calendar.svg" alt=""></div>
+							<p>{{event.evtItemDate.month}} {{event.evtItemDate.date}}</p>
+						</div>
+					</router-link>
+					<div class="form_input_row">
+						<ui-select
+							:label="tr('chat_start_stand_from')"
+							floatingLabel
+							ref="event.id"
+							:placeholder="'select stand to start chat'"
+							:options="filteredEvent_stands[event.id].options"
+							v-model="event.standFrom"
+							
+							iconPosition="right"
+							class="select_empty_label select_fw"
+						>
+							
+							<img v-show="event.standCount > 1" slot="icon" src="@/img/hsb_dropdown.svg" alt="">
+						</ui-select>
+						<div><p>{{!!event.standFrom?event.standFrom.name:''}}</p></div>
+					</div>
+				</div>
+        	</div>
+
+
+	        <h2 class="title" v-if="!notFound && (chatList.length || pendingChatList.length)">{{tr('stands')}}</h2>
+
+	        
+	        <div v-if="!notFound" class="event_grid_new">
+
+				<router-link :to="'/'+routes.chat+'/'+routes.stand+'/'+item.stand.id+'/owner'" class="item" v-if="eventsList[item.stand.eventId] && slq" v-for="item in filteredChatList">
+					<div class="image_box" :class="{'image_placeholder': !item.stand.templateCoverUrl }">
+						<img class="item_image" :src="item.stand.templateCoverUrl" alt="">
+						<div class="hover_box">
+							<div class="hover_top">
+								<div class="follow" style="opacity: 0">
+									<div class="icon_box"><img src="@/img/ICON_Follow.svg" alt=""></div>
+									<span>{{tr('follow')}}</span>
+								</div>
+							</div>
+							<div class="hover_text">{{item.stand.description_short}}</div>
+							<div class="button_box">
+								<button class="btn btn_tr">{{tr('mychats_start_stands_chats')}}</button>
+							</div>
+						</div>
+					</div>
+					<div class="text_box">
+						<p class="name">{{item.stand.name ? item.stand.name : tr('noname_stand_name')}}</p>
+					</div>
+					<!-- <div class="event_name_text">
+						<p class="name"><strong>{{tr('event')}}: </strong>{{eventsList[item.stand.eventId].name}}</p>
+					</div> -->
+					<div class="date">
+						<div class="icon_box"><img src="@/img/ICON_calendar.svg" alt=""></div>
+						<p>{{eventsList[item.stand.eventId].evtItemDate.month}} {{eventsList[item.stand.eventId].evtItemDate.date}}</p>
+					</div>
+					<div class="invitation_message" v-if="chatsUnreadCount(item.chats)">
+						<span>{{chatsUnreadCount(item.chats)}}</span>
+					</div>
+				</router-link>
+
+				<template v-if="pendingChatList.length" v-for="item in filteredPendingChatList">
+					<div class="item" v-if="eventsList[item.stand.eventId] && slq" v-for="chat in item.chats">
+						<div class="image_box" :class="{'image_placeholder': !item.stand.templateCoverUrl }">
+							<img class="item_image" :src="item.stand.templateCoverUrl" alt="">
+							<div class="hover_box">
+								<div class="hover_top">
+									<div class="follow" style="opacity: 0">
+										<div class="icon_box"><img src="@/img/ICON_Follow.svg" alt=""></div>
+										<span>{{tr('follow')}}</span>
+									</div>
+								</div>
+								<div class="hover_text">{{item.stand.description_short}}</div>
+								<div class="button_box">
+									<button class="btn btn_tr" @click="assignChat(chat)">{{tr('mychats_assign')}}</button>
+								</div>
+							</div>
+						</div>
+						<div class="text_box">
+							<p class="name">{{item.stand.name ? item.stand.name : tr('noname_stand_name')}}</p>
+						</div>
+						<div class="event_name_text">
+							<p class="name"><strong>{{tr('mychats_initiator')}}: </strong>{{chat.user.name}} {{chat.user.surname}}</p>
+						</div>
+						<div class="date">
+							<div class="icon_box"><img src="@/img/ICON_calendar.svg" alt=""></div>
+							<p>{{eventsList[item.stand.eventId].evtItemDate.month}} {{eventsList[item.stand.eventId].evtItemDate.date}}</p>
+						</div>
+						<div class="invitation_message">
+							<span>{{tr('mychats_pending_chat')}}</span>
+						</div>
+					</div>
+				</template>
+
+			</div>
+
+		</div>
+	</div>
+</section>

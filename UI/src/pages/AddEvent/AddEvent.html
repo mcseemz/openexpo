@@ -1,0 +1,32 @@
+<div class=" page_add_event preloader_wrapper" v-if="localesLoaded">
+    <div class="preloader_overlay preload_overlay_white fixed" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+    <header class="add_event_header">
+        <div class="container flex">
+
+            <div class="back_link flex" v-if="currentStep == 0" @click="$router.go(-1)"><img src="./img/arrow_bold_left.svg" alt="">{{tr('back')}}</div>
+            <span class="back_link flex" v-if="currentStep != 0" @click="changeStep(currentStep - 1)"><img src="./img/arrow_bold_left.svg" alt="">{{tr('back')}}</span>
+
+            <button class="btn btn_orange s" @click="nextStep" v-if="currentStep == 0">{{tr('save_and_continue')}}</button>
+
+        </div>
+    </header>
+
+    <CreateEvent v-on:custom-name-change="checkCustomName" :categoryTouched="categoryTouched" :customNameAvaliable="customNameAvaliable" v-if="currentStep == 0" :eventObj="eventObj"></CreateEvent>
+
+    <Register v-if="currentStep == 1 && !getSignedIn && !getAuthUser && !isLinkedinSignin" ref="registerRefComponent" v-on:signed="nextStep"></Register>
+
+    <ui-modal ref="messageModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">Validation error</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="./img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+
+
+</div>

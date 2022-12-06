@@ -1,0 +1,18 @@
+.back-button {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  gap: 8px;
+  border: 1px solid transparent;
+
+  img {
+    width: 22px;
+    transform: rotate(180deg);
+    height: 14px;
+  }
+
+  &:hover {
+    cursor: pointer;
+    border-bottom-color: #E5843D;
+  }
+}

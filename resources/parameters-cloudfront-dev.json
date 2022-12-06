@@ -1,0 +1,15 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "dev"
+  },
+    {
+    "ParameterKey": "BinaryPrefixName",
+    "ParameterValue": "binary"
+  },
+  {
+    "ParameterKey": "DomainName",
+    "ParameterValue": "enter_your.domain"
+  }
+
+]

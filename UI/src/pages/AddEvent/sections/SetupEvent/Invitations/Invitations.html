@@ -1,0 +1,63 @@
+<div class="main sbr">
+    <div class="main_form_box">
+	    <div class="main_section invitations_main_section">
+	      	<p class="text">Invite stand owners to participate in your event</p>
+	      	
+	      	<div class="form_input_row ">
+                <ui-textbox 
+                    placeholder="Search stand owners registered on the platform" 
+                    v-model="search_stand_owners"
+                    class="ui-search-input"
+                >
+                    <img slot="icon" src="../img/search_icon.svg" alt="">
+                </ui-textbox>  
+            </div>
+
+            <div class="delimiter_w_text">
+            	<span class="delimiter_text">Or invite by email address</span>
+            </div>
+
+            <div class="form_input_row ">
+                <ui-textbox 
+                    placeholder="Introduce email addresses" 
+                    v-model="email_addresses"
+                    class="ui-email-input"
+                >
+                    <img slot="icon" src="../img/envelope_thin.svg" alt="">
+                </ui-textbox>  
+            </div>
+
+            <div class="text text_w_items flex">Import your contacts from: 
+            	<div class="mail_item flex"><img src="../img/colored_gmail.svg" alt=""><span>Gmail</span></div>
+            	<div class="mail_item flex"><img src="../img/colored_outlook.svg" alt=""><span>Outlook</span></div>
+            </div>
+			
+			<div class="form_input_row">
+				<!-- <tinymce
+                   api-key="no-api-key"
+                   :init="{
+                     height: 272,
+                     menubar: false,
+                     plugins: [
+                       'casechange imagetools advlist autolink lists link image charmap print preview anchor',
+                       'searchreplace visualblocks code fullscreen',
+                       'insertdatetime media table paste code help wordcount'
+                     ],
+                     toolbar:
+                       'casechange | bold italic underline | \
+                       alignleft aligncenter alignright alignjustify | \
+                       bullist numlist | imageoptions'
+                   }"
+                 /> -->
+			</div>
+
+            <div class="button_row_end flex">
+            	<button class="btn btn_orange ">Send invitations</button>
+            </div>
+	    
+		</div>
+    </div>
+    <div class="main_form_sidebar">
+    	
+    </div>
+</div>

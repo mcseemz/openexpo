@@ -1,0 +1,21 @@
+{
+  "page_setup_meetings_title": "Setup meetings",
+  "setup_meetings_subtitle": "Setup meetings",
+  "setup_meetings_title": "Setup meetings with stand owners",
+  "setup_meetings_text": "Setting up meetings with stand's/booth's staff is essential to networking. Feel free to roam around each and every exhibitor's booth and find the right staff member to contact!",
+  "staff_list_interactions_title": "<span class=\"orange\">Staff</span> list and interactions",
+  "staff_list_interactions_text": "Let's start with the basics. Roam. Find. Network!",
+  "staff_list_interactions_tab1": "You can find all staff members to network in the “Our Staff” tab",
+  "staff_list_interactions_tab2": "Find information about the staff of the stand",
+  "staff_list_interactions_tab3": "From here you can either schedule meeting or start chat with them",
+  "schedule_meeting_calendar_title": "Schedule a meeting through <span class=\"orange\"> the calendar </span>",
+  "schedule_meeting_calendar_text": "We have an internal calendar/scheduler that will allow the attendee to keep track of his/her time and view the available slots of the stand's staff too",
+  "schedule_meeting_calendar_tab1": "Schedule a meeting through the calendar!",
+  "schedule_meeting_calendar_tab2": "A staff member will receive a notification and can confirm or refuse the meeting.",
+  "schedule_meeting_calendar_tab3": "Attendee can cancel their meeting request anytime. Staff members can reschedule the meeting.",
+  "one_on_one_meetings_title": "<span class=\"orange\">1 on 1 meeting</span> with the stand's staff",
+  "one_on_one_meetings_text": "The platform allows to start a video meeting through the calendar.",
+  "one_on_one_meetings_tab1": "Use either zoom or in-house broadcast tool!",
+  "one_on_one_meetings_tab2": "Use Zoom for meetings!",
+  "one_on_one_meetings_tab3": "Receive video one on one link through calendar!"
+}

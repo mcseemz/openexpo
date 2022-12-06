@@ -1,0 +1,95 @@
+<div class="page_wrapper contact_page shl" v-if="localesLoaded">
+
+	<section class="contact_content">
+		<div class="container">
+			<h1 class="title">{{tr('contact_title')}}</h1>
+			<div class="banner_box">
+				<img class="contact_main_img" src="./img/contact.jpg.webp" alt="">
+				<div class="contact_card">
+					<p class="card_title big_text">
+						{{tr('contact_card_title')}}
+					</p>
+					<p class="text_item"><strong>{{tr('contact_email')}}: </strong>contact-us@openexpo.com</p>
+					<!-- <p class="text_item"><strong>{{tr('contact_call')}}: </strong> +34 (0)456456623066 | +34 (0)3445165</p> -->
+					<img src="./img/illustration_decoration_02.svg" alt="" class="d_img">
+				</div>
+			</div>
+			<div class="contact_offices" v-if="false">
+				<h2 class="contact_office_title flex"><img src="./img/location_icon.svg" alt="">{{tr('contact_offices_title')}}</h2>
+
+				<div class="contact_office_items flex">
+					<div class="office_card">
+						<p class="card_title big_text">{{tr('contact_office_1_title')}}</p>
+						<p class="address">{{tr('contact_office_1_address')}}</p>
+						<a href="tel:#" class="phone">{{tr('contact_office_1_phone')}}</a>
+					</div>
+					<div class="office_card">
+						<p class="card_title big_text">{{tr('contact_office_2_title')}}</p>
+						<p class="address">{{tr('contact_office_2_address')}}</p>
+						<a href="tel:#" class="phone">{{tr('contact_office_2_phone')}}</a>
+					</div>
+					<div class="office_card">
+						<p class="card_title big_text">{{tr('contact_office_3_title')}}</p>
+						<p class="address">{{tr('contact_office_3_address')}}</p>
+						<a href="tel:#" class="phone">{{tr('contact_office_3_phone')}}</a>
+					</div>
+				</div>
+
+				<img src="./img/illustration_triangle.svg" alt="" class="d_img">
+
+			</div>
+
+			<div class="content get_in_touch_section">
+                <form action="#" class="contact_form">
+    				<p class="form_title big_text">{{tr('contact_contact_us')}}</p>
+    				<ui-textbox
+	                    :placeholder="tr('contact_name_ph')"
+	                    v-model="request.name"
+	                    :invalid="reqNameTouched && !request.name"
+	                    v-on:touch.passive="reqNameTouched = true"
+	                >
+	                </ui-textbox>
+	                <ui-textbox
+	                    :placeholder="tr('contact_email_ph')"
+	                    v-model="request.email"
+	                    :invalid="(reqMailTouched && !request.email) || (reqTelTouched && request.email && !validateEmail(request.email))"
+	                    v-on:touch.passive="reqMailTouched = true"
+	                >
+	                </ui-textbox>
+	                <ui-textbox
+	                    :placeholder="tr('contact_phone_ph')"
+	                    v-model="request.tel"
+	                    :invalid="(reqTelTouched && !request.tel) || (reqTelTouched && request.tel && !(/^[\d()\-#+\s]*$/.test(request.tel)))"
+	                    v-on:touch.passive="reqTelTouched = true"
+	                >
+	                </ui-textbox>
+	                <ui-textbox
+	                    :placeholder="tr('contact_msg_ph')"
+	                    v-model="request.msg"
+	                    :rows="4"
+                        :multi-line="true"
+	                >
+	                </ui-textbox>
+    				<div class="form_footer flex">
+    					<ui-checkbox v-model="terms" color="accent">
+    						<span v-html="tr('terms_html')"></span>
+    					</ui-checkbox>
+    					<button class="btn btn_orange" @click.prevent="sendRequest">{{tr('contact_send')}}</button>
+    				</div>
+    			</form>
+            </div>
+		</div>
+	</section>
+
+	<ui-modal ref="messageModal" class="status_modal" removeHeader size="auto">
+        <div class="status_modal_wrapper">
+            <div class="content">
+                <p class="modal_title">{{modalTitle}}</p>
+                <p class="modal_text" v-html="modalMsg">{{modalMsg}}</p>
+            </div>
+        </div>
+
+        <span class="status_modal_close" @click="messageModalClose"><img src="@/img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+</div>

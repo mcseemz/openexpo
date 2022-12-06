@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Globals:
+  Function:
+    Runtime: nodejs10.x
+    MemorySize: 128
+    Environment:
+      Variables:
+        RETENTION_DAYS:
+          Ref: RetentionDays
+Resources:
+  SetRetentionForNewLogGroups:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: functions/set-retention.newLogGroups
+      Description: Updates the retention policy for a newly create CloudWatch log group to the specified number of days.
+      Timeout: 6
+      Policies:
+      - Statement:
+          Effect: Allow
+          Action: logs:PutRetentionPolicy
+          Resource: '*'
+      Events:
+        SubscribeEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              source:
+              - aws.logs
+              detail-type:
+              - AWS API Call via CloudTrail
+              detail:
+                eventSource:
+                - logs.amazonaws.com
+                eventName:
+                - CreateLogGroup
+      CodeUri:
+        Bucket: awsserverlessrepo-changesets-1xxlnameudh3r
+        Key: 698718118888/arn:aws:serverlessrepo:us-east-1:374852340823:applications-auto-set-log-group-retention-versions-1.4.0/c9626a53-9683-4357-8167-2296ace95bcc
+  SetRetentionForNewLogGroupsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Sub: /aws/lambda/${SetRetentionForNewLogGroups}
+  SetRetentionForExistingLogGroups:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: functions/set-retention.existingLogGroups
+      Description: Updates the retention policy for existing log groups to match the configured number of days.
+      Timeout: 900
+      Policies:
+      - Statement:
+          Effect: Allow
+          Action:
+          - logs:PutRetentionPolicy
+          - logs:DescribeLogGroups
+          Resource: '*'
+      CodeUri:
+        Bucket: awsserverlessrepo-changesets-1xxlnameudh3r
+        Key: 698718118888/arn:aws:serverlessrepo:us-east-1:374852340823:applications-auto-set-log-group-retention-versions-1.4.0/c9626a53-9683-4357-8167-2296ace95bcc
+  SetRetentionForExistingLogGroupsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Sub: /aws/lambda/${SetRetentionForExistingLogGroups}
+  LambdaInvocationCustomResource:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:374852340823:applications/lambda-invocation-cfn-custom-resource
+        SemanticVersion: 1.4.0
+  InvokeSetRetentionForExistingLogGroups:
+    Type: Custom::LambdaInvocation
+    DependsOn:
+    - SetRetentionForExistingLogGroups
+    - LambdaInvocationCustomResource
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+        - LambdaInvocationCustomResource
+        - Outputs.FunctionArn
+      FunctionName:
+        Ref: SetRetentionForExistingLogGroups
+      InvocationType: Event
+      Configurations:
+        RETENTION_DAYS:
+          Ref: RetentionDays
+Parameters:
+  RetentionDays:
+    Type: Number
+    Default: 7
+    Description: The number of days to retain logs in CloudWatch Logs for.

@@ -1,0 +1,81 @@
+<div class="page_wrapper page_single_article preloader_wrapper" v-if="localesLoaded">
+
+	<NotFound v-if="article && article.notFound"></NotFound>
+
+	<div class="container" v-if="article && !article.notFound">
+		<div class="article_wrapper flex">
+			<div class="article_sidebar">
+				<div class="author_box" v-if="user">
+					<div class="image_box"><img v-if="user && user.userBranding && user.userBranding.logo.big_url" :src="user.userBranding.logo.big_url" alt=""></div>
+					<p class="name">{{user.userObj.name}} {{user.userObj.surname}}</p>
+					<p class="date">{{getDate()}}</p>
+					<p class="time"><img src="./img/clock.svg" alt=""> <span>{{minForRead}} min read</span></p>
+				</div>
+				<div class="social_block" style="display: none">
+					<p class="social_title">SHARE:</p>
+					<div class="share_box">
+						<a href="#" class="share_icon"><img src="./img/facebook.svg" alt=""></a>
+						<a href="#" class="share_icon"><img src="./img/linkedin.svg" alt=""></a>
+						<a href="#" class="share_icon"><img src="./img/twitter.svg" alt=""></a>
+					</div>
+				</div>
+
+			</div>
+			<div class="article_main">
+				<div class="article_content" v-if="article">
+					<h1 class="article_title">{{article.articleTitle}}</h1>
+					<div class="article_image_box"><img class="article_image" :src="article.articleBranding.articleCover.url" alt="" v-if="article.articleBranding && article.articleBranding.articleCover.url"></div>
+					<div class="content" v-html="article.articleContent">
+						{{article.articleContent}}
+					</div>
+
+
+				</div>
+				<div class="social_block" style="display: none">
+					<p class="social_title">SHARE THIS STORY:</p>
+					<div class="share_box">
+						<a href="#" class="share_icon"><img src="./img/facebook.svg" alt=""></a>
+						<a href="#" class="share_icon"><img src="./img/linkedin.svg" alt=""></a>
+						<a href="#" class="share_icon"><img src="./img/twitter.svg" alt=""></a>
+					</div>
+				</div>
+
+				<div class="related_tags" v-if="article && article.tags && article.tags.length">
+					<p class="related_tags_title">Related tags</p>
+					<div class="tags_box">
+						<a v-for="tag in article.tags" href="#" class="tag" style="color: #0062FB; border-color: #0062FB">{{tag.text}}</a>
+					</div>
+				</div>
+
+				<div class="realted_posts"  v-if="related.length" style="display: block">
+					<p class="related_title">Related Stories</p>
+
+					<div class="articles_list">
+			        	<div class="articles_item" v-for="item in related">
+			                <div class="image_box">
+			                    <img :src="item.articleBranding.articleBanner.url" alt="" class="article_main" v-if="item.articleBranding && item.articleBranding.articleBanner.url">
+			                </div>
+			                <div class="content">
+			                    <div class="top">
+			                        <div class="source">
+			                            <div class="source_img_box"><img v-if="users[item.editor] && users[item.editor].userBranding && users[item.editor].userBranding.logo.url" :src="users[item.editor].userBranding.logo.url" alt=""></div>
+			                            <p v-if="users[item.editor]">{{users[item.editor].userObj.name}} {{users[item.editor].userObj.surname}}</p>
+			                        </div>
+			                    </div>
+			                    <div class="middle">
+			                        <h3 class="article_title">{{item.articleTitle}}</h3>
+			                        <p class="article_text">{{item.articleDescription}}</p>
+			                    </div>
+			                    <div class="bottom">
+			                        <router-link :to="'/'+routes.article+'/'+item.id" class="article_goto">Go to full article <img src="./img/Shape.svg" alt=""></router-link>
+			                    </div>
+			                </div>
+			            </div>
+			        </div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+</div>

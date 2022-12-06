@@ -1,0 +1,253 @@
+<section class="my_events_main preloader_wrapper">
+	
+	<div class="preloader_overlay" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+	<div class="container" :class="{'op_loading': preload}">
+		<div class="my_events_not_found" v-if="notFound">
+			<img src="../img/illustration_calendar.svg" alt="">
+			<div class="big_text">{{tr('mychats_nochats_text')}}</div>
+			<router-link :to="'/'+routes.discover" class="btn btn_orange btn_md">
+				{{tr('mychats_search_events')}}
+			</router-link>
+		</div>
+		<div class="my_events_grid_section" v-if="!notFound">
+			
+			<div class="my_events_search_block events_search_block">
+				<div class="events_search">
+					<div class="events_search_left flex">
+						<div class="search_input_block">
+							<input type="search" v-model="searchString" class="search_input" :placeholder="tr('mychats_search_ph')">
+							<a href="#" class="search_btn"><img src="../../../img/search_icon.svg" alt=""></a>
+						</div>	
+					</div>
+
+					<div class="events_search_right flex">
+						<div class="events_search_date">
+							<ui-datepicker
+				                :placeholder="tr('select_a_date')"
+				                iconPosition="right"
+				                v-model="date_val"
+				                :lang="datepicker_lang"
+				            >
+				            	<img slot="icon" src="../../../img/dropdown_arrow.svg" alt="">
+				            	{{tr('date')}}
+				            </ui-datepicker>
+				            <!-- <ui-datepicker
+				                placeholder="Select a date"
+				                iconPosition="right"
+				                v-model="date_val"
+				                :lang="datepicker_lang"
+				            >
+				            	<img slot="icon" src="../../../img/dropdown_arrow.svg" alt="">
+				            	Date
+				            </ui-datepicker> -->
+						</div>
+						<!-- <div class="filter_trigger_block"><a href="#" @click="triggerFilter" class="filter_trigger"><img src="../../../img/filter_icon.svg" alt=""></a></div> -->
+					</div>
+				</div>
+				<div class="events_search_filter_items" v-if="expand_filter">
+					<div class="filter_item">
+						<div class="text">
+							<div class="item_title">{{tr('order_by')}}:</div>
+							<div class="item_text">{{tr('order_by')}}</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div>
+					<div class="filter_item">
+						<div class="text">
+							<div class="item_title">{{tr('event_type')}}</div>
+							<div class="item_text">{{tr('event_type')}}</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div>
+					
+				</div>
+			</div>
+
+			<!-- <div class="user_items col4 flex">
+				<template v-for='item in chatList'>
+		            <router-link :to="'/'+routes.chat+'/'+routes.event+'/'+item.event.id+'/id/'+chat.sid" class="user_item" v-for="chat in item.chats">
+		                <div class="image_box"><img src="../../../img/default_avatar.svg" alt=""></div>
+		                <p class="name">Name Lastname</p>
+		                <p class="role">{{item.event.name}}</p>
+		            </router-link>
+		        </template>
+	            
+	        </div> -->
+
+			<div class="events_grid event_grid_new">
+
+				<router-link :to="'/'+routes.chat+'/'+routes.event+'/'+item.event.id+'/owner'" class="item" v-if="chatList.length"  v-for="item in filteredChatList(chatList)">
+					<div class="image_box" :class="{'image_placeholder': !item.event.templateCoverUrl }">
+						<img class="item_image" :src="item.event.templateCoverUrl" alt="">
+						<div class="hover_box">
+							<div class="hover_top">
+								<div class="follow" style="opacity: 0">
+									<div class="icon_box"><img src="@/img/ICON_Follow.svg" alt=""></div>
+									<span>{{tr('follow')}}</span>
+								</div>
+							</div>
+							<div class="hover_text">{{item.event.description_short}}</div>
+							<div class="button_box">
+								<button class="btn btn_tr">{{tr('mychats_open_chats')}}</button>
+							</div>
+						</div>
+					</div>
+					<div class="text_box">
+						<p class="name">{{item.event.name}}</p>
+					</div>
+					<!-- <div class="event_name_text">
+						<p class="name"><strong>{{tr('event')}}: </strong>{{eventsList[item.stand.eventId].name}}</p>
+					</div> -->
+					<div class="date">
+						<div class="icon_box"><img src="@/img/ICON_calendar.svg" alt=""></div>
+						<p>{{item.event.evtItemDate.month}} {{item.event.evtItemDate.date}}</p>
+					</div>
+					<div class="invitation_message" v-if="chatsUnreadCount(item.chats)">
+						<span>{{chatsUnreadCount(item.chats)}}</span>
+					</div>
+				</router-link>
+
+				<!-- <router-link :to="'/'+routes.chat+'/'+routes.event+'/'+item.event.id+'/owner'" class="events_item" v-if="chatList.length"  v-for="item in filteredChatList(chatList)">
+					<div class="img_block" :class="{'image_placeholder': !item.event.templateCoverUrl }"><img :src="item.event.templateCoverUrl" alt=""></div>
+					<div class="content">
+						<div class="top flex">
+							<div class="date" v-if="item.event.evtItemDate">
+								<p class="month">{{item.event.evtItemDate.month}}</p>
+								<p class="nums">{{item.event.evtItemDate.date}}</p>
+							</div>
+							<div class="logo"><img :src ="item.event.logoUrl" alt=""></div>
+						</div>
+						<div class="main">
+							<div><h3 class="title">{{item.event.name}}</h3></div>
+							<p class="descr">{{item.event.description_short}}</p>
+						</div>
+						<div class="bottom flex">
+							<div class="location flex">
+								<p v-if="item.event.langList">{{item.event.langList}}</p>
+							</div>
+							<div class="price_box">
+								<button class="btn btn_white">{{tr('mychats_open_chats')}}</button>
+							</div>
+						</div>
+					</div>
+					<div class="time_remaning" v-if="chatsUnreadCount(item.chats)">{{chatsUnreadCount(item.chats)}}</div>
+				</router-link> -->
+
+				<template v-if="pendingChatList.length" v-for="item in filteredChatList(pendingChatList)">
+					<div class="item" v-for="chat in item.chats">
+						<div class="image_box" :class="{'image_placeholder': !item.event.templateCoverUrl }">
+							<img class="item_image" :src="item.event.templateCoverUrl" alt="">
+							<div class="hover_box">
+								<div class="hover_top">
+									<div class="follow" style="opacity: 0">
+										<div class="icon_box"><img src="@/img/ICON_Follow.svg" alt=""></div>
+										<span>{{tr('follow')}}</span>
+									</div>
+								</div>
+								<div class="hover_text">{{item.event.description_short}}</div>
+								<div class="button_box">
+									<button class="btn btn_tr" @click="assignChat(chat)">{{tr('mychats_assign')}}</button>
+								</div>
+							</div>
+						</div>
+						<div class="text_box">
+							<p class="name">{{item.event.name}}</p>
+						</div>
+						<div class="event_name_text">
+							<p class="name"><strong>{{tr('mychats_initiator')}}: </strong>{{chat.standUser.name}} {{chat.standUser.surname}}</p>
+						</div>
+						<div class="date">
+							<div class="icon_box"><img src="@/img/ICON_calendar.svg" alt=""></div>
+							<p>{{item.event.evtItemDate.month}} {{item.event.evtItemDate.date}}</p>
+						</div>
+						<div class="invitation_message">
+							<span>{{tr('mychats_pending_chat')}}</span>
+						</div>
+					</div>
+				</template>
+
+				<!-- <template v-if="pendingChatList.length" v-for="item in filteredChatList(pendingChatList)">
+				<div class="events_item" v-for="chat in item.chats">
+					<div class="img_block" :class="{'image_placeholder': !item.event.templateCoverUrl }"><img :src="item.event.templateCoverUrl" alt=""></div>
+					<div class="content">
+						<div class="top flex">
+							<div class="date" v-if="item.event.evtItemDate">
+								<p class="month">{{item.event.evtItemDate.month}}</p>
+								<p class="nums">{{item.event.evtItemDate.date}}</p>
+							</div>
+							<div class="logo"><img :src ="item.event.logoUrl" alt=""></div>
+						</div>
+						<div class="main">
+							<div><h3 class="title">{{item.event.name}}</h3></div>
+							<p class="descr">{{item.event.description_short}}</p>
+						</div>
+						<div class="bottom flex">
+							<div class="location flex">
+								<p v-if="item.event.langList">{{item.event.langList}}</p>
+							</div>
+							<div class="price_box">
+								<button class="btn btn_white" @click="assignChat(chat)">{{tr('mychats_assign')}}</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				</template> -->
+
+				<!-- <div class="events_item events_list_item"  v-for="event in filteredEventList">
+					<router-link :to="'/'+routes.event+'/'+event.id" class="img_block" :class="{'image_placeholder': !event.templateCoverUrl }"><img :src="event.templateCoverUrl" alt=""></router-link>
+					<div class="content">
+						
+						<div class="main">
+							<div class="left">
+								<router-link :to="'/'+routes.event+'/'+event.id"><h3 class="title">{{event.name}}</h3></router-link>
+								<p class="descr">{{event.description_short}}</p>
+								<div class="location flex">
+									<p v-if="event.langList">{{event.langList}}</p>
+								</div>
+							</div>
+							<div class="right flex">
+								<div class="date" v-if="event.evtItemDate">
+									<p class="month">{{event.evtItemDate.month}}</p>
+									<p class="nums">{{event.evtItemDate.date}}</p>
+								</div>
+								<div class="logo"><img :src="event.logoUrl" alt=""></div>
+							</div>
+							
+						</div>
+						<div class="bottom flex">
+							<div class="left">
+								<div class="info_items">
+
+									<div class="info_item">
+										<p class="info_title">{{tr('stands')}}</p>
+										<p class="info_text">{{event.standsCount}}</p>
+									</div>
+									<div class="info_divider"></div>
+									<div class="info_item">
+										<p class="info_title">{{tr('status')}}</p>
+										<p class="info_text">{{eventStatus(event)}}</p>
+									</div>
+								</div>
+							</div>
+							<div class="right">
+								<div class="action_buttons">
+									<router-link :to="'/'+routes.event+'/'+event.id" class="action_button">
+										<img src="../../../img/preview_filled.svg" alt=""><span>{{tr('preview')}}</span>
+									</router-link>
+									<router-link :to="'/'+routes.editevent+'/'+event.id" class="action_button">
+										<img src="../../../img/edit_filled.svg" alt=""><span>{{tr('edit')}}</span>
+									</router-link>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+					<div class="time_remaning">{{dateLeft(event)}}</div>
+				</div> -->
+
+			</div>
+
+		</div>
+	</div>
+</section>

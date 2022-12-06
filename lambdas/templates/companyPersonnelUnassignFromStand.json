@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "CompanyPersonnelUnassignFromStand",
+    "SubjectPart": "You've been removed from the stand",
+    "HtmlPart": "You've been removed from the stand: {{standName}}. Reason: {{reason}}",
+    "TextPart": "You've been removed from the stand: {{standName}}. Reason: {{reason}}"
+  }
+}

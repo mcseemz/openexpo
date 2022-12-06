@@ -1,0 +1,3122 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: all API-related lambdas, and API Gateway for those.
+# '{{resolve:ssm:/rds_demo/master_username:1}} check https://github.com/garystafford/aws-rds-postgres/blob/master/parameter_store_values.sh'
+#  Description: '{{resolve:ssm-secure:/rds_demo/master_password:1}}'
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+  APIStage:
+    Description: Stage name for publishing
+    Type: String
+Conditions:
+  CreateDevResources: !Equals
+    - !Ref 'Environment'
+    - dev
+Resources:
+#=====================================================================
+#LAMBDAS
+
+  lambdaCorsProxy:
+    Type: AWS::Lambda::Function
+    Description: Cors Proxy
+    Properties:
+      FunctionName: !Sub 'corsProxy-${Environment}'
+      Handler: corsProxy.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventCreateNew:
+    Type: AWS::Lambda::Function
+    Description: Create new event
+    Properties:
+      FunctionName: !Sub 'eventCreateNew-${Environment}'
+      Handler: eventCreateNew.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventGetById:
+    Type: AWS::Lambda::Function
+    Description: Get event by id
+    Properties:
+      FunctionName: !Sub 'eventGetById-${Environment}'
+      Handler: eventGetById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventSearch:
+    Type: AWS::Lambda::Function
+    Description: Search for a string in event name
+    Properties:
+      FunctionName: !Sub 'eventSearch-${Environment}'
+      Handler: eventSearch.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventUpdateById:
+    Type: AWS::Lambda::Function
+    Description: Update event by id
+    Properties:
+      FunctionName: !Sub 'eventUpdateById-${Environment}'
+      Handler: eventUpdateById.handler
+      Layers:
+        - !ImportValue
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventGetStands:
+    Type: AWS::Lambda::Function
+    Description: Get stands for a given event
+    Properties:
+      FunctionName: !Sub 'eventGetStands-${Environment}'
+      Handler: eventGetStands.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventGetSchedule:
+    Type: AWS::Lambda::Function
+    Description: Get schedule for event by eventId
+    Properties:
+      FunctionName: !Sub 'eventGetSchedule-${Environment}'
+      Handler: eventGetSchedule.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCustomNameAvailabilityCheck:
+    Type: AWS::Lambda::Function
+    Description: Get sent personnel invitations
+    Properties:
+      FunctionName: !Sub 'customNameAvailabilityCheck-${Environment}'
+      Handler: customNameAvailabilityCheck.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaUserPersonnelInvitationCancel:
+    Type: AWS::Lambda::Function
+    Description: Cancel sent personnel invitation to company/event/stand
+    Properties:
+      FunctionName: !Sub 'userPersonnelInvitationCancel-${Environment}'
+      Handler: userPersonnelInvitationCancel.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventInvitationCancelById:
+    Type: AWS::Lambda::Function
+    Description: Cancel outgoing invitaion made by company to a stand
+    Properties:
+      FunctionName: !Sub 'eventInvitationCancelById-${Environment}'
+      Handler: eventInvitationCancelById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventPublish:
+    Type: AWS::Lambda::Function
+    Description: Send event for moderation before publishing
+    Properties:
+      FunctionName: !Sub 'eventPublish-${Environment}'
+      Handler: eventPublish.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaModerationResolve:
+    Type: AWS::Lambda::Function
+    Description: Resolve event moderation
+    Properties:
+      FunctionName: !Sub 'moderationResolve-${Environment}'
+      Handler: moderationResolve.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaConfirmationResolve:
+    Type: AWS::Lambda::Function
+    Description: Resolve confirmation
+    Properties:
+      FunctionName: !Sub 'confirmationResolve-${Environment}'
+      Handler: confirmationResolve.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventGetStandInvitations:
+    Type: AWS::Lambda::Function
+    Description: Get stand invitations for a given event
+    Properties:
+      FunctionName: !Sub 'eventGetStandInvitations-${Environment}'
+      Handler: eventGetStandInvitations.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaUserGetInvitations:
+    Type: AWS::Lambda::Function
+    Description: Get all invitations for a user
+    Properties:
+      FunctionName: !Sub 'userGetInvitations-${Environment}'
+      Handler: userGetInvitations.handler
+      Layers:
+        - !ImportValue
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventCreateUploadURL:
+    Type: AWS::Lambda::Function
+    Description: Create pre-signed URL for uploads to the event.
+    Properties:
+      FunctionName: !Sub 'eventCreateUploadURL-${Environment}'
+      Handler: eventCreateUploadURL.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaUserCreateUploadURL:
+    Type: AWS::Lambda::Function
+    Description: Create pre-signed URL for user uploads.
+    Properties:
+      FunctionName: !Sub 'userCreateUploadURL-${Environment}'
+      Handler: userCreateUploadURL.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCompanyCreateUploadURL:
+    Type: AWS::Lambda::Function
+    Description: Create pre-signed URL for company uploads.
+    Properties:
+      FunctionName: !Sub 'companyCreateUploadURL-${Environment}'
+      Handler: companyCreateUploadURL.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventGetUploadURL:
+    Type: AWS::Lambda::Function
+    Description: Get pre-signed URL for downloading files attached to the event.
+    Properties:
+      FunctionName: !Sub 'eventGetUploadURL-${Environment}'
+      Handler: eventGetUploadURL.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaReportGetDownloadURL:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'reportGetDownloadURL-${Environment}'
+      Handler: reportGetDownloadURL.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaActivityGetDownloadURL:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'activityGetDownloadURL-${Environment}'
+      Handler: reportGetDownloadURL.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+
+  lambdaEventRecommended:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'eventGetRecommended-${Environment}'
+      Handler: eventGetRecommended.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaActivityCreateNew:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'activityCreateNew-${Environment}'
+      Handler: activityCreateNew.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaActivityGetById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'activityGetById-${Environment}'
+      Handler: activityGetById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaActivityUpdateById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'activityUpdateById-${Environment}'
+      Handler: activityUpdateById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaActivityDeleteById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'activityDeleteById-${Environment}'
+      Handler: activityDeleteById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'sqs-send-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+          SqsBinaryDeleteUrl: !ImportValue
+            Fn::Sub: 'sqs-binary-delete-url-${Environment}'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaActivityCreateMeeting:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'activityCreateMeeting-${Environment}'
+      Handler: activityCreateMeeting.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaActivityGetMeetingById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'activityGetMeetingById-${Environment}'
+      Handler: activityGetMeetingById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaActivityUpdateMeeting:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'activityUpdateMeeting-${Environment}'
+      Handler: activityUpdateMeeting.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventGetStatistics:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'eventGetStatistics-${Environment}'
+      Handler: eventGetStatistics.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventAnnouncementUpdate:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'eventAnnouncementUpdate-${Environment}'
+      Handler: eventAnnouncementUpdate.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaActivityDeleteMeetingById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'activityDeleteMeetingById-${Environment}'
+      Handler: activityDeleteMeetingById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandGetById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'standGetById-${Environment}'
+      Handler: standGetById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandSendRequestToOrganizer:
+    Type: AWS::Lambda::Function
+    Description: Request from stand owner to an organizer
+    Properties:
+      FunctionName: !Sub 'standSendRequestToOrganizer-${Environment}'
+      Handler: standSendRequestToOrganizer.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandInviteUserToEvent:
+    Type: AWS::Lambda::Function
+    Description: Create an invitation for the user to join the stand
+    Properties:
+      FunctionName: !Sub 'standInviteUserToEvent-${Environment}'
+      Handler: standInviteUserToEvent.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandActivityPromote:
+    Type: AWS::Lambda::Function
+    Description: Propose activity for promotion
+    Properties:
+      FunctionName: !Sub 'standActivityPromote-${Environment}'
+      Handler: standActivityPromote.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandActivityResolvePromotion:
+    Type: AWS::Lambda::Function
+    Description: Resolve activity promotion with a given visibility
+    Properties:
+      FunctionName: !Sub 'standActivityResolvePromotion-${Environment}'
+      Handler: standActivityResolvePromotion.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandCreateNew:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'standCreateNew-${Environment}'
+      Handler: standCreateNew.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandUpdateById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'standUpdateById-${Environment}'
+      Handler: standUpdateById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandInvitationRejectById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'standInvitationRejectById-${Environment}'
+      Handler: standInvitationRejectById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandInvitationAcceptById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'standInvitationAcceptById-${Environment}'
+      Handler: standInvitationAcceptById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandGetSchedule:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'standGetSchedule-${Environment}'
+      Handler: standGetSchedule.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandManagementById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'standManagementById-${Environment}'
+      Handler: standManagementById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandGetMaterials:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'standGetMaterials-${Environment}'
+      Handler: standGetMaterials.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandCreateUploadUrl:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'standCreateUploadUrl-${Environment}'
+      Handler: standCreateUploadUrl.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaResizeImage:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'resizeImage-${Environment}'
+      Handler: resizeImage.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaResizeImageImpl:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'resizeImageImpl-${Environment}'
+      Handler: CreateThumbnail.handler
+      Code: ../lambdas/imageResize/CreateThumbnail.zip
+      Timeout: 60
+      Runtime: python3.7
+      Role: !ImportValue 
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 512
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaTicketCreateNew:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'ticketCreateNew-${Environment}'
+      Handler: ticketCreateNew.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaTicketManagementById:
+    Type: AWS::Lambda::Function
+    Description: 'management operations with ticket - ban,unban,refund etc. /ticket/{ticketid}/mgmt/{operation}'
+    Properties:
+      FunctionName: !Sub 'ticketManagementById-${Environment}'
+      Handler: ticketManagementById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+        - Key: "debug"
+          Value: !If [CreateDevResources, "debug", "warn"]
+
+  lambdaProcessPayment:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'processPayment-${Environment}'
+      Handler: processPayment.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventTicketsUploadCsv:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'eventTicketsUploadCsv-${Environment}'
+      Handler: eventTicketsUploadCsv.handler
+      Layers:
+        - !ImportValue
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'cognito-ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStringCreateNew:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'stringCreateNew-${Environment}'
+      Handler: stringCreateNew.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStringUpdateById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'stringUpdateById-${Environment}'
+      Handler: stringUpdateById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStringDeleteById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'stringDeleteById-${Environment}'
+      Handler: stringDeleteById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStringGetById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'stringGetById-${Environment}'
+      Handler: stringGetById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatCreateForEventNew:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatCreateForEventNew-${Environment}'
+      Handler: chatCreateForEventNew.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'twilio-layer-arn-${Environment}'
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatDeactivate:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatDeactivate-${Environment}'
+      Handler: chatDeactivate.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'twilio-layer-arn-${Environment}'
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatArchiveForEvent:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatArchiveForEvent-${Environment}'
+      Handler: chatArchiveForEvent.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'twilio-layer-arn-${Environment}'
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatAssign:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatAssign-${Environment}'
+      Handler: chatAssign.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'twilio-layer-arn-${Environment}'
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatAssignToPersonnel:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatAssignToPersonnel-${Environment}'
+      Handler: chatAssignToPersonnel.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'twilio-layer-arn-${Environment}'
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatsGetForEvent:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatsGetForEvent-${Environment}'
+      Handler: chatsGetForEvent.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 256
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatsGetForUser:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatsGetForUser-${Environment}'
+      Handler: chatsGetForUser.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatUnreadForUser:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatUnreadForUser-${Environment}'
+      Handler: chatUnreadForUser.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatCreateForStandNew:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatCreateForStandNew-${Environment}'
+      Handler: chatCreateForStandNew.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'twilio-layer-arn-${Environment}'
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatsGetForStand:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatsGetForStand-${Environment}'
+      Handler: chatsGetForStand.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 256
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatCreateMeeting:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatCreateMeeting-${Environment}'
+      Handler: chatCreateMeeting.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'twilio-layer-arn-${Environment}'
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaUserGetMeetings:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'userGetMeetings-${Environment}'
+      Handler: userGetMeetings.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaUserGetById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'userGetById-${Environment}'
+      Handler: userGetById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaUserGetStandInvitations:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'userGetStandInvitations-${Environment}'
+      Handler: userGetStandInvitations.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaUserUpdateById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'userUpdateById-${Environment}'
+      Handler: userUpdateById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCompanyUpdateById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'companyUpdateById-${Environment}'
+      Handler: companyUpdateById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaRoleGetByType:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'roleGetByType-${Environment}'
+      Handler: roleGetByType.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaUserGetOwnedStands:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'userGetOwnedStands-${Environment}'
+      Handler: userGetOwnedStands.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaUserGetEvents:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'userGetEvents-${Environment}'
+      Handler: userGetEvents.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaUserCustomFields:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'userCustomFields-${Environment}'
+      Handler: userCustomFields.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCompanyRemoveUser:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'companyRemoveUser-${Environment}'
+      Handler: companyRemoveUser.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCompanyGetProfile:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'companyGetProfile-${Environment}'
+      Handler: companyGetProfile.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventGetPersonnel:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'eventGetPersonnel-${Environment}'
+      Handler: eventGetPersonnel.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandGetPersonnel:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'standGetPersonnel-${Environment}'
+      Handler: standGetPersonnel.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCompanyGetPersonnel:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'companyGetPersonnel-${Environment}'
+      Handler: companyGetPersonnel.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCompanyInviteUser:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'companyInviteUser-${Environment}'
+      Handler: companyInviteUser.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaPersonnelCreateNew:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'personnelCreateNew-${Environment}'
+      Handler: personnelCreateNew.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'cognito-ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaPersonnelDeleteById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'personnelDeleteById-${Environment}'
+      Handler: personnelDeleteById.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'cognito-ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+          SqsBinaryDeleteUrl: !ImportValue
+            Fn::Sub: 'sqs-binary-delete-url-${Environment}'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaPersonnelUpdateById:
+    Type: AWS::Lambda::Function
+    Description: Update personnel with email, role, position or visibility
+    Properties:
+      FunctionName: !Sub 'personnelUpdateById-${Environment}'
+      Handler: personnelUpdateById.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'cognito-ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatWebhookOnMessageSent:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatWebhookOnMessageSent-${Environment}'
+      Handler: chatWebhookOnMessageSent.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatUpdateLastConsumedMessageIndex:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatUpdateLastConsumedMessageIndex-${Environment}'
+      Handler: chatUpdateLastConsumedMessageIndex.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCompanyUpdateUserRole:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'companyUpdateUserRole-${Environment}'
+      Handler: companyUpdateUserRole.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCompanyResign:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'companyResign-${Environment}'
+      Handler: companyResign.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCompanyAssignUserToEventWithRole:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'companyAssignUserToEventWithRole-${Environment}'
+      Handler: companyAssignUserToEventWithRole.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCompanyAssignUserToStandWithRole:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'companyAssignUserToStandWithRole-${Environment}'
+      Handler: companyAssignUserToStandWithRole.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaBinaryDeleteById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'binaryDeleteById-${Environment}'
+      Handler: binaryDeleteById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'sqs-send-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+          SqsBinaryDeleteUrl: !ImportValue
+            Fn::Sub: 'sqs-binary-delete-url-${Environment}'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaBinaryUpdateById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'binaryUpdateById-${Environment}'
+      Handler: binaryUpdateById.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaDictionaryGet:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'dictionaryGet-${Environment}'
+      Handler: dictionaryGet.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaPricingGetAll:
+    Type: AWS::Lambda::Function
+    Description: Get all pricing entries for an event
+    Properties:
+      FunctionName: !Sub 'pricingGetAll-${Environment}'
+      Handler: pricingGetAll.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaPricingCreateNew:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'pricingCreateNew-${Environment}'
+      Handler: pricingCreateNew.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaPricingUpdate:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'pricingUpdate-${Environment}'
+      Handler: pricingUpdate.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaPricingDeleteById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'pricingDeleteById-${Environment}'
+      Handler: pricingDeleteById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaChatGetToken:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'chatGetToken-${Environment}'
+      Handler: chatGetToken.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'twilio-layer-arn-${Environment}'
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaArticlesGet:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'articlesGet-${Environment}'
+      Handler: articlesGet.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaArticleGetById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'articleGetById-${Environment}'
+      Handler: articleGetById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaArticleDeleteById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'articleDeleteById-${Environment}'
+      Handler: articleDeleteById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'sqs-send-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+          SqsBinaryDeleteUrl: !ImportValue
+            Fn::Sub: 'sqs-binary-delete-url-${Environment}'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaArticleCreateNew:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'articleCreateNew-${Environment}'
+      Handler: articleCreateNew.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaArticleUpdateById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'articleUpdateById-${Environment}'
+      Handler: articleUpdateById.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaActivityStreamGetForEntity:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'activityStreamGetForEntity-${Environment}'
+      Handler: activityStreamGetForEntity.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaTierCreateNew:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'tierCreateNew-${Environment}'
+      Handler: tierCreateNew.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaTiersGetForEvent:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'tiersGetForEvent-${Environment}'
+      Handler: tiersGetForEvent.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaTierUpdate:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'tierUpdate-${Environment}'
+      Handler: tierUpdate.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaSponsorshipGetActionData:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'sponsorshipGetActionData-${Environment}'
+      Handler: sponsorshipGetActionData.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaSponsorshipRecordAction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'sponsorshipRecordAction-${Environment}'
+      Handler: sponsorshipRecordAction.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaSponsorshipUpdateData:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'sponsorshipUpdateData-${Environment}'
+      Handler: sponsorshipUpdateData.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaSponsorshipDeleteData:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'sponsorshipDeleteData-${Environment}'
+      Handler: sponsorshipDeleteData.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 's3-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventPageGetPromos:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'eventPageGetPromos-${Environment}'
+      Handler: eventPageGetPromos.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaSponsorshipRecordView:
+    Type: AWS::Lambda::Function
+    Description: store sponsor material view event, update ticket metadata if required
+    Properties:
+      FunctionName: !Sub 'sponsorshipRecordView-${Environment}'
+      Handler: sponsorshipRecordView.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaTierGetPricing:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'tierGetPricing-${Environment}'
+      Handler: tierGetPricing.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventGetAttendees:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'eventGetAttendees-${Environment}'
+      Handler: eventGetAttendees.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaUserConfirmRegistration:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'userConfirmRegistration-${Environment}'
+      Handler: userConfirmRegistration.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaEventBuySponsorship:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'eventBuySponsorship-${Environment}'
+      Handler: eventBuySponsorship.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaSponsorshipRequestRefund:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'sponsorshipRequestRefund-${Environment}'
+      Handler: sponsorshipRequestRefund.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaActivityStreamCleanupForEvent:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'activityStreamCleanupForEvent-${Environment}'
+      Handler: activityStreamCleanupForEvent.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaFeedbackPost:
+    Type: AWS::Lambda::Function
+    Description: low level requests
+    Properties:
+      FunctionName: !Sub 'feedbackPost-${Environment}'
+      Handler: feedbackPost.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaGetSponsoredEvents:
+    Type: AWS::Lambda::Function
+    Description: low level requests
+    Properties:
+      FunctionName: !Sub 'getSponsoredEvents-${Environment}'
+      Handler: getSponsoredEvents.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaLowlevelPost:
+    Type: AWS::Lambda::Function
+    Description: low level requests
+    Properties:
+      FunctionName: !Sub 'lowlevelPost-${Environment}'
+      Handler: lowlevelPost.handler
+      Layers:
+        - !ImportValue 
+            Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+#==================================
+#STAND
+  lambdaStandGetReps:
+    Type: AWS::Lambda::Function
+    Description: Get stand representatives with their schedules. Endpoint GET /stand/{standid}/reps
+    Properties:
+      FunctionName: !Sub 'standGetRepresentatives2-${Environment}'
+      Handler: standGetReps.handler
+      Layers:
+        - !ImportValue 
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandCreateMeeting:
+    Type: AWS::Lambda::Function
+    Description: Create meeting in unconfirmed status with stand rep. Endpoint POST /stand/{standid}/meeting
+    Properties:
+      FunctionName: !Sub 'StandCreateMeeting-${Environment}'
+      Handler: standCreateMeeting.handler
+      Layers:
+        - !ImportValue 
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandConfirmMeeting:
+    Type: AWS::Lambda::Function
+    Description: Confirm meeting request by stand rep. Endpoint PUT /stand/{standid}/meeting
+    Properties:
+      FunctionName: !Sub 'standConfirmMeeting2-${Environment}'
+      Handler: standConfirmMeeting.handler
+      Layers:
+        - !ImportValue 
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaStandCancelMeeting:
+    Type: AWS::Lambda::Function
+    Description: Cancel or reject meeting request by stand rep or visitor. Endpoint DELETE /stand/{standid}/meeting
+    Properties:
+      FunctionName: !Sub 'standCancelMeeting2-${Environment}'
+      Handler: standCancelMeeting.handler
+      Layers:
+        - !ImportValue 
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue 
+        Fn::Sub: 'ses-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags: 
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaSearchReindex:
+    Type: AWS::Lambda::Function
+    Description: Initiate search reindex sequence. POST /search/reindex
+    Properties:
+      FunctionName: !Sub 'searchReindex-${Environment}'
+      Handler: searchReindex.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaSearchGet:
+    Type: AWS::Lambda::Function
+    Description: Search request processing. GET /search
+    Properties:
+      FunctionName: !Sub 'searchGet-${Environment}'
+      Handler: searchGet.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'es-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+          #disabling ES for search indexing. This way we can skip deploying cf-es.yaml
+          #ELASTICSEARCH_DOMAIN: !ImportValue
+          #  Fn::Sub: 'tex-es-endpoint'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaGetEventReps:
+    Type: AWS::Lambda::Function
+    Description: Get event representatives with their schedules. Endpoint GET /event/{eventid}/reps
+    Properties:
+      FunctionName: !Sub 'eventGetRepresentatives-${Environment}'
+      Handler: eventGetReps.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaDiscountGetById:
+    Type: AWS::Lambda::Function
+    Description: Get discount by it's id. Endpoint GET /open/discount/{discountCode}
+    Properties:
+      FunctionName: !Sub 'discountGetById-${Environment}'
+      Handler: discountGetById.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCollectionCreateNew:
+    Type: AWS::Lambda::Function
+    Description: Create new collection. Endpoint POST /event/{eventid}/collection
+    Properties:
+      FunctionName: !Sub 'collectionCreateNew-${Environment}'
+      Handler: collectionCreateNew.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCollectionsGet:
+    Type: AWS::Lambda::Function
+    Description: return all available collections. Endpoint GET /event/{eventid}/collections
+    Properties:
+      FunctionName: !Sub 'collectionsGet-${Environment}'
+      Handler: collectionsGet.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCollectionUpdateById:
+    Type: AWS::Lambda::Function
+    Description: update collection. Endpoint PUT /event/{eventid}/collection/{collectionid}
+    Properties:
+      FunctionName: !Sub 'collectionUpdateById-${Environment}'
+      Handler: collectionUpdateById.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCollectionDeleteById:
+    Type: AWS::Lambda::Function
+    Description: delete collection. Endpoint DELETE /event/{eventid}/collection/{collectionid}
+    Properties:
+      FunctionName: !Sub 'collectionDeleteById-${Environment}'
+      Handler: collectionDeleteById.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'sqs-send-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+          SqsBinaryDeleteUrl: !ImportValue
+            Fn::Sub: 'sqs-binary-delete-url-${Environment}'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaCollectionGetById:
+    Type: AWS::Lambda::Function
+    Description: return collection by id. Endpoint GET /event/{eventid}/collection/{collectionid}
+    Properties:
+      FunctionName: !Sub 'collectionGetById-${Environment}'
+      Handler: collectionGetById.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+
+  #=====================================================================
+  # Messengerpeople integration
+  lambdaMessengerPeopleAuthorizer:
+    Type: AWS::Lambda::Function
+    Description: authorize a webhook call from Messengerpeople
+    Properties:
+      FunctionName: !Sub 'messengerpeopleAuthorizer-${Environment}'
+      Handler: messengerpeopleAuthorizer.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  lambdaMessengerPeopleWebhook:
+    Type: AWS::Lambda::Function
+    Description: process a webhook call from Messengerpeople
+    Properties:
+      FunctionName: !Sub 'messengerpeopleWebhook-${Environment}'
+      Handler: messengerpeopleWebhook.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/API
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  AuthorizerInvokationRole:
+    Type: AWS::IAM::Role
+    Description: Messengerpeople authorizer with role
+    Properties:
+      RoleName: !Sub 'api-gateway-authoriser-messengerpeople-role-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - apigateway.amazonaws.com
+  AuthorizerInvocationPolicy:
+    Type: AWS::IAM::Policy
+    DependsOn: [AuthorizerInvokationRole]
+    Properties:
+      PolicyName: AuthorizerInvocationPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: lambda:InvokeFunction
+            Resource: !GetAtt lambdaMessengerPeopleAuthorizer.Arn
+      Roles:
+        - !Ref AuthorizerInvokationRole
+
+#  MessengerpeopleAuthorizer:
+#    Type: AWS::ApiGateway::Authorizer
+#    Properties:
+#      AuthorizerCredentials: !GetAtt ApiGatewayAccessRole.Arn
+##      AuthorizerResultTtlInSeconds: 30
+#      AuthorizerUri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaMessengerPeopleAuthorizer.Arn}/invocations'
+#      AuthType: apiKey
+#      IdentitySource: method.request.header.Bearer
+#      IdentityValidationExpression: '.*'
+#      Name:     messengerpeople
+##      ProviderARNs:
+##        - string
+#      RestApiId: !Ref TexAPI
+#      Type: REQUEST
+#
+#  MessengerpeopleAuthorizerPermission:
+#    Type: "AWS::Lambda::Permission"
+#    Properties:
+#      Action: lambda:InvokeFunction
+#      FunctionName: !GetAtt lambdaMessengerPeopleAuthorizer.Arn
+#      Principal: "apigateway.amazonaws.com"
+#      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${TexAPI}/authorizers/${MessengerpeopleAuthorizer}"
+
+  #=====================================================================
+#API GATEWAY
+  ApiGatewayAccessRole:
+    Type: AWS::IAM::Role
+    Description: we need this role here to substitute in openapi file while deploying update. Import from other stacks won't work easily as it requires multiline replace.
+    Properties:
+      RoleName: !Sub 'api-gateway-access-role-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - apigateway.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      ManagedPolicyArns: []
+      Path: /
+      Policies:
+        - PolicyName: TexApiGatewayRolePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: arn:aws:logs:::*
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - apigateway:*
+                  - iam:PassRole
+                Resource: '*'
+
+  ApiGatewayAccount:
+    Type: AWS::ApiGateway::Account
+    Properties:
+      CloudWatchRoleArn: !ImportValue 
+        Fn::Sub: 'api-gateway-logging-role-arn-${Environment}'
+  
+  ApiStage:
+    DependsOn:
+      - ApiGatewayAccount
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref 'ApiDeployment'
+      MethodSettings:
+        - DataTraceEnabled: true
+          HttpMethod: '*'
+          LoggingLevel: INFO
+          ResourcePath: /*
+      RestApiId: !Ref 'TexAPI'
+      StageName: !Ref 'APIStage'
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref 'TexAPI'
+      StageName: DummyStage
+
+  TexAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub "Tex API - ${Environment}"
+      Description: API used for frontend requests
+      FailOnWarnings: true
+      BinaryMediaTypes:
+        - text/csv
+      Body: !Transform
+        Name: AWS::Include
+        Parameters:
+          Location: s3://openexpo-lambda-storage-dev/openapi.yaml
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+#=====================================================================
+#OUTPUTS
+
+Outputs:
+  TexAPI:
+    Description: API Endpoint
+    Value: !Ref 'TexAPI'
+    Export:
+      Name: !Sub 'TexAPI-${Environment}'
+  TexApiGatewayAccessRoleArn:
+    Value: !GetAtt ApiGatewayAccessRole.Arn
+    Export:
+        Name: !Sub 'api-gateway-access-role-arn-${Environment}'
+    Description: Api Gateway access role for running lambdas

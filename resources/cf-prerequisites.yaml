@@ -1,0 +1,496 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Basics required by multiple other templates and resources
+
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+
+Resources:
+
+#========================================================
+# ROLES
+#========================================================
+  LambdaSESRole:
+    Type: AWS::IAM::Role
+    Description: Lambda role with SES access
+    Properties:
+      RoleName: !Sub 'LambdaSESRole-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: SESRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                  - ses:SendTemplatedEmail
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - lambda:invokeFunction
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - dynamodb:Scan
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: '*'
+
+  LambdaBasicRole:
+    Type: AWS::IAM::Role
+    Description: Lambda role with minimal required access
+    Properties:
+      RoleName: !Sub 'LambdaBasicRole-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: LambdaExecutionRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:invokeFunction
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:GetItem"
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: '*'
+
+  LambdaCognitoSESRole:
+    Type: AWS::IAM::Role
+    Description: Lambda role with cognito update capabilities, with SES to send emails
+    Properties:
+      RoleName: !Sub 'LambdaCognitoSESRole-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: LambdaCognitoSESRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:invokeFunction
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:GetItem"
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                  - ses:SendTemplatedEmail
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - cognito-idp:AdminGetUser
+                  - cognito-idp:AdminCreateUser
+                  - cognito-idp:AdminDeleteUser
+                  - cognito-idp:AdminUpdateUserAttributes
+                  - cognito-idp:AdminConfirmSignUp
+                Resource: '*'
+        - PolicyName: allowSqsSend
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:ChangeMessageVisibility
+                Resource: '*'
+
+  LambdaS3Role:
+    Type: AWS::IAM::Role
+    Description: Lambda role with S3 access
+    Properties:
+      RoleName: !Sub 'LambdaS3Role-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: S3Role
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource:
+                  - !Join
+                    - ''
+                    - - 'arn:aws:s3:::'
+                      - '*'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:GetObjectTagging
+                  - s3:PutObjectTagging
+                Resource:
+                  - !Join
+                    - ''
+                    - - 'arn:aws:s3:::'
+                      - '*'
+                      - /*
+              - Effect: Allow
+                Action:
+                  - lambda:invokeFunction
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - "dynamodb:DescribeTable"
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:GetItem"
+                Resource: 
+                  Fn::Sub: "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/texorigins"
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: '*'
+
+  LambdaVideoRole:
+    Type: AWS::IAM::Role
+    Description: Lambda role with S3 access
+    Properties:
+      RoleName: !Sub 'LambdaVideoRole-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: VideoRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:invokeFunction
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+# VPC evexution requirement
+              - Effect: Allow
+                Action:
+                  - "ec2:DescribeNetworkInterfaces"
+                  - "ec2:CreateNetworkInterface"
+                  - "ec2:DeleteNetworkInterface"
+                  - "ec2:DescribeInstances"
+                  - "ec2:AttachNetworkInterface"
+                Resource: '*'
+# network configuration
+              - Effect: Allow
+                Action:
+                  - "elasticloadbalancing:DescribeLoadBalancers"
+                  - "elasticloadbalancing:DescribeTargetGroups"
+                  - "elasticloadbalancing:DescribeTargetHealth"
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - "dynamodb:DescribeTable"
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:GetItem"
+                Resource:
+                  Fn::Sub: "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/texorigins"
+              - Effect: Allow
+                Action:
+                  - "dynamodb:DescribeTable"
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:DeleteItem"
+                  - "dynamodb:UpdateItem"
+                  - "dynamodb:ConditionCheckItem"
+                Resource:
+                  - Fn::Sub: "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/texvideosession-${Environment}"
+                  - Fn::Sub: "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/texvideosession-${Environment}/index/*"
+                  - Fn::Sub: "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/texvideouser-${Environment}"
+                  - Fn::Sub: "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/texvideouser-${Environment}/index/*"
+                  - Fn::Sub: "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/texvideohistory-${Environment}"
+                  - Fn::Sub: "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/texvideohistory-${Environment}/index/*"
+              - Effect: Allow
+                Action:
+                  - "dynamodb:DescribeTable"
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:ConditionCheckItem"
+                Resource:
+                  - Fn::Sub: "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/texorigins"
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: '*'
+
+  LambdaESRole:
+    Type: AWS::IAM::Role
+    Description: Lambda role with elasticsearch access, content only, no management
+    Properties:
+      RoleName: !Sub 'LambdaESRole-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: ESRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - es:ESHttp*
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - lambda:invokeFunction
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - dynamodb:Scan
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: '*'
+
+  ApiGatewayCloudWatchLogsRole:
+    Type: AWS::IAM::Role
+    Description: Api Gateway logging enabled role
+    Properties:
+      RoleName: !Sub 'api-gateway-cloudwatch-role-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - sts:AssumeRole
+          - Effect: Allow
+            Principal:
+              Service:
+                - cognito-idp.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: ApiGatewayLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvents
+                  - logs:GetLogEvents
+                  - logs:FilterLogEvents
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - lambda:invokeFunction
+                Resource: '*'
+
+#========================================================
+# LAYERS
+#========================================================
+
+  AWSSDK2LambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - nodejs12.x
+      Content:
+        S3Bucket: !Sub 'openexpo-lambda-storage-${Environment}'
+        S3Key: layer-aws.zip
+      Description: AWS SDK layer
+      LayerName: !Sub 'aws-sdk-2-layer-${Environment}'
+      LicenseInfo: MIT
+
+  PGLambdaLayer2:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - nodejs12.x
+      Content:
+        S3Bucket: !Sub 'openexpo-lambda-storage-${Environment}'
+        S3Key: layer-database.zip
+      Description: Postgres layer and Pino logging framework
+      LayerName: !Sub 'postgres-layer-${Environment}'
+      LicenseInfo: MIT
+
+
+  TwilioLambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - nodejs12.x
+        - nodejs10.x
+      Content:
+        S3Bucket: !Sub 'openexpo-lambda-storage-${Environment}'
+        S3Key: layer-twilio.zip
+      Description: Twilio layer
+      LayerName: !Sub 'twilio-layer-${Environment}'
+      LicenseInfo: MIT
+
+#========================================================
+
+Outputs:
+  TexSESLambdaRoleArn:
+    Value: !GetAtt LambdaSESRole.Arn
+    Export:
+        Name: !Sub 'ses-lambda-role-arn-${Environment}'
+    Description: Lambda role with SES access
+  TexESLambdaRoleArn:
+    Value: !GetAtt LambdaESRole.Arn
+    Export:
+      Name: !Sub 'es-lambda-role-arn-${Environment}'
+    Description: Lambda role with ElasticSearch access
+  TexBasicLambdaRoleArn:
+    Value: !GetAtt LambdaBasicRole.Arn
+    Export:
+        Name: !Sub 'basic-lambda-role-arn-${Environment}'
+    Description: Lambda role with minimal required access
+  TexS3LambdaRoleArn:
+    Value: !GetAtt LambdaS3Role.Arn
+    Export:
+        Name: !Sub 's3-lambda-role-arn-${Environment}'
+    Description: Lambda role with S3 access
+  TexVideoLambdaRoleArn:
+    Value: !GetAtt LambdaVideoRole.Arn
+    Export:
+        Name: !Sub 'video-lambda-role-arn-${Environment}'
+    Description: Lambda role with access video table in dynamodb
+  TexApiGatewayLoggingRoleArn:
+    Value: !GetAtt ApiGatewayCloudWatchLogsRole.Arn
+    Export:
+        Name: !Sub 'api-gateway-logging-role-arn-${Environment}'
+    Description: Api Gateway logging enabled role
+  TexLambdaCognitoSESRole:
+    Value: !GetAtt LambdaCognitoSESRole.Arn
+    Export:
+      Name: !Sub 'cognito-ses-lambda-role-arn-${Environment}'
+    Description: Lambda role with SES access and Cognito update
+
+#-----------
+  TexAWSSDK2LambdaLayer:
+    Value: !Ref AWSSDK2LambdaLayer
+    Export:
+        Name: !Sub 'aws-sdk-2-layer-arn-${Environment}'
+    Description: Lambda layer with latest aws-sdk-2
+
+  TexPostgresLambdaLayerNew:
+    Value: !Ref PGLambdaLayer2
+    Export:
+      Name: !Sub 'postgres-log-layer-arn-${Environment}'
+    Description: Lambda layer to have everything related to Postgres
+
+  TexTwilioLambdaLayer:
+    Value: !Ref TwilioLambdaLayer
+    Export:
+        Name: !Sub 'twilio-layer-arn-${Environment}'
+    Description: Lambda layer to have everything related to Twilio integration

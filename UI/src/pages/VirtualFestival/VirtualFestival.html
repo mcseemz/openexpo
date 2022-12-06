@@ -1,0 +1,124 @@
+<div class="page_wrapper static_nik_page" v-if="localesLoaded">
+
+	<!-- Hero -->
+    <div class="page-hero_wrapper">
+        <div class="page-hero content-wrapper">
+            <div class="breadcrumbs">
+                <ul class="breadcrumbs_list">
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('home')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray">
+                        <router-link :to="'/'+routes.solutions" class="breadcrumbs_link breadcrumbs_link--gray">{{tr('solutions')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--gray ">
+                        <span class="breadcrumbs_link breadcrumbs_link--gray breadcrumbs_link--active">{{tr('virtual_film_festival_title')}}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="hero_content">
+                <div class="hero_content_inner">
+                    <div class="hero_content_text hero_content_text--mr">
+                        <p class="hero_subtitle hero_subtitle--gray">{{tr('virtual_film_festival_subtitle')}}</p>
+                        <h1 class="hero_title hero_title--gray">{{tr('virtual_film_festival_title')}}</h1>
+                        <p class="hero_text hero_text--gray" v-html="tr('virtual_film_festival_text')"></p>
+
+                        <div class="hero--btns">
+                            <router-link :to="'/'+routes.addevent" class="primary-btn">{{tr('create_event_btn')}}</router-link>
+                            <button @click="requestDemoClick" class="primary-btn primary-btn--reverse">{{tr('request_a_demo_btn')}}</button>
+                        </div>
+                    </div>
+                    <div class="hero_content_img">
+                        <img class="hero_img--people" src="@/img/static-pages/virtual-festival-platform/hero.png" alt="Host a virtual festival with Openexpo!">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="page-main_wrapper">
+        <main class="page-main">
+            <!-- 1 -->
+            <AddCustomFields :color="'blue'"></AddCustomFields>
+
+            <Customisation :color="'white'"></Customisation>
+
+            <!-- 2 -->
+            <InviteSponsors :color="'blue'"></InviteSponsors>
+
+            <article class="article-block article-block--m100 article-block--white">
+                <h2 class="article-title article-title--center article-title-m0" v-html="tr('add_cinemas_to_your_event_title')"></h2>
+                <ol class="fox-list">
+                    <li class="fox-item content-wrapper">
+                        <p class="fox-list--head"></p>
+                        <article class="article-block article-block--m70">
+                            <div class="article_header article_header--center content-wrapper">
+                                <div class="article_img_wrapper article_img_wrapper--small">
+                                    <img class="article_img" src="@/img/static-pages/virtual-festival-platform/list-1.jpg" alt="Adding cinemas to your event">
+                                </div>
+                                <div class="article_header_content article_header_content-ml">
+                                    <h2 class="article-title article-title--small article-title-m0" v-html="tr('adding_cinemas_to_your_event_title')"></h2>
+                                    <p class="article_text">{{tr('adding_cinemas_to_your_event_text')}}</p>
+                                    <ol class="ordered_list">
+                                        <li class="ordered_item">{{tr('adding_cinemas_to_your_event_tab1')}}</li>
+                                        <li class="ordered_item">{{tr('adding_cinemas_to_your_event_tab2')}}</li>
+                                        <li class="ordered_item">{{tr('adding_cinemas_to_your_event_tab3')}}</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </article>
+                    </li>
+                    <li class="fox-item content-wrapper">
+                        <article class="article-block article-block--m70">
+                            <div class="article_header article_header--center content-wrapper">
+                                <div class="article_header_content article_header_content-ml">
+                                    <h2 class="article-title article-title--small article-title-m0" v-html="tr('create_schedule_for_cinema_title')"></h2>
+                                    <p class="article_text">{{tr('create_schedule_for_cinema_text')}}</p>
+                                    <ol class="ordered_list">
+                                        <li class="ordered_item">{{tr('create_schedule_for_cinema_tab1')}}</li>
+                                        <li class="ordered_item">{{tr('create_schedule_for_cinema_tab2')}}</li>
+                                        <li class="ordered_item">{{tr('create_schedule_for_cinema_tab3')}}</li>
+                                    </ol>
+                                </div>
+                                <div class="article_img_wrapper article_img_wrapper--small">
+                                    <img class="article_img" src="@/img/static-pages/virtual-festival-platform/list-2.png" alt="Create agenda for each cinema">
+                                </div>
+                            </div>
+                        </article>
+                    </li>
+                    <li class="fox-item content-wrapper">
+                        <article class="article-block article-block--m70">
+                            <div class="article_header article_header--center content-wrapper">
+                                <div class="article_img_wrapper article_img_wrapper--small">
+                                    <img class="article_img" src="@/img/static-pages/virtual-festival-platform/list-3.png" alt="Add videos from Youtube or Vimeo">
+                                </div>
+                                <div class="article_header_content article_header_content-ml">
+                                    <h2 class="article-title article-title--small article-title-m0" v-html="tr('add_videos_youtube_title')"></h2>
+                                    <p class="article_text">{{tr('add_videos_youtube_text')}}</p>
+                                    <ul class="unordered_list">
+                                        <li class="unordered_item">{{tr('add_videos_youtube_tab1')}}</li>
+                                        <li class="unordered_item">{{tr('add_videos_youtube_tab2')}}</li>
+                                        <li class="unordered_item">{{tr('add_videos_youtube_tab3')}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </article>
+                        <p class="fox-list--tail"></p>
+                    </li>
+                </ol>
+            </article>
+
+            <!-- 5 -->
+            <EngageSponsors></EngageSponsors>
+
+            <!-- 7 -->
+            <SolutionsCarousel :color="'white'"></SolutionsCarousel>
+
+            <!-- 8 -->
+            <StaticBottomSection :color="'blue'"></StaticBottomSection>
+        </main>
+    </div>
+
+    <RequestDemo ref="request_demo"></RequestDemo>
+</div>

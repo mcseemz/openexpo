@@ -1,0 +1,61 @@
+
+Scenario: Successful Login
+Given I am not registered user
+And I have correct login credentials as Login and Password
+
+When I press "Sign In" button
+Then I see login page
+
+When Login value entered into "Login" field
+And  Password value entered into "Password" field
+And  Press "Login" button pressed
+Then Page refreshed
+And  I see user avatar in header
+
+Scenario: Unsuccessful Login
+
+Scenario: Logout
+
+#events
+
+Scenario: Create event
+
+Scenario: Send stand invitation
+
+Scenario: Accept stand invitation
+
+Scenario: Reject stand invitation
+
+Scenario: Upload event branding
+
+Scenario: Change event branding
+
+Scenario: Set event agenda
+
+Scenario: Update event agenda
+
+Scenario: Set event description
+
+Scenario: Update event description
+
+Scenario: Set payment information
+
+Scenario: Update payment information
+
+Scenario: Set event downloadables
+
+Scenario: Update event downloadables
+
+
+
+Scenario: Resize image
+Given I am registered
+And I created event
+
+When I upload image to event
+And I fetch resized image
+
+Then I should get resized image
+
+
+https://crossover.zoom.us/j/6408201428

@@ -1,0 +1,127 @@
+<section class="my_events_main preloader_wrapper">
+
+	<div class="preloader_overlay" v-show="preload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+	<div class="container" :class="{'op_loading': preload}">
+		<div class="my_events_not_found" v-if="notFound">
+			<img src="../img/illustration_calendar.svg" alt="">
+			<div class="big_text">{{tr('myevents_noevents_text')}}</div>
+			<router-link :to="'/'+routes.discover" v-if="features.discover" class="btn btn_orange btn_md">
+				{{tr('myevents_search_events')}}
+			</router-link>
+		</div>
+		<div class="my_events_grid_section" v-if="!notFound">
+			
+			<div class="my_events_search_block events_search_block">
+				<div class="events_search">
+					<div class="events_search_left flex">
+						<div class="search_input_block">
+							<input type="search" v-model="searchString" class="search_input" :placeholder="tr('myevents_search_ph')">
+							<a href="#" class="search_btn"><img src="../../../img/search_icon.svg" alt=""></a>
+						</div>	
+					</div>
+
+					<div class="events_search_right flex">
+						<div class="events_search_date">
+							<ui-datepicker
+				                :placeholder="tr('select_a_date')"
+				                iconPosition="right"
+				                v-model="date_val"
+				                :lang="datepicker_lang"
+				            >
+				            	<img slot="icon" src="../../../img/dropdown_arrow.svg" alt="">
+				            	{{tr('date')}}
+				            </ui-datepicker>
+						</div>
+						<!-- <div class="filter_trigger_block"><a href="#" @click="triggerFilter" class="filter_trigger"><img src="../../../img/filter_icon.svg" alt=""></a></div> -->
+					</div>
+				</div>
+				<div class="events_search_filter_items" v-if="expand_filter">
+					<!-- <div class="filter_item">
+						<div class="text">
+							<div class="item_title">{{tr('order_by')}}:</div>
+							<div class="item_text">{{tr('order_by')}}</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div>
+					<div class="filter_item">
+						<div class="text">
+							<div class="item_title">{{tr('event_type')}}</div>
+							<div class="item_text">{{tr('event_type')}}</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div> -->
+				<!-- 	<div class="filter_item">
+						<div class="text">
+							<div class="item_title">Country</div>
+							<div class="item_text">Select country</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div>
+					<div class="filter_item">
+						<div class="text">
+							<div class="item_title">City</div>
+							<div class="item_text">Select city</div>
+						</div>
+						<a href=""><img src="../../../img/dropdown_arrow.svg" alt="" class="dropdown_img"></a>
+					</div> -->
+					
+				</div>
+
+			</div>
+
+			<div class="events_grid">
+				<div class="events_grid">
+
+					<div class="events_item" v-if="filteredEventsList[stand.eventId] && slq" v-for="stand in standList">
+						<router-link :to="'/'+routes.event+'/'+(filteredEventsList[stand.eventId].customName ? filteredEventsList[stand.eventId].customName :filteredEventsList[stand.eventId].id)" class="img_block" :class="{'image_placeholder': !eventsList[stand.eventId].templateCoverUrl }">
+							<img :src="eventsList[stand.eventId].templateCoverUrl" alt="">
+						</router-link>
+						
+						<div class="content">
+							<div class="top flex">
+								<div class="date" v-if="eventsList[stand.eventId].evtItemDate">
+									<p class="month">{{eventsList[stand.eventId].evtItemDate.month}}</p>
+									<p class="nums">{{eventsList[stand.eventId].evtItemDate.date}}</p>
+								</div>
+								<div class="logo"><img :src="eventsList[stand.eventId].logoUrl" alt=""></div>
+							</div>
+							<div class="main">
+								<router-link :to="'/'+routes.event+'/'+(filteredEventsList[stand.eventId].customName ? filteredEventsList[stand.eventId].customName :filteredEventsList[stand.eventId].id)"><h3 class="title">{{eventsList[stand.eventId].name}}</h3></router-link>
+							</div>
+							<div class="bottom flex">
+								<div class="location flex">
+									<!-- <img src="../../../img/loc2.svg" alt="">
+									<p>London, UK</p> -->
+									<p v-if="eventsList[stand.eventId].langList">{{eventsList[stand.eventId].langList}}</p>
+								</div>
+								<div class="price_box">
+									<p class="text">Starts at</p>
+									<p class="price">{{startPricing(eventsList[stand.eventId])}}</p>
+								</div>
+							</div>
+						</div>
+						<div class="events_item_footer">
+							<p class="events_item_footer_stand">
+								{{stand.name}}
+							</p>
+							<div class="action_buttons">
+								
+								<router-link :to="'/'+routes.stand+'/'+(stand.customName ? stand.customName :stand.id)" class="action_button">
+									<img src="../../../img/preview_filled.svg" alt=""><span>{{tr('preview')}}</span>
+								</router-link>
+								<router-link :to="'/'+routes.editstand+'/'+(stand.customName ? stand.customName :stand.id)" class="action_button">
+									<img src="../../../img/edit_filled.svg" alt=""><span>{{tr('edit')}}</span>
+								</router-link>
+							</div>
+						</div>
+						<div v-if="dateLeft(eventsList[stand.eventId]) != 'Past'" class="time_remaning">{{dateLeft(eventsList[stand.eventId])}}</div>
+						<div v-if="dateLeft(eventsList[stand.eventId]) == 'Past'" class="time_remaning past">{{tr('past')}}</div>
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+</section>

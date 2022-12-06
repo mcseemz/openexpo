@@ -1,0 +1,9 @@
+site_name: Scripts
+nav:
+    - Home: 'index.md'
+theme: readthedocs
+docs_dir: ./markdown
+site_dir: ../documentation/cloudformation
+use_directory_urls: false
+markdown_extensions:
+    - sane_lists

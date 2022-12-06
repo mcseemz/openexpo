@@ -1,0 +1,109 @@
+{
+  "faq_tabs": [
+    {
+      "tab_title" : "Getting Started",
+      "svg_icon" : "<svg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M28.2783 13.2929C28.6689 12.9024 29.302 12.9024 29.6926 13.2929C30.053 13.6534 30.0808 14.2206 29.7757 14.6129L29.6926 14.7071L16.7016 27.6981C16.3411 28.0586 15.7738 28.0863 15.3816 27.7813L15.2873 27.6981L10.2929 22.7036C9.90237 22.3131 9.90237 21.68 10.2929 21.2894C10.6534 20.9289 11.2206 20.9012 11.6129 21.2062L11.7071 21.2894L15.6409 25.2229C15.8362 25.4181 16.1527 25.4181 16.348 25.2229L28.2783 13.2929Z' fill='#70B9C3'/></svg>",
+
+      "tab_items" : [
+        {
+          "item_title" : "How does an online exhibition work?",
+          "item_text" : "Exhibitions are one of the most effective ways of promoting your products and brands to your targeted audience. An online exhibition works in the same way. You can promote your product or services to lots of potential clients who can also influence your industry.<br><br>Unlike an offline exhibition, we don’t close our doors. With the opportunity for a year-round attendance, you are assured of generating sales leads from your virtual stand for a long period of time."
+        },
+        {
+          "item_title" : "Why choose an online event over an offline event?",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "TESTLorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        }
+      ]
+    },
+    {
+      "tab_title" : "Create an event",
+      "svg_icon" : "<svg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M23.9384 7.87536H22.6461V7.1369C22.6461 6.72927 22.3152 6.39844 21.9076 6.39844C21.5 6.39844 21.1691 6.72927 21.1691 7.1369V7.87536H10.8307V7.1369C10.8307 6.72927 10.4998 6.39844 10.0922 6.39844C9.68458 6.39844 9.35375 6.72927 9.35375 7.1369V7.87536H8.06144C7.14538 7.87536 6.3999 8.62084 6.3999 9.5369V23.9369C6.3999 24.853 7.14538 25.5984 8.06144 25.5984H23.9384C24.8544 25.5984 25.5999 24.853 25.5999 23.9369V9.5369C25.5999 8.62084 24.8544 7.87536 23.9384 7.87536ZM23.9384 24.1215H8.06144C7.95953 24.1215 7.87683 24.0384 7.87683 23.9369V13.0446H24.123V23.9369C24.123 24.0384 24.0399 24.1215 23.9384 24.1215ZM10.0922 20.4292C10.5001 20.4292 10.8307 20.7598 10.8307 21.1677C10.8307 21.5755 10.5001 21.9061 10.0922 21.9061C9.68437 21.9061 9.35375 21.5755 9.35375 21.1677C9.35375 20.7598 9.68437 20.4292 10.0922 20.4292ZM13.0461 20.4292C13.4539 20.4292 13.7845 20.7598 13.7845 21.1677C13.7845 21.5755 13.4539 21.9061 13.0461 21.9061C12.6382 21.9061 12.3076 21.5755 12.3076 21.1677C12.3076 20.7598 12.6382 20.4292 13.0461 20.4292ZM15.9999 20.4292C16.4077 20.4292 16.7384 20.7598 16.7384 21.1677C16.7384 21.5755 16.4077 21.9061 15.9999 21.9061C15.5921 21.9061 15.2614 21.5755 15.2614 21.1677C15.2614 20.7598 15.5921 20.4292 15.9999 20.4292ZM18.9584 20.4292C19.3662 20.4292 19.6968 20.7598 19.6968 21.1677C19.6968 21.5755 19.3662 21.9061 18.9584 21.9061C18.5505 21.9061 18.2199 21.5755 18.2199 21.1677C18.2199 20.7598 18.5505 20.4292 18.9584 20.4292ZM10.0922 17.4754C10.5001 17.4754 10.8307 17.806 10.8307 18.2138C10.8307 18.6217 10.5001 18.9523 10.0922 18.9523C9.68437 18.9523 9.35375 18.6217 9.35375 18.2138C9.35375 17.806 9.68437 17.4754 10.0922 17.4754ZM13.0461 17.4754C13.4539 17.4754 13.7845 17.806 13.7845 18.2138C13.7845 18.6217 13.4539 18.9523 13.0461 18.9523C12.6382 18.9523 12.3076 18.6217 12.3076 18.2138C12.3076 17.806 12.6382 17.4754 13.0461 17.4754ZM15.9999 17.4754C16.4077 17.4754 16.7384 17.806 16.7384 18.2138C16.7384 18.6217 16.4077 18.9523 15.9999 18.9523C15.5921 18.9523 15.2614 18.6217 15.2614 18.2138C15.2614 17.806 15.5921 17.4754 15.9999 17.4754ZM18.9584 17.4754C19.3662 17.4754 19.6968 17.806 19.6968 18.2138C19.6968 18.6217 19.3662 18.9523 18.9584 18.9523C18.5505 18.9523 18.2199 18.6217 18.2199 18.2138C18.2199 17.806 18.5505 17.4754 18.9584 17.4754ZM21.9076 17.4754C22.3154 17.4754 22.6461 17.806 22.6461 18.2138C22.6461 18.6217 22.3154 18.9523 21.9076 18.9523C21.4998 18.9523 21.1691 18.6217 21.1691 18.2138C21.1691 17.806 21.4998 17.4754 21.9076 17.4754ZM13.0461 14.5215C13.4539 14.5215 13.7845 14.8521 13.7845 15.26C13.7845 15.6678 13.4539 15.9984 13.0461 15.9984C12.6382 15.9984 12.3076 15.6678 12.3076 15.26C12.3076 14.8521 12.6382 14.5215 13.0461 14.5215ZM15.9999 14.5215C16.4077 14.5215 16.7384 14.8521 16.7384 15.26C16.7384 15.6678 16.4077 15.9984 15.9999 15.9984C15.5921 15.9984 15.2614 15.6678 15.2614 15.26C15.2614 14.8521 15.5921 14.5215 15.9999 14.5215ZM18.9537 14.5215C19.3616 14.5215 19.6922 14.8521 19.6922 15.26C19.6922 15.6678 19.3616 15.9984 18.9537 15.9984C18.5459 15.9984 18.2153 15.6678 18.2153 15.26C18.2153 14.8521 18.5459 14.5215 18.9537 14.5215ZM21.9076 14.5215C22.3154 14.5215 22.6461 14.8521 22.6461 15.26C22.6461 15.6678 22.3154 15.9984 21.9076 15.9984C21.4998 15.9984 21.1691 15.6678 21.1691 15.26C21.1691 14.8521 21.4998 14.5215 21.9076 14.5215ZM9.35375 9.35228V10.0907C9.35375 10.4984 9.68458 10.8292 10.0922 10.8292C10.4998 10.8292 10.8307 10.4984 10.8307 10.0907V9.35228H21.1691V10.0907C21.1691 10.4984 21.5 10.8292 21.9076 10.8292C22.3152 10.8292 22.6461 10.4984 22.6461 10.0907V9.35228H23.9384C24.0399 9.35228 24.123 9.43499 24.123 9.5369V11.5677H7.87683V9.5369C7.87683 9.43499 7.95953 9.35228 8.06144 9.35228H9.35375Z' fill='#70B9C3'/></svg>",
+      "tab_items" : [
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Testes Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        }
+      ]
+    },
+    {
+      "tab_title" : "Checkout Process",
+      "svg_icon" : "<svg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' clip-rule='evenodd' d='M11.2386 12H28.7614C30.5472 12 32 13.4528 32 15.2386V24.7509C32 26.5367 30.5472 27.9895 28.7614 27.9895H11.2386C9.45281 27.9895 8 26.5367 8 24.7509V15.2386C8 13.4528 9.45281 12 11.2386 12ZM28.7614 13.9713H11.2386C10.5398 13.9713 9.97131 14.5398 9.97131 15.2386V16.0052H30.0287V15.2386C30.0287 14.5398 29.4602 13.9713 28.7614 13.9713ZM11.2386 26.0182H28.7614C29.4602 26.0182 30.0287 25.4497 30.0287 24.7509V17.9765H9.97131V24.7509C9.97131 25.4497 10.5398 26.0182 11.2386 26.0182ZM12.8514 21H14.1486C14.6188 21 15 21.4477 15 22C15 22.5523 14.6188 23 14.1486 23H12.8514C12.3812 23 12 22.5523 12 22C12 21.4477 12.3812 21 12.8514 21Z' fill='#70B9C3'/></svg>",
+      "tab_items" : [
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Tetetest Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        }
+      ]
+    },
+    {
+      "tab_title" : "Info for stand owners",
+      "svg_icon" : "<svg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M25.5649 10.9818L24.1935 6.86748C24.1002 6.58732 23.838 6.39836 23.5428 6.39844H8.45704C8.16177 6.39836 7.89961 6.58732 7.80631 6.86748L6.43486 10.9818C6.41372 11.0458 6.40191 11.1125 6.3999 11.1799C6.3999 11.1868 6.3999 11.1916 6.3999 11.1984V11.8842C6.40239 12.9585 6.91045 13.9691 7.77132 14.6119C7.77132 14.6174 7.77132 14.6215 7.77132 14.627V23.5413C7.77132 24.6774 8.69233 25.5984 9.82846 25.5984H22.1713C23.3074 25.5984 24.2284 24.6774 24.2284 23.5413V14.627C24.2284 14.6215 24.2284 14.6174 24.2284 14.6119C25.0893 13.9691 25.5974 12.9585 25.5999 11.8842V11.1984C25.5999 11.1916 25.5999 11.1868 25.5999 11.1799C25.5979 11.1125 25.5861 11.0458 25.5649 10.9818ZM20.7999 7.76985H23.0484L23.9631 10.5127H20.7999V7.76985ZM16.6856 7.76985H19.4285V10.5127H16.6856V7.76985ZM12.5713 7.76985H15.3142V10.5127H12.5713V7.76985ZM8.95144 7.76985H11.1999V10.5127H8.0367L8.95144 7.76985ZM17.3713 24.227H14.6285V18.7413H17.3713V24.227ZM22.857 23.5413C22.857 23.92 22.55 24.227 22.1713 24.227H18.7428V18.0556C18.7428 17.6769 18.4357 17.3699 18.057 17.3699H13.9427C13.564 17.3699 13.257 17.6769 13.257 18.0556V24.227H9.82846C9.44974 24.227 9.14273 23.92 9.14273 23.5413V15.2441C10.105 15.4417 11.1057 15.212 11.8856 14.6147C13.1097 15.5137 14.7758 15.5137 15.9999 14.6147C17.224 15.5137 18.8901 15.5137 20.1142 14.6147C20.894 15.2121 21.8947 15.4417 22.857 15.2441V23.5413ZM22.1713 13.9413C21.5783 13.9409 21.0152 13.6808 20.6305 13.2295C20.3813 12.9444 19.9481 12.9152 19.663 13.1644C19.6398 13.1846 19.618 13.2064 19.5978 13.2295C18.8354 14.0805 17.5275 14.1522 16.6765 13.3898C16.6202 13.3393 16.5667 13.2858 16.5162 13.2295C16.2479 12.9444 15.7992 12.9307 15.514 13.1991C15.5035 13.2089 15.4934 13.2191 15.4835 13.2295C14.7211 14.0805 13.4132 14.1522 12.5622 13.3898C12.5059 13.3393 12.4524 13.2858 12.4019 13.2295C12.1336 12.9444 11.6848 12.9307 11.3997 13.1991C11.3892 13.2089 11.3791 13.2191 11.3693 13.2295C10.9846 13.6808 10.4215 13.9409 9.82846 13.9413C8.69233 13.9413 7.77132 13.0203 7.77132 11.8841H24.2284C24.2284 13.0203 23.3074 13.9413 22.1713 13.9413Z' fill='#70B9C3'/></svg>",
+      "tab_items" : [
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+          "item_title" : "Lorem ipsum dolor sit amet, consectetur adiscing",
+          "item_text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius tempor incididunt ut labore et dolore magna aliqua. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad min veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        }
+      ]
+    }
+  ]
+}

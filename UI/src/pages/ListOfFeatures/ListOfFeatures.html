@@ -1,0 +1,244 @@
+<div class="page_wrapper static_nik_page">
+
+	<!-- Hero -->
+    <div class="page-hero_wrapper page-hero--back-img">
+        <div class="page-hero content-wrapper">
+            <div class="breadcrumbs">
+                <ul class="breadcrumbs_list">
+                    <li class="breadcrumbs_item breadcrumbs_item--white">
+                        <router-link :to="'/'" class="breadcrumbs_link breadcrumbs_link--white">{{tr('home')}}</router-link>
+                    </li>
+                    <li class="breadcrumbs_item breadcrumbs_item--white ">
+                        <span class="breadcrumbs_link breadcrumbs_link--white breadcrumbs_link--active">{{tr('openexpo_features')}}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="hero_content hero_content--center">
+                <p class="hero_subtitle hero_subtitle--white">{{tr('feature_list_subtitle')}}</p>
+                <h1 class="hero_title hero_title--white">{{tr('feature_list_title')}}</h1>
+                <p class="hero_text hero_text--white">{{tr('feature_list_text')}}</p>
+            </div>
+            <div class="hero_screen">
+                <img src="@/img/static-pages/welcome/note.png" alt="One platform for all your Events" width="655" height="406">
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="page-main_wrapper">
+        <main class="page-main">
+            <!-- 1 -->
+            <article class="article-block article-block--white">
+                <div class="content-wrapper">
+                    <h2 class="article-title article-title--center article-title-m" v-html="tr('feature_list_article_title')"></h2>
+                    <div class="features">
+                        <ul class="features_list">
+                            <li class="features_list-item">
+                                <router-link :to="'/'+routes.feature+'/'+routes.inhouse_broadcast" class="feature_link">
+                                    <div class="feature_item">
+                                        <div class="feature_logo">
+                                            <img class="feature_logo_img" src="@/img/static-pages/features/inhouse.png" alt="In-House Video/Broadcasting" width="62" height="70">
+                                        </div>
+                                        <h3 class="feature_title">{{tr('inhouse_video_title')}}</h3>
+                                        <p class="feature_text">{{tr('inhouse_video_text')}}</p>
+                                        <div class="feature_arrow">
+                                            <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34 " height="20 ">
+                                        </div>
+                                    </div>
+                                </router-link>
+                            </li>
+                            <li class="features_list-item">
+                                <router-link :to="'/'+routes.feature+'/'+routes.advanced_sponsorship" class="feature_link">
+                                    <div class="feature_item">
+                                        <div class="feature_logo">
+                                            <img class="feature_logo_img" src="@/img/static-pages/features/sponsorship.png" alt="Sponsorship" width="62" height="70">
+                                        </div>
+                                        <h3 class="feature_title">{{tr('advancedsponsorship_title')}}</h3>
+                                        <p class="feature_text">{{tr('advancedsponsorship_text')}}</p>
+                                        <div class="feature_arrow">
+                                            <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                        </div>
+                                    </div>
+                                </router-link>
+                            </li>
+                            <li class="features_list-item">
+                                <router-link :to="'/'+routes.feature+'/'+routes.streaming_integrations" class="feature_link">
+                                    <div class="feature_item">
+                                        <div class="feature_logo">
+                                            <img class="feature_logo_img" src="@/img/static-pages/features/livestreaming.png" alt="Streaming" width="62" height="70">
+                                        </div>
+                                        <h3 class="feature_title">{{tr('streamingintegrations_title')}}</h3>
+                                        <p class="feature_text">{{tr('streamingintegrations_text')}}</p>
+                                        <div class="feature_arrow">
+                                            <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                        </div>
+                                    </div>
+                                </router-link>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 2 -->
+            <section class="section-blue--pad100 article-block--blue">
+                <article class="article-block">
+                    <div class="content-wrapper">
+                        <div class="article_header article_header--left">
+                            <div class="article_header_content article_header_content-margin">
+                                <h2 class="article-title article-title-m0" v-html="tr('feature_list_powerful_customisations_title')"></span></h2>
+                                <p class="article_text article_text--accent">{{tr('feature_list_powerful_customisations_text')}}</p>
+                            </div>
+                            <div class="article_img_wrapper article_img_wrapper--right--abs">
+                                <img class="article_img" src="@/img/static-pages/welcome/img-costum.png" alt="High level of customization">
+                            </div>
+                        </div>
+                        <div class="features">
+                            <ul class="features_list features-grid">
+                                <li class="features_list-item features-grid_big">
+                                    <router-link :to="'/'+routes.feature+'/'+routes.event_customisation" class="feature_link">
+                                        <div class="feature_item">
+                                            <div class="feature_logo">
+                                                <img class="feature_logo_img" src="@/img/static-pages/features/customise.png" alt="Customisation of the event page" width="62" height="70">
+                                            </div>
+                                            <h3 class="feature_title">{{tr('customisations_event_title')}}</h3>
+                                            <p class="feature_text">{{tr('customisations_event_text')}}</p>
+                                            <div class="feature_arrow">
+                                                <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                            </div>
+                                        </div>
+                                    </router-link>
+                                </li>
+                                <li class="features_list-item features-grid_big">
+                                    <router-link :to="'/'+routes.feature+'/'+routes.content_of_the_event" class="feature_link">
+                                        <div class="feature_item">
+                                            <div class="feature_logo">
+                                                <img class="feature_logo_img" src="@/img/static-pages/features/articles.png" alt="Content creation for the event" width="62" height="70">
+                                            </div>
+                                            <h3 class="feature_title">{{tr('feature_list_content_creation_title')}}</h3>
+                                            <p class="feature_text">{{tr('feature_list_content_creation_text')}}</p>
+                                            <div class="feature_arrow">
+                                                <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                            </div>
+                                        </div>
+                                    </router-link>
+                                </li>
+                                <li class="features_list-item features-grid_small">
+                                    <router-link :to="'/'+routes.feature+'/'+routes.custom_field" class="feature_link feature_link--small">
+                                        <div class="feature_item feature_item--small">
+                                            <div class="feature_item--small-main">
+                                                <div class="feature_logo">
+                                                    <img class="feature_logo_img" src="@/img/static-pages/features/field.png" alt="Custom field registration" width="62" height="70">
+                                                </div>
+                                                <h3 class="feature_title">{{tr('feature_list_custom_field_registration_title')}}</h3>
+                                            </div>
+                                            <div class="feature_arrow--small">
+                                                <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                            </div>
+                                        </div>
+                                    </router-link>
+                                </li>
+                                <li class="features_list-item features-grid_small">
+                                    <router-link :to="'/'+routes.feature+'/'+routes.event_permissions_management" class="feature_link feature_link--small">
+                                        <div class="feature_item feature_item--small">
+                                            <div class="feature_item--small-main">
+                                                <div class="feature_logo">
+                                                    <img class="feature_logo_img" src="@/img/static-pages/features/permissions.png" alt="Permissions" width="62" height="70">
+                                                </div>
+                                                <h3 class="feature_title">{{tr('event_permission_management_title')}}</h3>
+                                            </div>
+                                            <div class="feature_arrow--small">
+                                                <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                            </div>
+                                        </div>
+                                    </router-link>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 3 -->
+                <article class="article-block">
+                    <div class="content-wrapper">
+                        <div class="article_header article_header--right">
+                            <div class="article_img_wrapper article_img_wrapper--left--abs">
+                                <img class="article_img article_img--440" src="@/img/static-pages/welcome/img-costum-2.png" alt="Arrange meetings for your event!">
+                            </div>
+                            <div class="article_header_content article_header_content-margin">
+                                <h2 class="article-title article-title-m0" v-html="tr('feature_list_event_explore_and_manage_title')"></h2>
+                                <p class="article_text article_text--accent">{{tr('feature_list_event_explore_and_manage_text')}}</p>
+                            </div>
+                        </div>
+                        <div class="features">
+                            <ul class="features_list features-grid">
+                                <li class="features_list-item features-grid_small">
+                                    <router-link :to="'/'+routes.feature+'/'+routes.advanced_search" class="feature_link feature_link--small">
+                                        <div class="feature_item feature_item--small">
+                                            <div class="feature_item--small-main">
+                                                <div class="feature_logo">
+                                                    <img class="feature_logo_img" src="@/img/static-pages/features/Search.png" alt="Advanced search" width="62" height="70">
+                                                </div>
+                                                <h3 class="feature_title">{{tr('feature_list_event_explore_and_manage_advanced_search_title')}}</h3>
+                                            </div>
+                                            <div class="feature_arrow--small">
+                                                <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                            </div>
+                                        </div>
+                                    </router-link>
+                                </li>
+                                <li class="features_list-item features-grid_big">
+                                    <router-link :to="'/'+routes.feature+'/'+routes.setup_meetings" class="feature_link">
+                                        <div class="feature_item">
+                                            <div class="feature_logo">
+                                                <img class="feature_logo_img" src="@/img/static-pages/features/calendar.png" alt="Set up meetings with event owners" width="62" height="70">
+                                            </div>
+                                            <h3 class="feature_title">{{tr('feature_list_event_explore_and_manage_setup_meetings_title')}}</h3>
+                                            <p class="feature_text">{{tr('feature_list_event_explore_and_manage_setup_meetings_text')}}</p>
+                                            <div class="feature_arrow">
+                                                <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                            </div>
+                                        </div>
+                                    </router-link>
+                                </li>
+                                <li class="features_list-item features-grid_big">
+                                    <router-link :to="'/'+routes.feature+'/'+routes.booths_and_stands" class="feature_link">
+                                        <div class="feature_item">
+                                            <div class="feature_logo">
+                                                <img class="feature_logo_img" src="@/img/static-pages/features/stand.png" alt="Unlimited number of booths/stands on the event" width="62" height="70">
+                                            </div>
+                                            <h3 class="feature_title">{{tr('unlimited_booths_stands_title')}}</h3>
+                                            <p class="feature_text">{{tr('unlimited_booths_stands_text')}}</p>
+                                            <div class="feature_arrow">
+                                                <img src="@/img/static-pages/arrow-or.png" alt="Read more" class="feature_arrow-img" width="34" height="20">
+                                            </div>
+                                        </div>
+                                    </router-link>
+                                </li>
+                                <li class="features_list-item features-grid_small">
+                                    <router-link :to="'/'+routes.feature+'/'+routes.chat_at_the_event" class="feature_link feature_link--small">
+                                        <div class="feature_item feature_item--small">
+                                            <div class="feature_item--small-main">
+                                                <div class="feature_logo">
+                                                    <img class="feature_logo_img" src="@/img/static-pages/features/chat.png" alt="Chat with stand staff" width="62" height="70">
+                                                </div>
+                                                <h3 class="feature_title">{{tr('chat_with_staff_title')}}</h3>
+                                            </div>
+                                            <div class="feature_arrow--small">
+                                                <img src="@/img/static-pages/arrow-or.png" alt="Read moreß" class="feature_arrow-img" width="34" height="20">
+                                            </div>
+                                        </div>
+                                    </router-link>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+            </section>
+            <!-- 6 -->
+            <StaticBottomSection></StaticBottomSection>
+        </main>
+    </div>
+
+</div>

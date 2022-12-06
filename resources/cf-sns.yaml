@@ -1,0 +1,242 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'SNS infrastructure.'
+
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+
+Resources:
+
+#================================================================
+#================================================================
+#SNS
+  LogsSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Tags: 
+        - Key: "environment"
+          Value: !Ref Environment
+        - Key: "creator"
+          Value: "automation"
+      TopicName: !Sub 'LogStream-${Environment}'
+
+#SQS
+  SQSBinaryDeleteQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub 'SQSBinaryDeleteQueue-${Environment}'
+      DelaySeconds: 0
+      VisibilityTimeout: 120
+      Tags:
+        - Key: "environment"
+          Value: !Ref Environment
+        - Key: "creator"
+          Value: "automation"
+
+  QueueDepthAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "Alarm if queue depth increases to more than 5 messages"
+      Namespace: "AWS/SQS"
+      MetricName: "ApproximateNumberOfMessagesVisible"
+      Dimensions:
+        - Name: "QueueName"
+          Value:
+            Fn::GetAtt:
+              - "SQSBinaryDeleteQueue"
+              - "QueueName"
+      Statistic: "Sum"
+      Period: "300"
+      EvaluationPeriods: "1"
+      Threshold: "5"
+      ComparisonOperator: "GreaterThanThreshold"
+#      AlarmActions:
+#        - Ref: "AlarmTopic"
+#      InsufficientDataActions:
+#        - Ref: "AlarmTopic"
+
+  LambdaSQSSendRole:
+    Type: AWS::IAM::Role
+    Description: Lambda role with SQS sending abilities
+    Properties:
+      RoleName: !Sub 'LambdaSQSSendRole-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: LambdaExecutionRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:invokeFunction
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:GetItem"
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: '*'
+        - PolicyName: allowSqsSend
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:ChangeMessageVisibility
+                Resource: !GetAtt SQSBinaryDeleteQueue.Arn
+
+  LambdaSQSS3Role:
+    Type: AWS::IAM::Role
+    Description: Lambda role with minimal required access
+    Properties:
+      RoleName: !Sub 'LambdaSQSS3Role-${Environment}-${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: LambdaExecutionRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:invokeFunction
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:GetItem"
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: '*'
+        - PolicyName: allowLambdaLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: arn:aws:logs:*:*:*
+        - PolicyName: allowSqsReceive
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:ChangeMessageVisibility
+                Resource: !GetAtt SQSBinaryDeleteQueue.Arn
+        - PolicyName: allowS3
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource:
+                  - !Join
+                    - ''
+                    - - 'arn:aws:s3:::'
+                      - '*'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:GetObjectTagging
+                  - s3:PutObjectTagging
+                Resource:
+                  - !Join
+                    - ''
+                    - - 'arn:aws:s3:::'
+                      - '*'
+                      - /*
+
+  lambdaBinaryDeleteById:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'binaryDeleteByPath-${Environment}'
+      Handler: binaryDeleteByPath.handler
+      Layers:
+        - !ImportValue
+          Fn::Sub: 'postgres-log-layer-arn-${Environment}'
+      Code: ../lambdas/SNS
+      Timeout: 60
+      Runtime: nodejs12.x
+      Role: !GetAtt LambdaSQSS3Role.Arn
+      MemorySize: 128
+      Environment:
+        Variables:
+          Environment: !Ref 'Environment'
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  LambdaFunctionEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      Enabled: true
+      EventSourceArn: !GetAtt SQSBinaryDeleteQueue.Arn
+      FunctionName: !GetAtt lambdaBinaryDeleteById.Arn
+
+Outputs:
+  TopicARN:
+    Value: !Ref LogsSNSTopic
+    Export:
+      Name: !Sub 'TexSNS-LogStream-${Environment}'
+    Description: Topic for logging refined log streams
+
+  SQSURL:
+    Value: !Ref SQSBinaryDeleteQueue
+    Export:
+      Name: !Sub 'sqs-binary-delete-url-${Environment}'
+    Description: URL for an SQS queue for deleting binaries from S3
+
+  TexSQSLambdaRoleArn:
+    Value: !GetAtt LambdaSQSSendRole.Arn
+    Export:
+      Name: !Sub 'sqs-send-lambda-role-arn-${Environment}'
+    Description: Lambda role with SQS Send access

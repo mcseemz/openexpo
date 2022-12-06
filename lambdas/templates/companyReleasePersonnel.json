@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "CompanyReleasePersonnel",
+    "SubjectPart": "You've been removed from the company",
+    "HtmlPart": "You've been removed from the company: {{company}}. Reason: {{reason}}",
+    "TextPart": "You've been removed from the company: {{company}}. Reason: {{reason}}"
+  }
+}

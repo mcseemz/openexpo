@@ -1,0 +1,3 @@
+<div class="iframe_videomeeting_wrapper">
+	<VideoMeeting ref="videoMeeting" v-if="features.video && activity && activity.meetingUrl && (activity.value.meetingType == 'webinar' || activity.value.meetingType == 'team_meeting')" :tiersList="[]" :iframe="true" :activity="activity"></VideoMeeting>
+</div>

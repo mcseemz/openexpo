@@ -1,0 +1,124 @@
+$grey80: #254854;
+$grey60: #386D7D;
+$grey40: #7096A1;
+$grey20: #AFC5CB;
+$grey10: #EBF0F2;
+$orange: #E5843D;
+$black: #1A323B;
+$secondary: #70B9C3;
+
+.contact_page {
+	padding-top: 56px;
+
+	.contact_content {
+		padding: 80px 0 112px;
+	}
+	.get_in_touch_section {
+		margin-top: 80px;
+		padding: 0;
+		background-color: transparent;
+		display: flex;
+		justify-content: center;
+
+		.contact_form {
+			width: 100%;
+			max-width: 800px;
+		}
+
+		.ui-textbox {
+			margin-bottom: 20px;
+		}
+	}
+	h1.title {
+		width: 100%;
+		max-width: 500px;
+		margin: 0;
+		font-size: 48px;
+		line-height: 117%;
+	}
+	.banner_box {
+		position: relative;
+		margin-top: 56px;
+
+		.contact_main_img {
+			width: 100%;
+			height: auto;
+		}
+	}
+	.contact_card {
+		position: absolute;
+		padding: 40px 32px;
+		height: 208px;
+		width: 464px;
+		left: 50%;
+		top: -160px;
+		background-color: $grey60;
+		color: #fff;
+		border-radius: 8px;
+
+		.card_title {
+			font-weight: bold;
+		}
+		.text_item {
+			margin-top: 24px;
+		}
+		.d_img {
+			position: absolute;
+			left: -44px;
+			bottom: -44px;
+		}
+	}
+
+	.contact_offices {
+		margin-top: 80px;
+		position: relative;
+
+		.contact_office_title {
+			margin: 0;
+			justify-content: flex-start;
+			align-items: center;
+			font-weight: normal;
+			font-size: 32px;
+			line-height: 124%;
+
+			img {
+				max-height: 40px;
+				max-width: 40px;
+				margin-right: 8px;
+				display: block;
+			}
+		}
+
+		.contact_office_items {
+			margin-top: 48px;
+			justify-content: space-between;
+		}
+
+		.office_card {
+			background: #FFFFFF;
+			box-shadow: 0px 5px 40px rgba(0, 0, 0, 0.15);
+			border-radius: 8px;	
+			padding: 24px;
+			width: 368px;
+			z-index: 10;
+
+			.card_title {
+				font-weight: bold;
+				margin-bottom: 8px;
+			}
+			.address {
+				margin-bottom: 8px;
+			}
+			.phone {
+				color: $secondary;
+			}
+		}
+
+		.d_img {
+			position: absolute;
+			right: -48px;
+			bottom: -54px;
+
+		}
+	}
+}

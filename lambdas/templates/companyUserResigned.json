@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "CompanyUserResigned",
+    "SubjectPart": "User resigned from the company",
+    "HtmlPart": "User resigned from the company: {{company}}. Reason: {{reason}}",
+    "TextPart": "User resigned from the company: {{company}}. Reason: {{reason}}"
+  }
+}

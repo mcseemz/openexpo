@@ -1,0 +1,99 @@
+$grey80: #254854;
+$grey60: #386D7D;
+$grey40: #7096A1;
+$grey20: #AFC5CB;
+$grey10: #EBF0F2;
+$orange: #E5843D;
+$black: #1A323B;
+$secondary: #70B9C3;
+
+.page_my_account {
+	.title_box {
+		justify-content: space-between;
+		align-items: center;
+	}
+	.content_sidebar_left .main_section {
+		width: 656px;
+		margin-bottom: 80px;
+
+		.avatar_preview_row {
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+
+			.avatar_remove {
+				margin-left: 20px;	
+				cursor: pointer;
+				color: $secondary;
+				padding-left: 20px;	
+				border-left: 1px solid $grey20;
+			}
+		}
+		
+		.avatar_preview {
+			width: auto;
+			height: auto;
+		}
+		.upload_avatar {
+			height: 64px;
+			width: auto;
+			background-color: transparent;
+			justify-content: flex-start;
+
+			.avatar_content {
+				align-items: center;
+				justify-content: flex-start;
+
+				.image_box {
+					width: 64px;
+					height: 64px;
+					margin-right: 16px;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+
+					.avatar_image {
+						max-width: 100%;
+						max-height: 100%;
+						border-radius: 50%;
+					}
+				}
+
+				.avatar_text {
+					color: $secondary;
+					cursor: pointer;
+				}
+			}
+		}
+
+		.form_input_qr {
+			width: 152px;
+		}
+
+		.form_row_qr_pref {
+			width: 112px;
+		}
+		.form_row_qr_phone {
+			width: 192px;
+		}
+
+		.change_password {
+			img {
+				margin-right: 8px;
+			}
+		}
+
+		p.text {
+			margin-bottom: 16px;
+		}
+
+		.button_box {
+			justify-content: flex-end;
+
+			.btn {
+				margin-left: 21px;
+				font-weight: 700;
+			}
+		}
+	}
+}

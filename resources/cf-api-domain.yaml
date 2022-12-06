@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+  EnvironmentName:
+    Description: what environment name we are using in URL. e.g. we use empty string for prod names
+    Type: String
+  APIStage:
+    Description: Stage name for publishing
+    Type: String
+  BaseDomain:
+    Description: domain to create api for
+    Type: String
+  CertificateArn:
+    Description: ARN for a Certificate that covers this BaseDomainn
+    Type: String
+
+Conditions:
+  CreateDevResources: !Equals
+    - !Ref 'Environment'
+    - dev
+Resources:
+  TexAPIDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      CertificateArn: !Ref 'CertificateArn'
+      DomainName: !Sub 'api${EnvironmentName}.${BaseDomain}'
+      EndpointConfiguration:
+        Types:
+          - EDGE
+      SecurityPolicy: TLS_1_2
+      Tags:
+        - Key: creator
+          Value: cf-lambda
+        - Key: envType
+          Value: !Ref 'Environment'
+  TexAPIMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Description: default mapping
+    Properties:
+#      BasePath: 'call'
+      DomainName: !Ref 'TexAPIDomain'
+      RestApiId: !ImportValue 
+        Fn::Sub: 'TexAPI-${Environment}'
+      Stage: !Ref 'APIStage'
+  TexAPIRoute53:
+    Type: AWS::Route53::RecordSet
+    DependsOn: TexAPIDomain
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt 'TexAPIDomain.DistributionDomainName'
+        EvaluateTargetHealth: false
+        HostedZoneId: !GetAtt 'TexAPIDomain.DistributionHostedZoneId'
+      HostedZoneName: !Sub '${BaseDomain}.'
+      Comment: temporary alias for API
+      Name: !Sub 'api${EnvironmentName}.${BaseDomain}'
+      Type: A
+
+#======================================
+Outputs:
+  TexAPIDomainDistributionURL:
+    Description: 'API Endpoint Cloudfront distribution'
+    Value: !GetAtt 'TexAPIDomain.DistributionDomainName'
+    Export:
+      Name: 
+        Fn::Sub:
+          - 'TexAPIDomainDistributionURL-${Environment}-${ASD}'
+          - ASD: !Join [ '-', !Split [ '.', !Ref BaseDomain ] ]
+  TexAPIRoute53:
+    Description: 'API Public URL'
+    Value: !Ref 'TexAPIRoute53'
+    Export:
+      Name: 
+        Fn::Sub:
+          - 'TexPublicAPIURL-${Environment}-${ASD}'
+          - ASD: !Join [ '-', !Split [ '.', !Ref BaseDomain ] ]

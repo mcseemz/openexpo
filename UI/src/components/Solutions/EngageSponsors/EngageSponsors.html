@@ -1,0 +1,16 @@
+<article class="article-block article-block--m100" :class="{'article-block--white': color == 'white', 'article-block--blue': color != 'white'}">
+    <div class="article_header article_header--center content-wrapper">
+        <div class="article_header_content article_header_content-mr">
+            <h2 class="article-title article-title-m0" v-html="tr('engage_with_sponsors_title')"></h2>
+            <p class="article_text">{{tr('engage_with_sponsors_text1')}}</p>
+            <ul class="unordered_list">
+                <li class="unordered_item">{{tr('engage_with_sponsors_tab1')}}</li>
+                <li class="unordered_item">{{tr('engage_with_sponsors_tab2')}}</li>
+                <li class="unordered_item">{{tr('engage_with_sponsors_tab3')}}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="added-info article_text--center">
+        <a :href="'/'+routes.feature+'/'+routes.advanced_sponsorship" class="primary-btn ">{{tr('learn_more_about_sponsorship')}}</a>
+    </div>
+</article>

@@ -1,0 +1,139 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  Environment:
+    Description: what environment cognito deployment we are using
+    Type: String
+    AllowedPattern: (dev|prod)
+  Dbname:
+    Description: simplified database name to attach to pool
+    Type: String
+    AllowedPattern: ([a-zA-Z0-9\-]+)
+
+Conditions:
+  CreateProdResources: !Equals
+    - !Ref 'Environment'
+    - prod
+  CreateDevResources: !Equals
+    - !Ref 'Environment'
+    - dev
+Resources:
+  CognitoUP:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      EmailConfiguration:
+        EmailSendingAccount: COGNITO_DEFAULT
+      MfaConfiguration: 'OFF'
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      UserPoolAddOns:
+        AdvancedSecurityMode: AUDIT
+      UsernameConfiguration:
+        CaseSensitive: false
+      UserPoolName: !Sub 'tex-userpool-${Dbname}'
+      UserPoolTags: {}
+      VerificationMessageTemplate:
+        DefaultEmailOption: CONFIRM_WITH_LINK
+        EmailMessageByLink: Please click the link below to verify your email address.
+          {##Verify Email##}
+        EmailSubjectByLink: Your verification link
+      LambdaConfig:
+        PostConfirmation: !ImportValue
+            Fn::Sub: LambdaPostConfirmation-${Environment}
+  
+  UserPoolResource:
+    Type: AWS::Cognito::UserPoolResourceServer
+    Properties:
+      Identifier: tex-api
+      Name: tex-api
+      Scopes:
+        - ScopeName: get
+          ScopeDescription: get operations
+        - ScopeName: create
+          ScopeDescription: create entity operations
+        - ScopeName: delete
+          ScopeDescription: delete entity operations
+        - ScopeName: report
+          ScopeDescription: reports operations
+        - ScopeName: lowlevel
+          ScopeDescription: lowlevel operations
+        - ScopeName: admin
+          ScopeDescription: platform level operations
+      UserPoolId: !Ref 'CognitoUP'
+  UserPoolClientLowlevel:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AllowedOAuthFlows:
+        - client_credentials
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - tex-api/lowlevel
+      ClientName: tex-app-lowlevel
+      GenerateSecret: true
+      UserPoolId: !Ref 'CognitoUP'
+    DependsOn: UserPoolResource
+  UserPoolClientRegular:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AllowedOAuthFlows:
+        - client_credentials
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - tex-api/get
+        - tex-api/create
+        - tex-api/delete
+      ClientName: tex-app-regular
+      GenerateSecret: true
+      UserPoolId: !Ref 'CognitoUP'
+    DependsOn: UserPoolResource
+  UserPoolClientFrontend:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AllowedOAuthFlows: []
+      AllowedOAuthFlowsUserPoolClient: false
+      AllowedOAuthScopes:
+        - tex-api/get
+        - tex-api/create
+        - tex-api/delete
+      ClientName: tex-app-frontend
+      GenerateSecret: false
+      UserPoolId: !Ref 'CognitoUP'
+    DependsOn: UserPoolResource
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub 'tex-api-${Dbname}'
+      UserPoolId: !Ref 'CognitoUP'
+
+Outputs:
+  CognitoUserPool:
+    Description: UserPool for API Gateway validation
+    Value: !GetAtt 'CognitoUP.Arn'
+    Export:
+      Name: !Sub 'CognitoUserPoolArn-${Dbname}'
+  CognitoDomain:
+    Description: Domain for Cognito OAuth flow
+    Value: !Ref 'UserPoolDomain'
+    Export:
+      Name: !Sub 'UserPoolDomain-${Dbname}'
+  ClientLowlevel:
+    Description: Client authorized for lowlevel operations
+    Value: !Ref 'UserPoolClientLowlevel'
+    Export:
+      Name: !Sub 'ClientLowlevel-${Dbname}'
+  ClientRegular:
+    Description: Client authorized for regular operations
+    Value: !Ref 'UserPoolClientRegular'
+    Export:
+      Name: !Sub 'ClientRegular-${Dbname}'
+  ClientFrontend:
+    Description: Client authorized for user-password login
+    Value: !Ref 'UserPoolClientFrontend'
+    Export:
+      Name: !Sub 'ClientFrontend-${Dbname}'
+

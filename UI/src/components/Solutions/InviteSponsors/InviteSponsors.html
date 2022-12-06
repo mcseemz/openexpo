@@ -1,0 +1,12 @@
+<article class="article-block article-block--m100" :class="{'article-block--blue': color == 'blue', 'article-block--white': color != 'blue'}">
+    <div class="article_header article_header--center content-wrapper">
+        <div class="article_img_wrapper">
+            <img class="article_img" src="@/img/static-pages/virtual-workshop/2.jpg" alt="Invite sponsors">
+        </div>
+        <div class="article_header_content article_header_content-ml">
+            <h2 class="article-title article-title-m0" v-html="tr('invite_sponsors_to_event_title')"></h2>
+            <p class="article_text">{{tr('invite_sponsors_to_event_text1')}}</p>
+            <p class="article_text">{{tr('invite_sponsors_to_event_text2')}}</p>
+        </div>
+    </div>
+</article>

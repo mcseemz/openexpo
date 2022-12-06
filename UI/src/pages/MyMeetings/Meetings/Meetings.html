@@ -1,0 +1,417 @@
+<div class="main">
+    <div class="main_form_box">
+
+        <div class="main_section meetings_main_section" v-if="tabFilter == 'all' || tabFilter == 'coming'">
+			<div class="form_input_row flex filter_row">
+
+	            <div class="form_input_qr">
+	                <ui-datepicker
+                        :placeholder="tr('select_a_date')"
+                        iconPosition="right"
+                        v-model="dateFrom"
+                        class="ui-select-labelin"
+                        :lang="datepicker_lang"
+                        @input="runGridFilter"
+                    >
+                        <img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+                        {{tr('mymeet_from')}}
+                    </ui-datepicker>
+	            </div>
+
+	            <div class="form_input_qr">
+	                <ui-datepicker
+                        :placeholder="tr('select_a_date')"
+                        iconPosition="right"
+                        v-model="dateTo"
+                        class="ui-select-labelin"
+                        :lang="datepicker_lang"
+                        @input="runGridFilter"
+                    >
+                        <img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+                        {{tr('mymeet_to')}}
+                    </ui-datepicker>
+	            </div>
+
+	            <div class="form_input_qr">
+	                <ui-select
+	                    :label="tr('order_by')"
+	                    :placeholder="tr('upcoming_first')"
+	                    :options="orderByList"
+	                    v-model="filter.orderBy"
+	                    iconPosition="right"
+	                    class="ui-select-labelin"
+	                    @input="runGridFilter"
+	                >
+	                    <img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+	                </ui-select>
+	            </div>
+	            
+	        </div>
+
+         	<div class="meetings_grid preloader_wrapper">
+         		<div class="preloader_overlay preload_overlay_white" v-show="gridPreload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+         		<div class="meetings_item" :key="item.id" v-if="item.user && filteredComingMeetings.length && ( tabFilter == 'all' || tabFilter == 'coming' ) && ( isMe(item) || item.visibility != 'visitor_proposed' ) " v-for="item, index in filteredComingMeetings">
+         			<div class="top">
+         				<div class="icon_item flex">
+         					<div class="icon_box"><img src="../img/calendar_w.svg" alt=""></div>
+         					<span>{{item.formatDate.dateCTZ}}</span>
+         				</div>
+         				<!-- <div class="icon_item flex">
+         					<div class="icon_box"><img src="../img/clock_w.svg" alt=""></div>
+         					<span>{{item.formatDate.time}}</span>
+         				</div> -->
+         				<div class="icon_item flex">
+         					<div class="icon_box"><img src="../img/clock_w.svg" alt=""></div>
+         					<span>{{item.formatDate.timeCTZ}} 
+         						<!-- (GTM {{item.timezone < 0 ? item.timezone : '+'+item.timezone}}) -->
+         					</span>
+         				</div>
+         			</div>
+         			<div class="item_main">
+         				<div class="user flex">
+							<div class="img_box" v-if="item.user.avatar"><img :src="item.user.avatar" alt=""></div>
+							<div class="img_box" v-if="!item.user.avatar"><img src="../img/default_avatar.svg" alt=""></div>
+							<div class="text_box">
+								<p class="small_text">{{item.user.name}} {{item.user.surname}}</p>
+								<p class="xsmall_text">{{item.company.name}}</p>
+							</div>
+						</div>
+						<div class="main_icon_items flex">
+							<div class="icon_item flex" v-if="item.visibility != 'visitor_proposed'">
+	         					<div class="icon_box"><img src="../img/info.svg" alt=""></div>
+	         					<span class="" @click="openInfoModal(item)">
+		         					{{tr('mymeet_info')}}
+
+		         					<!-- <ui-popover class="meetings_info_popover" animation="none">
+					                    
+					                </ui-popover> -->
+		         				</span>
+	         				</div>
+	         				<router-link v-if="item.visibility != 'visitor_proposed'" :to="getVideoLink(item)" class="icon_item flex">
+	         					<div class="icon_box"><img src="../img/videocamera.svg" alt=""></div>
+	         					<span v-if="twitchOrZoom(item) == 'zoom'">{{tr('mymeet_zoom_link')}}</span>
+	         					<span v-if="twitchOrZoom(item) == 'twitch'">{{tr('mymeet_twitch_link')}}</span>
+	         					<span v-if="twitchOrZoom(item) == 'team_meeting'">{{tr('mymeet_webinar_link')}}</span>
+	         				</router-link>
+	         				<router-link :to="'/'+routes.mymeetings+'/'+routes.mymeetings_video+'/'+item.activityId" v-if="item.visibility == 'private_meeting' && item.activityId" class="icon_item flex">
+	         					<div class="icon_box"><img src="../img/videocamera.svg" alt=""></div>
+	         					<span>{{tr('mymeet_video')}}</span>
+	         				</router-link>
+	         				<router-link v-if="item.visibility != 'visitor_proposed'" :to="getChatLink(item)" class="icon_item flex">
+	         					<div class="icon_box"><img src="../img/message.svg" alt=""></div>
+	         					<span>{{tr('mymeet_chat')}}</span>
+	         				</router-link>
+						</div>
+
+         			</div>
+         			<div class="bottom flex" v-if="isMe(item) && item.visibility != 'visitor_proposed'">
+         				<button @click="deleteMeeting(item, index)" class="btn btn_tr">{{tr('mymeet_delete')}}</button>
+         				<button class="btn btn_owhite" @click="openPostponeModal(item)">{{tr('mymeet_postpone')}}</button>
+         			</div>
+
+         			<div class="bottom flex" v-if="isMe(item) && item.visibility == 'visitor_proposed'">
+         				<button class="btn btn_owhite" @click="openAcceptModal(item)">{{tr('mymeet_accept_meeting')}}</button>
+         				<button @click="deleteMeeting(item, index)" class="btn btn_tr">{{tr('mymeet_reject_meeting')}}</button>
+         			</div>
+
+         			<div class="bottom flex" v-if="!isMe(item) && item.visibility == 'private_meeting'">
+         				<button @click="deleteMeeting(item, index)" class="btn btn_tr">{{tr('mymeet_delete')}}</button>
+         			</div>
+         		</div>
+
+         		<div class="meetings_item past" :key="item.id" v-if="item.visibility != 'visitor_proposed' && item.user && filteredPastMeetings.length && tabFilter == 'all'" v-for="item in filteredPastMeetings">
+         			<div class="top">
+         				<div class="icon_item flex">
+         					<div class="icon_box"><img src="../img/calendar_w.svg" alt=""></div>
+         					<span>{{item.formatDate.dateCTZ}}</span>
+         				</div>
+         				<!-- <div class="icon_item flex">
+         					<div class="icon_box"><img src="../img/clock_w.svg" alt=""></div>
+         					<span>{{item.formatDate.timeCTZ}}</span>
+         				</div> -->
+         				<div class="icon_item flex">
+         					<div class="icon_box"><img src="../img/clock_w.svg" alt=""></div>
+         					<span>{{item.formatDate.timeCTZ}} 
+         						<!-- (GTM {{item.timezone < 0 ? item.timezone : '+'+item.timezone}}) -->
+         					</span>
+         				</div>
+         			</div>
+         			<div class="item_main">
+         				<div class="user flex">
+							<div class="img_box" v-if="item.user.avatar"><img :src="item.user.avatar" alt=""></div>
+							<div class="img_box" v-if="!item.user.avatar"><img src="../img/default_avatar.svg" alt=""></div>
+							<div class="text_box">
+								<p class="small_text">{{item.user.name}} {{item.user.surname}}</p>
+								<p class="xsmall_text">{{item.company.name}}</p>
+							</div>
+						</div>
+						<div class="main_icon_items flex">
+							<div class="icon_item flex">
+	         					<div class="icon_box"><img src="../img/info.svg" alt=""></div>
+	         					<span @click="openInfoModal(item)">
+		         					{{tr('mymeet_info')}}
+		         				</span>
+	         				</div>
+	         				<router-link :to="getVideoLink(item)" class="icon_item flex">
+	         					<div class="icon_box"><img src="../img/videocamera.svg" alt=""></div>
+	         					<span v-if="twitchOrZoom(item) == 'zoom'">{{tr('mymeet_zoom_link')}}</span>
+	         					<span v-if="twitchOrZoom(item) == 'twitch'">{{tr('mymeet_twitch_link')}}</span>
+	         				</router-link>
+	         				<router-link :to="getChatLink(item)" class="icon_item flex">
+	         					<div class="icon_box"><img src="../img/message.svg" alt=""></div>
+	         					<span>{{tr('mymeet_chat')}}</span>
+	         				</router-link>
+						</div>
+
+         			</div>
+         			<div class="bottom flex">
+         				<button class="btn btn_tr">{{tr('mymeet_delete')}}</button>
+         				<button class="btn btn_owhite" @click="openPostponeModal(item)">{{tr('mymeet_postpone')}}</button>
+         			</div>
+         		</div>
+         	</div>
+        </div>
+
+        <div class="main_section meetings_main_section" v-if="tabFilter == 'past'">
+        	<div class="form_input_row flex filter_row jcsb">
+
+	            <div class="form_input_search">
+	                <ui-textbox 
+	                    :placeholder="tr('mymeet_search_ph')" 
+	                    v-model="search"
+	                    class="ui-search-input"
+	                    @input="tableSearch"
+	                >
+	                    <img slot="icon" src="../../../img/search_icon.svg" alt="">
+	                </ui-textbox>
+	            </div>
+
+	            <!-- <div class="form_input_qr">
+	                <ui-select
+	                    :label="'Personnel:'"
+	                    :placeholder="'All'"
+	                    :options="personnelList"
+	                    v-model="filter.personnel"
+	                    iconPosition="right"
+	                    class="ui-select-labelin"
+	                >
+	                    <img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+	                </ui-select>
+	            </div> -->
+	            
+	        </div>
+			
+			<table class="default_table table6col">
+				<thead>
+					<tr>
+						<th>
+							<div class="table_filter flex" @click="tableFilter('date')">
+								<span>{{tr('mymeet_date')}}</span>
+								<div class="icon_box"><img src="../img/udarrows_white.svg" alt=""></div>
+							</div>
+						</th>
+						<th>
+							<div class="table_filter flex" @click="tableFilter('time')">
+								<span>{{tr('mymeet_time')}}</span>
+								<div class="icon_box"><img src="../img/udarrows_white.svg" alt=""></div>
+							</div>
+						</th>
+						<th>
+							<div class="table_filter flex" @click="tableFilter('duration')">
+								<span>{{tr('mymeet_duration')}}</span>
+								<div class="icon_box"><img src="../img/udarrows_white.svg" alt=""></div>
+							</div>
+						</th>
+						<th>
+							<div class="table_filter flex" @click="tableFilter('type')">
+								<span>{{tr('mymeet_meeting_type')}}</span>
+								<div class="icon_box"><img src="../img/udarrows_white.svg" alt=""></div>
+							</div>
+						</th>
+						<th>
+							<div class="table_filter flex" @click="tableFilter('name')">
+								<span>{{tr('mymeet_contact_person')}}</span>
+								<div class="icon_box"><img src="../img/udarrows_white.svg" alt=""></div>
+							</div>
+						</th>
+						<th class="tac">
+							{{tr('mymeet_note')}}
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-if="pastMeetings.length" :key="item.id" v-for="item in pastMeetingsTable">
+						<td>{{item.formatDate.displayDate}}</td>
+						<td>{{item.formatDate.displayTimeStart}}</td>
+						<td>{{item.formatDate.duration}} {{tr('mymeet_min')}}</td>
+						<td v-if="twitchOrZoom(item) == 'zoom'">{{tr('mymeet_zoom_call')}}</td>
+						<td v-if="twitchOrZoom(item) == 'twitch'">{{tr('mymeet_twitch_call')}}</td>
+						<td>{{item.otherUser.name}} {{item.otherUser.surname}}</td>
+						<td class="tac">
+							<span class="note_eye popover-trigger" v-if="item.notes">
+								<img src="../img/table_eye.svg" alt="">
+
+								<ui-popover class="my-popover-style" animation="none">
+									<div class="note_eye_popover">
+										<p>{{item.notes}}</p>
+									</div>
+				                </ui-popover>
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+        </div>
+
+    </div>
+    <ui-modal ref="infoModal" class="status_modal meeting_info_modal" removeHeader size="auto">
+    	<div class="info_modal_header">
+    		<p class="modal_title">{{tr('mymeet_add_info')}}</p>
+    		<div class="modal_date flex">
+    			<div class="img_box flex"><img src="../img/calendar_w_b.svg" alt=""></div>
+    			<span>{{infoModalData.date}}</span>
+    		</div>
+    	</div>
+    	<div class="info_modal_content">
+    		<p class="content_title">{{tr('mymeet_duration')}}</p>
+    		<p class="content_text">{{infoModalData.duration}}</p>
+    		<p class="content_title">{{tr('mymeet_email_address')}}</p>
+    		<p class="content_text">{{infoModalData.email}}</p>
+    		<p class="content_title">{{tr('mymeet_questions')}}</p>
+    		<p class="content_text">{{infoModalData.questions}}</p>
+    	</div>
+
+
+        <span class="status_modal_close" @click="infoModalClose"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+    <ui-modal ref="postponeModal" class="status_modal meeting_info_modal meeting_form_modal preloader_wrapper" removeHeader size="auto">
+    	<div class="preloader_overlay preload_overlay_white" v-show="updatePreload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+    	<div class="info_modal_header">
+    		<p class="modal_title">{{tr('mymeet_select_new_date')}}</p>
+    		<div class="modal_date flex">
+    			<div class="img_box flex"><img src="../img/calendar_w_b.svg" alt=""></div>
+    			<span>{{ppModalData.date}}</span>
+    		</div>
+    	</div>
+    	<div class="info_modal_content">
+    		<div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                	<ui-datepicker
+                        :placeholder="tr('select_a_date')"
+                        iconPosition="right"
+                        v-model="ppModalData.dateStart"
+                        :lang="datepicker_lang"
+                        :minDate="new Date()"
+                    >
+                        <img slot="icon" src="../../../img/calendar.svg" alt="">
+                       {{tr('mymeet_session_start')}}
+                    </ui-datepicker>
+                    <!-- <ui-datepicker
+                        placeholder="Select a date"
+                        iconPosition="right"
+
+                        :minDate="new Date()"
+                    >
+                        <img slot="icon" src="../../../img/calendar.svg" alt="">
+                        Session start
+                    </ui-datepicker> -->
+                </div>
+
+                 <div class="form_input_hr">
+                    <ui-select
+                        :label="tr('mymeet_start_time_label')"
+                        :placeholder="tr('mymeet_start_time_ph')"
+                        :options="timeList"
+                        v-model="ppModalData.timeStart"
+                        iconPosition="right"
+                    >
+                        <img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+                    </ui-select>
+                </div>
+
+            </div>
+
+            <div class="form_input_row">
+                <ui-select
+                    :label="tr('mymeet_duration_label')"
+                    :placeholder="tr('mymeet_duration_ph')"
+                    :options="durationList"
+                    v-model="ppModalData.duration"
+                    iconPosition="right"
+                >
+                    <img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+            <div class="button_box"><button class="btn" :class="{disabled: !checkFields}" @click="updateMeeting(ppModalData)">{{tr('update')}}</button></div>
+    	</div>
+
+
+        <span class="status_modal_close" @click="postponeModalClose"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+
+
+    <ui-modal ref="acceptModal" class="status_modal meeting_info_modal meeting_form_modal preloader_wrapper" removeHeader size="auto">
+    	<div class="preloader_overlay preload_overlay_white" v-show="updatePreload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+    	<div class="info_modal_header">
+    		<p class="modal_title">{{tr('mymeet_accept_meeting_title')}}</p>
+    		<div class="modal_date" v-if="acceptModalData.subject"><strong>{{tr('mymeet_subject')}}: </strong>{{acceptModalData.subject}}</div>
+    		<div class="modal_date flex">
+    			<div class="img_box flex"><img src="../img/calendar_w_b.svg" alt=""></div>
+    			<span>{{acceptModalData.date}}</span>
+    		</div>
+    	</div>
+    	<div class="info_modal_content">
+    		<div class="form_input_row flex">
+
+                <div class="form_input_hr">
+                	<ui-datepicker
+                        :placeholder="tr('select_a_date')"
+                        iconPosition="right"
+                        v-model="acceptModalData.dateStart"
+                        :lang="datepicker_lang"
+                        :minDate="new Date()"
+                    >
+                        <img slot="icon" src="../../../img/calendar.svg" alt="">
+                       {{tr('mymeet_session_start')}}
+                    </ui-datepicker>
+                </div>
+
+                 <div class="form_input_hr">
+                    <ui-select
+                        :label="tr('mymeet_start_time_label')"
+                        :placeholder="tr('mymeet_start_time_ph')"
+                        :options="timeList"
+                        v-model="acceptModalData.timeStart"
+                        iconPosition="right"
+                    >
+                        <img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+                        {{tr('mymeet_start_time_label')}} 
+                        <!-- (GTM {{acceptModalData.item.timezone < 0 ? acceptModalData.item.timezone : '+'+acceptModalData.item.timezone}}) -->
+                    </ui-select>
+                </div>
+
+            </div>
+
+            <div class="form_input_row">
+                <ui-select
+                    :label="tr('mymeet_duration_label')"
+                    :placeholder="tr('mymeet_duration_ph')"
+                    :options="durationList"
+                    v-model="acceptModalData.duration"
+                    iconPosition="right"
+                >
+                    <img slot="icon" src="../../../img/hsb_dropdown.svg" alt="">
+                </ui-select>
+            </div>
+
+            <div class="button_box"><button class="btn" :class="{disabled: !checkAcceptFields}" @click="acceptMeeting(acceptModalData)">{{tr('mymeet_accept_meeting')}}</button></div>
+    	</div>
+
+
+        <span class="status_modal_close" @click="acceptModalClose"><img src="../../../img/close_medium.svg" alt=""></span>
+    </ui-modal>
+</div>

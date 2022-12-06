@@ -1,0 +1,172 @@
+<div class="page_wrapper page_single_event  preloader_wrapper">
+
+	<div class="preloader_overlay fixed preload_overlay_white" v-show="globalPreload"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+
+	<NotFound v-if="eventObj.notFound"></NotFound>
+	<NotPermitted v-if="eventObj.notPermitted" :isUserAuth="isUserAuth" />
+	<div class="floating_link" v-if="pageGuestStyle || preview">
+		<router-link class="imagelink" :to="'/'+routes.editevent+'/'+eventObj.id"><img src="@/img/edit_sec.svg" alt=""><span>{{tr('se_edit_event_link')}}</span></router-link>
+	</div>
+	<section class="single_event_main_new" v-if="!showTickets && !eventObj.notFound && !eventObj.notPermitted" :style="eventBannerStyle">
+		<div class="mask_box" :style="customEventColorStyle" v-if="customEventColorStyle"></div>
+		<div class="container">
+			<div class="breadcrumbs flex">
+				<router-link :to="'/'">{{tr('home')}}</router-link>
+				<span class="delimeter">/</span>
+				<span class="current">{{eventObj.name}}</span>
+			</div>
+			<div class="breadcrumb_line"></div>
+			<div class="map flex">
+				<div class="icon_box"><img src="./img/location_icon_white.svg" alt=""></div>
+				<p>{{tr('online_event')}}</p>
+			</div>
+			<h1 class="event_title">{{eventObj.name}}</h1>
+			<p class="date" v-if="evtItemDate">{{evtItemDate.eventString}}</p>
+			<p class="starting" v-if="startPricing && startPricing != 'Free'">{{tr('starting_at')}} {{startPricing}}</p>
+			<p class="starting" v-if="startPricing == 'Free'">{{startPricing}}</p>
+			<div class="button_box flex">
+				<button v-if="eventObj.externalTicketUrl" @click="buyTicket" class="btn">{{ startPricing == 'Free' ? tr('se_i_will_go') : tr('buy_ticket')}}</button>
+				<button class="btn" v-if="(standsList.length || featuredStandsList.length || isUserOwner) && !videoLink" @click="selectTab('dt3')">{{tr('preview_stands')}}</button>
+				<button class="btn" v-if="videoLink" @click="videoOpened = true">{{tr('se_watch_promo')}}</button>
+			</div>
+			<div class="follow" style="opacity: 0">
+				<div class="icon_box"><img src="@/img/ICON_Follow.svg" alt=""></div>
+				<span>{{tr('follow')}}</span>
+			</div>
+			<div class="live_event" v-if="isLive">
+				<div class="left"><div class="mark"></div>{{tr('se_event_live')}}</div> <div class="right">{{tr('se_event_day')}} {{eventCurrentDay}} / {{eventTotalDays}}</div>
+			</div>
+		</div>
+
+		<div class="watch_promo_section" :class="{fixed: isScrolled}" v-if="videoLink && videoOpened">
+			<div class="iframe_wrapper" v-if="videoIframeLink" style="overflow: hidden;">
+				<iframe :src="videoIframeLink" frameborder="0" allow="accelerometer; autoplay; clipboard-write; fullscreen; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+			</div>
+
+			<div class="close_button" @click="videoOpened = false">+</div>
+		</div>
+	</section>
+
+	<section class="single_tabs" v-if="!eventObj.notFound && !eventObj.notPermitted && downloadablesLoaded" :class="{tabmenu_fixed: showTickets}">
+		<div class="single_tabs_header_block">
+			<div class="container flex">
+				<div class="single_tabs_header" :style="customEventBorderStyle" :class="{ active: activeTab == 'dt8' }" @click="tabClick('dt8')">
+					{{tr('ct_tn_recommended_'+eventObj.theme)}}
+				</div>
+				<div class="single_tabs_header" v-if="!eventObj.hidden.includes('about')" :style="customEventBorderStyle" :class="{ active: activeTab == 'dt1' }" @click="tabClick('dt1')">
+					{{tr('ct_tn_about_'+eventObj.theme)}}
+				</div>
+				<div class="single_tabs_header" v-if="!eventObj.hidden.includes('collections')" :style="customEventBorderStyle" :class="{ active: activeTab == 'dt9' }" @click="tabClick('dt9')">
+					{{tr('ct_tn_collections_'+eventObj.theme)}}
+				</div>
+				<div class="single_tabs_header" v-if="!eventObj.hidden.includes('articles')" :style="customEventBorderStyle" :class="{ active: activeTab == 'dt5' }" @click="tabClick('dt5')">
+					{{tr('ct_tn_articles_'+eventObj.theme)}}
+				</div>
+				<div class="single_tabs_header" :style="customEventBorderStyle" v-if="!showTickets  && !eventObj.hidden.includes('tickets')" :class="{ active: activeTab == 'dt2' }" @click="tabClick('dt2')">
+					{{tr('ct_tn_tickets_'+eventObj.theme)}}
+				</div>
+				<div class="single_tabs_header" :style="customEventBorderStyle" v-if="showTickets && !eventObj.hidden.includes('downloads')" :class="{ active: activeTab == 'dt2' }" @click="tabClick('dt2')">
+					{{tr('ct_tn_downloads_'+eventObj.theme)}}
+				</div>
+				<div class="single_tabs_header" :style="customEventBorderStyle" :class="{ active: activeTab == 'dt3' }" @click="tabClick('dt3')" v-if="(standsList.length || featuredStandsList.length) && !eventObj.hidden.includes('stands')">
+					{{tr('ct_tn_stands_'+eventObj.theme)}}
+				</div>
+				<div class="single_tabs_header" v-if="!eventObj.hidden.includes('agenda')" :style="customEventBorderStyle" :class="{ active: activeTab == 'dt4' }" @click="tabClick('dt4')">
+					{{tr('ct_tn_agenda_'+eventObj.theme)}}
+				</div>
+				<div class="single_tabs_header" :style="customEventBorderStyle" v-if="features.sponsors && tiersList.length && !eventObj.hidden.includes('sponsors')" :class="{ active: activeTab == 'dt7' }" @click="tabClick('dt7')">
+					{{tr('ct_tn_sponsors_'+eventObj.theme)}}
+				</div>
+			</div>
+		</div>
+
+		<ui-tabs ref="single_tabs">
+			<ui-tab id="dt8" key="dt8" :selected="activeTab == 'dt8'">
+        <RecommendedTab v-if="eventObj.id && standsLoaded && tiersLoaded && downloadablesLoaded"
+					:standsList="[...standsList, ...featuredStandsList]"
+					:sponsorsList="sponsorsList"
+					:downloadables="evtDownloadables"
+					:agenda="agenda"
+					:evtItemDate="evtItemDate"
+					:eventBranding="eventBranding"
+					:tiersList="tiersList"
+					:eventObj="eventObj"
+
+        />
+      </ui-tab>
+    	<ui-tab id="dt1" key="dt1" :selected="activeTab == 'dt1'" v-if="!eventObj.hidden.includes('about')">
+        <div slot="header" class="my-custom-tab-header">
+        </div>
+
+				<MainTab v-if="eventObj.description_long.length && agenda" :agenda="agenda" :mainObj="eventObj" :branding="eventBranding" type="event"></MainTab>
+
+      	<EmptyTabContent v-if="!eventObj.description_long.length" :message="tr('se_empty_tab_text')"></EmptyTabContent>
+
+      </ui-tab>
+      <ui-tab id="dt5" key="dt5" :selected="activeTab == 'dt5'" v-if="!eventObj.hidden.includes('articles')">
+        <div slot="header" class="my-custom-tab-header">
+        </div>
+
+      	<ArticlesTab :key="key" v-if="articlesList.length" :articlesList="articlesList" :usersList="usersList" :eventObj="eventObj"></ArticlesTab>
+
+      	<EmptyTabContent v-if="!articlesList.length" :message="tr('se_empty_tab_text')"></EmptyTabContent>
+
+      </ui-tab>
+			<ui-tab id="dt9" key="dt9" :selected="activeTab == 'dt9'" v-if="!eventObj.hidden.includes('collections')">
+        <CollectionsTab :eventObj="eventObj" :collections="collections" :stands="[...standsList, ...featuredStandsList]" v-if="collections.length"/>
+      </ui-tab>
+      <ui-tab v-if="!showTickets" id="dt2" key="dt2" :selected="activeTab == 'dt2'">
+        <div slot="header" class="my-custom-tab-header">
+        </div>
+
+        <TicketsTab ref="ticketsTab" @open-register-modal="buyTicket" @ticked_bought="ticketBought" :customFields="customFields" :eventObj="eventObj" :tickets="tickets"></TicketsTab>
+      </ui-tab>
+      <ui-tab v-if="showTickets && !eventObj.hidden.includes('downloads')" id="dt2" key="dt2" :selected="activeTab == 'dt2'">
+        <div slot="header" class="my-custom-tab-header">
+        </div>
+
+        <DownloadTab v-if="downloadablesLength" type="event" :downloadables="evtDownloadables"></DownloadTab>
+        <EmptyTabContent v-if="!downloadablesLength" :message="tr('se_empty_tab_text')"></EmptyTabContent>
+      </ui-tab>
+      <ui-tab class="preloader_wrapper" v-if="!eventObj.hidden.includes('stands')" id="dt3" key="dt3" :selected="activeTab == 'dt3'">
+        <div slot="header" class="my-custom-tab-header">
+        </div>
+        <div class="preloader_overlay fixed preload_overlay_white" v-show="!standsLoaded"><ui-progress-circular color="primary" ></ui-progress-circular></div>
+				<StandsTab v-if="standsLoaded && standsList.length || featuredStandsList.length" :eventObj="eventObj" :standsList="[...standsList, ...featuredStandsList]"></StandsTab>
+				<EmptyTabContent v-if="standsLoaded && !standsList.length && !featuredStandsList.length" :message="tr('se_empty_tab_text')"></EmptyTabContent>
+      </ui-tab>
+      <ui-tab id="dt4" key="dt4" v-if="!eventObj.hidden.includes('agenda')" :selected="activeTab == 'dt4'">
+        <div slot="header" class="my-custom-tab-header">
+        </div>
+
+        <AgendaTab ref="agendaTab" type="event" @agenda-opened="agendaOpenedAction" v-if="agenda.sessions.length" @single-event-agenda-loaded="agendaLoadedTrigger" :evtDayList="evtDayList" :agenda="agenda" :tiersList="tiersList" :showTickets="showTickets" :eventObj="eventObj"></AgendaTab>
+        <EmptyTabContent v-if="!agenda.sessions.length" :message="tr('se_empty_tab_text')"></EmptyTabContent>
+      </ui-tab>
+      <ui-tab id="dt7" key="dt7" v-if="features.sponsors && !eventObj.hidden.includes('sponsors')" :selected="activeTab == 'dt7'">
+        <div slot="header" class="my-custom-tab-header">
+        </div>
+
+        <SponsorsTab v-if="eventObj.id && tiersList.length" :isUserSponsor="isUserSponsor" :tiersList="tiersList" :eventObj="eventObj"></SponsorsTab>
+      </ui-tab>
+    </ui-tabs>
+	</section>
+
+
+	<div id="event_banner" class="sponsor_banner_overlay preloader_overlay fixed" v-if="showBanner">
+		<span @click="bannerClick" target="_blank" class="image_box banner_redirect_link">
+			<img v-if="currentSponsorBanner" :src="currentSponsorBanner" alt="" />
+			<span class="closebutton" @click="closeBanner" v-if="showBannerClose">
+				x
+			</span>
+		</span>
+	</div>
+
+	<ui-modal ref="registerModal" class="empty_modal with_fox" removeHeader size="auto">
+    <div class="status_modal_wrapper">
+      <RegistrationForm v-if="registerModalOpened && !eventObj.letmein" @user-can-buy-ticket="customFieldsUpdatedAction" :customFields="customFields" :eventObj="eventObj" />
+    </div>
+
+    <span class="status_modal_close with_fox" @click="closeRegisterModal"><img src="@/img/close_medium.svg" alt=""></span>
+  </ui-modal>
+
+</div>

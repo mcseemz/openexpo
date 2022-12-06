@@ -1,0 +1,41 @@
+<div class="tabs_download_section">
+    <div class="container">
+        <h2 class="title">{{ tr(locPrefix + 'dwnl_title') }}</h2>
+        <div style="display: flex;flex-wrap: wrap">
+            <template v-for="item in filteredDownloadables.exist">
+                <div class="single_download_grid single_spc_downl" v-if="!item.TypeSponsor">
+                    <div class="single_download_item single_spc_item_downl flex">
+                        <div class="left flex">
+                            <div class="icon_box" :class="{'thumb_box': item.thumbnail}">
+                                <img :src="item.thumbnail" v-if="item.thumbnail" class="thumbnail"/>
+                                <img src="./img/file_pdf.svg" alt="" v-else-if="item.fileType == 'application/pdf'">
+                                <img
+                                        src="./img/file_image.svg" alt=""
+                                        v-else-if="item.fileType == 'image' ||
+                                        item.fileType == 'image/jpeg' ||
+                                        item.fileType == 'image/png' ||
+                                        item.fileType == 'image/gif'"
+                                >
+                                <img
+                                        src="./img/file_archive.svg" alt=""
+                                        v-else-if="item.fileType == 'application/gzip' || item.fileType == 'application/zip'"
+                                >
+                                <img src="./img/file.svg" alt="" v-else>
+                            </div>
+                            <div class="text_box">
+                                <p class="big_text">{{ item.name }}</p>
+                                <p class="download_item_desc">{{ item.description }}</p>
+                                <p class="desc">{{ item.fileType }} - {{ item.size }}KB</p>
+                            </div>
+                        </div>
+                        <div class="right flex">
+                            <a :href="item.url" class="download_url flex" target="_blank"><img
+                                    src="./img/download_filled.svg" alt="">{{ tr(locPrefix + 'download_file') }}</a>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+    </div>
+</div>
