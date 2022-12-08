@@ -67,6 +67,7 @@ Don't forget to:
 1. Create and upload logo in publicly accessible resource, so it can be used in email templates. Patch them up accordingly in `lambdas/templates`. Reupload templates if required.
 2. Templates are also in `lambdas/Cognito/resources`, those are used for registration. Patch them for a logo.
 3. Update social networ links (search for `twitter` in the code)
+4. If required, create auth domain in Cognito to manage external authentication (e.g. via LinkedIn). You should use AWS managed certificate for your domain.
 
 ### Elasticseach deployment
 1. Currently, ES is not used in lambdas as we have `tex-es-endpoint` reference disabled.

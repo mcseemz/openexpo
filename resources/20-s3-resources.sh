@@ -89,3 +89,6 @@ else
     echo "4. waiting for changeset to be applied"
     aws cloudformation wait stack-update-complete --stack-name $STACKNAME --profile openexpo
 fi
+
+aws s3 cp ./statics/resizeFailed.gif s3://tex-statics-$1/img/resizeFailed.gif --profile openexpo
+aws s3 cp ./statics/fb.png ./statics/instagram.png ./statics/twitter.png s3://tex-statics-$1/img/ --profile openexpo
