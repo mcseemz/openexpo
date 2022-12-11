@@ -1,5 +1,10 @@
 # Openexpo
 
+### Preconfiguration
+0. run ./01-set-domain.sh to configure your domain on a project.
+1. configure ./aws/config to have new profile for your project
+1. run ./02-aws-profile.sh to configure all scripts to run in this profile.
+
 ### Initial setup
 
 1. you should set up Secrets per environment (dev|prod)
@@ -22,6 +27,15 @@
       
    Example:
 
+3. You need to have the following parameters set in AWS SSM Parameter Store. You should have dev domains listed along with production ones. We suggest you add /<localhost> also in case of local development within dev environment, as domain resolution comes from user requests:
+   4. name: //<enter_your.domain>/moderators
+      - value: comma-separated emails
+      - meaning: list of moderators to approve new event after publishing
+   5. name: //<enter_your.domain>/sender
+       - value: sender email address, registered with SES
+       - meaning: single email to nem sender
+
+ 
 ```
 "localhost","apidev.openexpo.com","binary-dev.openexpo.com","tex-binary-dev","dev","eu-central-1_someid" 
 "dev.openexpo.com","apidev.openexpo.com","binary-dev.openexpo.com","tex-binary-dev","dev","eu-central-1_someid"
@@ -68,6 +82,8 @@ Don't forget to:
 2. Templates are also in `lambdas/Cognito/resources`, those are used for registration. Patch them for a logo.
 3. Update social networ links (search for `twitter` in the code)
 4. If required, create auth domain in Cognito to manage external authentication (e.g. via LinkedIn). You should use AWS managed certificate for your domain.
+
+
 
 ### Elasticseach deployment
 1. Currently, ES is not used in lambdas as we have `tex-es-endpoint` reference disabled.
