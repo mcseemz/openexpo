@@ -3101,7 +3101,7 @@ Resources:
       Body: !Transform
         Name: AWS::Include
         Parameters:
-          Location: s3://openexpo-lambda-storage-dev/openapi.yaml
+          Location: !Sub "s3://openexpo-lambda-storage-${Environment}/openapi.yaml"
       Tags:
         - Key: "Environment"
           Value: !Ref 'Environment'

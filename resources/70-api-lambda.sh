@@ -22,8 +22,7 @@ if [ -z "$1" ]; then
 fi
 
 #upload to dev bucket as it is hardcoded in template
-aws s3 cp ../API/openapi.yaml s3://openexpo-lambda-storage-dev/openapi.yaml --profile openexpo
-aws s3 cp ../lambdas/API/resources/resizeFailed.gif s3://tex-statics-prod/img/resizeFailed.gif --profile openexpo
+aws s3 cp ../API/openapi.yaml s3://openexpo-lambda-storage-$1/openapi.yaml --profile openexpo
 
 cd ../lambdas/API
 npm install

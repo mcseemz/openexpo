@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "Repository",
+    "ParameterValue": "https://github.com/mcseemz/expoze"
+  },
+  {
+    "ParameterKey": "DomainName",
+    "ParameterValue": "enter_your.domain"
+  }
+]

@@ -578,6 +578,7 @@ Resources:
 
   TimestreamSponsorReportRule:
     Type: AWS::Events::Rule
+    DependsOn: TimestreamSponsorReportLambda
     Properties:
       Description: Rule to fire sponsor reports generation
       EventBusName: default

@@ -6,17 +6,17 @@
   {
     "ParameterKey": "DBInstanceClass",
     "ParameterValue": "db.t3.micro"
-  }, 
-  {
-    "ParameterKey": "DBName",
-    "ParameterValue": "db_name_dev"
   },
   {
-    "ParameterKey": "DBUser",
-    "ParameterValue": "db_user_dev"
+    "ParameterKey": "DBInstanceIdentifier",
+    "ParameterValue": "openexpo-dev-instance"
   },
   {
-    "ParameterKey": "DBPassword",
-    "ParameterValue": "db_password_dev"
+    "ParameterKey": "ReplicaInstanceIdentifier",
+    "ParameterValue": "openexpo-dev-replica"
+  },
+  {
+    "ParameterKey": "DBDefaultName",
+    "ParameterValue": "default_dev"
   }
 ]

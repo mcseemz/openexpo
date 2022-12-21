@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# @file 02-prerequisites.sh
-# @brief prerequisites create/update
+# @file 31-database.sh
+# @brief database creation script
 # @description
-#     upload initial prereqs and create/update stack
+#     upload python connectivity setup, and create non-default database on chosen RDS instance environment
 #
 #   prerequesites:
 #
@@ -21,10 +21,25 @@ if [ -z "$1" ]; then
     exit
 fi
 
-STACKNAME=tex-prerequisites-$1
-CHANGESETNAME=tex-prerequisites-update-$1
-PARAMETERS=parameters-prerequisites-$1.json
-TEMPLATE=cf-prerequisites.yaml
+mkdir /tmp/python-database
+
+#https://github.com/jkehler/awslambda-psycopg2
+git clone --depth 1 https://github.com/jkehler/awslambda-psycopg2.git /tmp/awslambda-psycopg2
+mv /tmp/awslambda-psycopg2/psycopg2-3.9 /tmp/python-database/psycopg2
+
+pip3 install boto3 -t /tmp/python-database
+zip -r layer-python-database.zip /tmp/python-database
+
+aws s3 cp layer-python-database.zip s3://openexpo-lambda-storage-$1/ --profile openexpo
+
+rm layer-python-database.zip
+rm -rf /tmp/python-database
+rm -rf /tmp/awslambda-psycopg2
+
+STACKNAME=tex-database-$1
+CHANGESETNAME=tex-database-update-$1
+PARAMETERS=parameters-database-$1.json
+TEMPLATE=cf-database.yaml
 
 LEN=$(aws cloudformation list-stacks --query "StackSummaries[?StackName=='$STACKNAME']" --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE UPDATE_ROLLBACK_COMPLETE --profile openexpo | jq --raw-output 'length')
 

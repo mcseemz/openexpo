@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# @file 02-prerequisites.sh
-# @brief prerequisites create/update
+# @file 03-lambda-layers.sh
+# @brief prerequisites lambda layers create/update
 # @description
 #     upload initial prereqs and create/update stack
 #
@@ -21,10 +21,17 @@ if [ -z "$1" ]; then
     exit
 fi
 
-STACKNAME=tex-prerequisites-$1
-CHANGESETNAME=tex-prerequisites-update-$1
-PARAMETERS=parameters-prerequisites-$1.json
-TEMPLATE=cf-prerequisites.yaml
+#uncomment if you rebuild any of these layers
+#they are commented to skip unnessesary traffic and deploy time
+aws s3 cp ../lambdas/layers/layer-mime-types.zip s3://openexpo-lambda-storage-$1/layer-mime-types.zip --profile openexpo
+aws s3 cp ../lambdas/layers/layer-aws.zip s3://openexpo-lambda-storage-$1/layer-aws.zip --profile openexpo
+aws s3 cp ../lambdas/layers/layer-twilio.zip s3://openexpo-lambda-storage-$1/layer-twilio.zip --profile openexpo
+aws s3 cp ../lambdas/layers/layer-database.zip s3://openexpo-lambda-storage-$1/layer-database.zip --profile openexpo
+
+STACKNAME=tex-lambda-layers-$1
+CHANGESETNAME=tex-lambda-layers-update-$1
+PARAMETERS=parameters-lambda-layers-$1.json
+TEMPLATE=cf-lambda-layers.yaml
 
 LEN=$(aws cloudformation list-stacks --query "StackSummaries[?StackName=='$STACKNAME']" --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE UPDATE_ROLLBACK_COMPLETE --profile openexpo | jq --raw-output 'length')
 

@@ -115,6 +115,7 @@ Resources:
       VersioningConfiguration:
         Status: Suspended
     DeletionPolicy: Retain
+
   TexS3BucketStaticsPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -132,25 +133,7 @@ Resources:
                 - !Ref 'TexS3BucketStatics'
                 - /*
       Bucket: !Ref 'TexS3BucketStatics'
-  TexS3BucketLambdas:
-    Type: AWS::S3::Bucket
-    Description: lambda predeployment storage
-    Properties:
-      BucketName: !Sub 'openexpo-lambda-storage-${Environment}'
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-      Tags:
-        - Key: creator
-          Value: cf-s3
-        - Key: purpose
-          Value: lambda predeployment storage
-        - Key: environment
-          Value: !Ref 'Environment'
-      VersioningConfiguration:
-        Status: Suspended
+
   TexS3BucketBinaries:
     Type: AWS::S3::Bucket
     Description: customers binary downloadables storage. Access with presigned URL
