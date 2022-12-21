@@ -1,11 +1,62 @@
 # Openexpo
 
 ### Preconfiguration
-0. run ./01-set-domain.sh to configure your domain on a project.
+6. Prepare Github repo with the code, if you hadn'd done it yet. You will bind webhooks to Amplify CICD
+0. run ./01-set-domain.sh to configure your base domain on a project.
 1. configure ./aws/config to have new profile for your project
 1. run ./02-aws-profile.sh to configure all scripts to run in this profile.
+2. check all Cloudformation parameter files for proper values (esp. database section)
 
-### Initial setup
+### Setup sequence
+Deployment is done in `resources` folder, where CloudFormation templates reside.
+Deployment files are numbered and ordered, (almost) each can deploy and update template. Some resources are per-account, so they do not separate between environments.
+For example, we reuse RDS for cost optimization.
+Deployment resources expect you use one of the two environments: dev|prod. Otherwise, you hould update templates.
+
+* 01-auto-set-log-group-retention-dev.sh
+  * that will get your cloudwatch logs cleaned up after a week
+* 02-prerequisites.sh
+  * required entities - permissions, buckets etc.
+  * (post-config) you will need to fill proper secrets values
+* 03-lamda-layers.sh
+  * lambda layers prerequisites
+* 10-cloudformation-create-lambda-delete-s3.sh
+  * bucket cleanup automation on CF template undeployment 
+* 20-s3-resources.sh
+  * remaining required S3 buckets
+* 25-es.sh (optional)
+  * elasticsearch support
+* 30-rds.sh
+  * database instance setup. Mind that default database is not used on the instance
+* 31-database.sh
+  * non-default database creation
+* 32-bind-database-enter_your.domain.sh
+  * It is possible, that due to cost-cutting you may have several databases for different environments on a single RDS instance. 
+  * So you need to match the web domain with proper database on the instance. That is also needed for multi-domain deployment (e.g. openexpo.fr and openexpo.de)
+  * This will create proper secret with connection credentials per domain
+* 32-bind-database-localhost.sh
+  * This is working example of routing localhost to dev database - for a local frontend development with dev backend
+* 35-sns-sqs.sh
+  * required buses
+* 36-timestream.sh (optional)
+  * timestream setup for lambda execution loggng
+* 40-amplify.sh
+  * preconfigured initial amplify setup. Basically, you need only one deployment per project
+  *  (post-config) Check Amplify Deployment section below
+* 50-cloudfront.sh
+  * s3 routing basically
+* 60-cognito.sh
+  * authentication setup and login
+* 69-non-api-lambda.sh
+  * backend lambdas fired by non-frontend events
+* 70-api-lambda.sh
+  * backend lambdas mapped to API Gateway, along with Gateway itself. Basically, API implementation
+* 71-api-domain-com.sh
+  * mapping domain name to API. You will need several configurations per-domain
+
+### (Post-config) Secret setup
+
+The installation will create several Secrets placeholders, that you need to fulfill. It is related to external integrations.
 
 1. you should set up Secrets per environment (dev|prod)
    1. \<env>/zoomintegration: {"secret":"\<zoom secret>","key":"\<zoom key>"}
@@ -18,14 +69,30 @@
    3. \<env>/twilio: {"chat_api_key":"\<chat_api_key>","chat_api_secret":"\<chat_api_secret>","chat_servicesid":"\<chat_setvicesid>","chat_accountsid":"\<chat_accountsid>","auth_token":"\<twilio_authtoken>"}
    
       This one is for chat fnctionality on the platform. We base chats on Twilio Chat technology
-   4. \<domain name>/database: {"username":"\<username>","password":"\<password>","engine":"postgres","host":"\<host>","port":"5432","dbname":"\<database name>"}
-      You can also use "localhost" for domain and configure it to AWS dev RDS db - so you can run site locally
 
-2. you should set up texorigins table in DynamoDB, with the following columns
-   "origindomain","apidomain","binarydomain","bucket","environment","userpool"
+### (Post-config) Amplify deployment
+1. install Amplify from Console onto Github, and give it enough permissions to work with your repo.
+2. run Amplify template script to install (40-amplify.sh).
+3. Go to Amplify console and install webhooks to your repo so all PRs and branch updates are tracked
+4. You might need to initiate initial build of the main branch manually.
+5. You might need to set up rewrite rules and subscriber notifications on your app.
+
+### (Post-config) domain mapping to internal objects
+
+1. Create DynamoDB `texorigins` table. You may use `scripts/dynamodb-create-origins-table.sh` for that
+2. Some of templates will create resources that you need to inject into `texorigins` table in DynamoDB. E.g. user pool id. You may use `scripts/dynamodb-add-origin.sh` file to add an origin record
+
+Generally, columns are the following:
+   "origindomain","apidomain","binarydomain","bucket","environment","userpool".
     Several domains can point to the same environment, e.g. localhost and dev.openexpo.com. In that case we expect them to have same settings
       
    Example:
+```
+"localhost","apidev.openexpo.com","binary-dev.openexpo.com","tex-binary-dev","dev","eu-central-1_someid" 
+"dev.openexpo.com","apidev.openexpo.com","binary-dev.openexpo.com","tex-binary-dev","dev","eu-central-1_someid"
+```
+
+### (Post-config) emailing
 
 3. You need to have the following parameters set in AWS SSM Parameter Store. You should have dev domains listed along with production ones. We suggest you add /<localhost> also in case of local development within dev environment, as domain resolution comes from user requests:
    4. name: //<enter_your.domain>/moderators
@@ -35,35 +102,22 @@
        - value: sender email address, registered with SES
        - meaning: single email to nem sender
 
- 
-```
-"localhost","apidev.openexpo.com","binary-dev.openexpo.com","tex-binary-dev","dev","eu-central-1_someid" 
-"dev.openexpo.com","apidev.openexpo.com","binary-dev.openexpo.com","tex-binary-dev","dev","eu-central-1_someid"
-```
-
-3. You should prepare `openexpo` profile with your credentials for AWS CLI. All automations are set to use this profile.
-
 4. You should create AWS SSL certificate in proper regions for your domain. Use that in parameters while deployment.
 
-6. Create repo with the code, if you hadn'd done it yet. You will bind ebhooks to Amplify CICD
+### (Post-config) statics and templates
 
-7. Create Amplify project for UI hosting. You will need that value for in UI configs. You will need to feed `amplify.yml` and `amplifyCustomHttp.yml` files in the project root to Amplify project settings to have CICD and routing set up.
+Don't forget to:
+1. Create and upload logo in publicly accessible resource, so it can be used in email templates. Patch them up accordingly in `lambdas/templates`. Reupload templates if required.
+2. Templates are also in `lambdas/Cognito/resources`, those are used for registration. Patch them for a logo.
+3. Update social networ links (search for `twitter` in the code)
+4. If required, create auth domain in Cognito to manage external authentication (e.g. via LinkedIn). You should use AWS managed certificate for your domain.
+9. upload all of SES templates from `lambdas/templates` using `scripts/ses-create-template.sh`
+10. Configure SES manually if you want to receive emails
+11. Deploy API Gateway definitions initiated with proper log retention and listeners, using `scripts/backend-rollout-api-complete.sh`. Each time you update OpenAPI definitions, you may run this file without redeploying CF template. If you update lambda contents, you need to redeploy CF template then.
 
 
+### (Post-config) Database model preparation
 
-### Deployment
-Deployment is done in `resources` folder, where CloudFormation templates reside.
-Deployment files are numbered and ordered, (almost) each can deploy and update template. Some resources are per-account, so they do not separate between environments. 
-For example, we reuse RDS for cost optimization.
-Deployment resources expect you use one of the two environments: dev|prod. Otherwise, you hould update templates.
-
-Before proceeding you better grep for `enter_your.domain` string in the code and replace it with you primary domain name.
-
-1. Update parameter files for your values (domain names, certificates, prefixes) 
-2. Run all shell scripts in `resources` folder in order. If required, update parameter files with your values.
-3. Create DynamoDB `texorigins` table. You may use `scripts/dynamodb-create-origins-table.sh` for that
-4. Some of templates will create resources that you need to inject into `texorigins` table in DynamoDB. E.g. user pool id. You may use `scripts/dynamodb-add-origin.sh` file to add an origin record
-5. If you need database with different name, use `scripts/rds-create-database.sh` for that. Mind that you need to have PSql installed and paths are update in the script.
 6. Check thata you have `<domain>/database` secret filled for database connection.
 7. Fill the database with tables, running `database/migrate.sh`
 8. Initiate database basic dictionaries running `api-cli-setup-origin.sh`. NB: we hadn't run this for a while, so it may fail to insert or authorize. Basically, the script uses administrative OAuth token for a special lambda for value injection to database.
@@ -71,26 +125,13 @@ You should check that `lowlevel` application is creted in Cognito.
 
 For that, you may also need to run `scripts/cognito-add-userpool.sh`, that runs addtional CloudFormation template `scripts/cf-cognito-addon.yaml`, creating required applications in Cognito.
 
-9. upload all of SES templates from `lambdas/templates` using `scripts/ses-create-template.sh`
-10. Configure SES manually if you want to receive emails
-11. Deploy API Gateway definitions initiated with proper log retention and listeners, using `scripts/backend-rollout-api-complete.sh`. Each time you update OpenAPI definitions, you may run this file without redeploying CF template. If you update lambda contents, you need to redeploy CF template then.
 
-### Post-deployment configuration
-
-Don't forget to:
-1. Create and upload logo in publicly accessible resource, so it can be used in email templates. Patch them up accordingly in `lambdas/templates`. Reupload templates if required.
-2. Templates are also in `lambdas/Cognito/resources`, those are used for registration. Patch them for a logo.
-3. Update social networ links (search for `twitter` in the code)
-4. If required, create auth domain in Cognito to manage external authentication (e.g. via LinkedIn). You should use AWS managed certificate for your domain.
-
-
-
-### Elasticseach deployment
+### (optional) Elasticseach deployment
 1. Currently, ES is not used in lambdas as we have `tex-es-endpoint` reference disabled.
 2. Currently, we do not have separate es deployment between dev and prod environments.
 3. But if you like you can enable that in Cloudformation templates, and search capabilities will start working. Search indexing done on entity create/update/delete operations with the separate pipeline, grepping Cloudfront logs for a specific markers on what should be indexed.
 
-### Quicksite configurations
+### (optional) Quicksite configurations
 Currently we have pipeline that gathers statistics on lambda execution from Cloudfront logs and stores those in Timestream. That includes response status, execution times and caller usernames
 You can visualize it in Quicksite with the custom dashboards.
 
@@ -98,7 +139,7 @@ You can visualize it in Quicksite with the custom dashboards.
 ### Toolset
 Node version: 16
 Deployment node version: 12. Possibly ugradable to 16 with n issue, lambdas should be updated
-
+Python 3.x
 
 
 ###### CLI scripts
@@ -108,6 +149,8 @@ Deployment node version: 12. Possibly ugradable to 16 with n issue, lambdas shou
 - jq
 - httpie
 - AWS CLI
+- Node 16
+- Python 3.x
 
 ###### Helpers
 
@@ -116,7 +159,7 @@ Deployment node version: 12. Possibly ugradable to 16 with n issue, lambdas shou
 - Python 3 + pip
 - https://github.com/awslabs/aws-cfn-template-flip - for CF templates conversion
 
-###### Documentation part:
+###### Documentation build:
 
 1. smartcomments - autogeneration for Javascript comments
    https://smartcomments.github.io/
@@ -178,7 +221,7 @@ Deployment node version: 12. Possibly ugradable to 16 with n issue, lambdas shou
     `npm install -g jsdoc-to-markdown`
 
 
-### Domain configuration
+### Frontend domain configuration
  - Setup Amplify using CLI tool https://docs.amplify.aws/cli/teams/overview/ 
    - Choose './UI/amplify' as a directory;
  - !! Recomended !! to set 'dev' prefix for development enviroment in aws Amplify. So every Pull-request previews will fetch development configs.
@@ -282,6 +325,8 @@ Deployment node version: 12. Possibly ugradable to 16 with n issue, lambdas shou
 }
 ```
 
+### Useful resources
+https://github.com/awstut-an-r/awstut-fa/tree/main/062
 
 ### Best wishes
 The code is fully functional, although not configured. Given some patience you can restore it in the full. Anyway, we should be around to help with guidance.

@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Database creation on the suggested instance using custom resourse.
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+  InstanceEnvironment:
+    Description: where to search for RDS instance, in what environment
+    Type: String
+    AllowedPattern: (dev|prod)
+  DBName:
+    Type: String
+    Default: db_name_dev
+    Description: 'now we use credentials from parameters file, but for security reasons
+      they should be in ssm, and used like: {{resolve:ssm:/rds_demo/db_name:1}}'
+
+Conditions:
+  CreateProdResources: !Equals
+    - !Ref 'Environment'
+    - prod
+Resources:
+  SQLParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${Environment}/Database-creation"
+      Type: String
+      Value:
+        Fn::Sub: |
+          CREATE database ${DBName}_${Environment};
+
+  LambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - "python3.8"
+      Content:
+        S3Bucket: !Sub "openexpo-lambda-storage-${Environment}"
+        S3Key: "layer-python-database.zip"
+      Description: Python layer only for database initialization
+      LayerName: !Sub "python-postgresql-layer-${Environment}"
+
+  DatabaseSetupFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: SQLParameter
+    Properties:
+      Environment:
+        Variables:
+          DB_ENDPOINT_ADDRESS: !ImportValue
+            Fn::Sub: 'tex-master-instance-endpoint-${InstanceEnvironment}'
+          DB_ENDPOINT_PORT: !ImportValue
+            Fn::Sub: 'tex-master-instance-port-${InstanceEnvironment}'
+          DB_USER: !Sub '{{resolve:secretsmanager:${InstanceEnvironment}/dbinstance::username}}'
+          DB_PASSWORD: !Sub '{{resolve:secretsmanager:${InstanceEnvironment}/dbinstance::password}}'
+          DB_DEFAULT: !Sub '{{resolve:secretsmanager:${InstanceEnvironment}/dbinstance::default_db}}'
+          REGION: !Ref AWS::Region
+          SQL_PARAMETER: !Ref SQLParameter
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+          import psycopg2
+          import os
+
+          db_endpoint_port = int(os.environ['DB_ENDPOINT_PORT'])
+          db_endpoint_address = os.environ['DB_ENDPOINT_ADDRESS']
+          db_password = os.environ['DB_PASSWORD']
+          db_user = os.environ['DB_USER']
+          db_default = os.environ['DB_DEFAULT']
+          region = os.environ['REGION']
+          sql_parameter = os.environ['SQL_PARAMETER']
+
+          CREATE = 'Create'
+          response_data = {'Message': 'Hello World!'}
+
+          def lambda_handler(event, context):
+            try:
+              if event['RequestType'] == CREATE:
+                client = boto3.client('ssm', region_name=region)
+                response = client.get_parameter(Name=sql_parameter)
+                sql_statements = response['Parameter']['Value']
+
+                conn = psycopg2.connect(
+                  host=db_endpoint_address,
+                  database=db_default,
+                  port=db_endpoint_port,
+                  user=db_user,
+                  password=db_password)
+          
+                conn.set_isolation_level(0)
+                cur = conn.cursor()
+
+                for sql in sql_statements.splitlines():
+                  print(sql)
+                  cur.execute(sql)
+
+                cur.close()
+          
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, response_data)
+            except Exception as e:
+              print(e)
+              cfnresponse.send(event, context, cfnresponse.FAILED, response_data)
+
+      FunctionName: !Sub "InitiateDatabase_${Environment}_on_${InstanceEnvironment}"
+      Handler: index.lambda_handler
+      Layers:
+        - !Ref LambdaLayer
+        - arn:aws:lambda:eu-central-1:898466741470:layer:psycopg2-py38:1 #https://github.com/jetbridge/psycopg2-lambda-layer
+      Runtime: "python3.8"
+      Role: !ImportValue
+        Fn::Sub: 'basic-lambda-role-arn-${Environment}'
+      Timeout: 60
+
+  CustomResource:
+    Type: Custom::CustomResource
+    DependsOn: DatabaseSetupFunction
+    Properties:
+      ServiceToken: !GetAtt DatabaseSetupFunction.Arn
+
+Outputs:
+  DatabaseName:
+    Description: Name of environmental database
+    Value: !Sub '${DBName}_${Environment}'
+    Export:
+      Name: !Sub 'tex-database-name-${Environment}'

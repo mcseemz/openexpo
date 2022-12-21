@@ -396,46 +396,63 @@ Resources:
                 Resource: '*'
 
 #========================================================
-# LAYERS
+# S3 LAMBDA BUCKETS
 #========================================================
-
-  AWSSDK2LambdaLayer:
-    Type: AWS::Lambda::LayerVersion
+  TexS3BucketLambdas:
+    Type: AWS::S3::Bucket
+    Description: lambda predeployment storage
     Properties:
-      CompatibleRuntimes:
-        - nodejs12.x
-      Content:
-        S3Bucket: !Sub 'openexpo-lambda-storage-${Environment}'
-        S3Key: layer-aws.zip
-      Description: AWS SDK layer
-      LayerName: !Sub 'aws-sdk-2-layer-${Environment}'
-      LicenseInfo: MIT
+      BucketName: !Sub 'openexpo-lambda-storage-${Environment}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: creator
+          Value: cf-s3
+        - Key: purpose
+          Value: lambda predeployment storage
+        - Key: environment
+          Value: !Ref 'Environment'
+      VersioningConfiguration:
+        Status: Suspended
 
-  PGLambdaLayer2:
-    Type: AWS::Lambda::LayerVersion
+#========================================================
+# SECRETS
+#========================================================
+  ZoomIntegrationSecret:
+    Type: AWS::SecretsManager::Secret
     Properties:
-      CompatibleRuntimes:
-        - nodejs12.x
-      Content:
-        S3Bucket: !Sub 'openexpo-lambda-storage-${Environment}'
-        S3Key: layer-database.zip
-      Description: Postgres layer and Pino logging framework
-      LayerName: !Sub 'postgres-layer-${Environment}'
-      LicenseInfo: MIT
+      Description: Zoom integration parameters for environment
+      Name: !Sub "${Environment}/zoomintegration"
+      SecretString:
+        "{\"secret\":\"<zoom secret>\",\"key\":\"<zoom key>\"}"
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
 
-
-  TwilioLambdaLayer:
-    Type: AWS::Lambda::LayerVersion
+  MessengerpeopleSecret:
+    Type: AWS::SecretsManager::Secret
     Properties:
-      CompatibleRuntimes:
-        - nodejs12.x
-        - nodejs10.x
-      Content:
-        S3Bucket: !Sub 'openexpo-lambda-storage-${Environment}'
-        S3Key: layer-twilio.zip
-      Description: Twilio layer
-      LayerName: !Sub 'twilio-layer-${Environment}'
-      LicenseInfo: MIT
+      Description: Messengerpeople integration parameters for environment
+      Name: !Sub "${Environment}/messengerpeople"
+      SecretString:
+        "{\"secret\":\"<secret>\",\"verificationToken\":\"<token>\",\"bearer\":\"<bearer>\",\"telegramIdentifier\":\"<telegram channel identifier>\"}"
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
+
+  TwilioSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Twilio integration parameters for environment
+      Name: !Sub "${Environment}/twilio"
+      SecretString:
+        "{\"chat_api_key\":\"<chat_api_key>\",\"chat_api_secret\":\"<chat_api_secret>\",\"chat_servicesid\":\"<chat_setvicesid>\",\"chat_accountsid\":\"<chat_accountsid>\",\"auth_token\":\"<twilio_authtoken>\"}"
+      Tags:
+        - Key: "Environment"
+          Value: !Ref 'Environment'
 
 #========================================================
 # SECRETS
@@ -513,20 +530,8 @@ Outputs:
     Description: Lambda role with SES access and Cognito update
 
 #-----------
-  TexAWSSDK2LambdaLayer:
-    Value: !Ref AWSSDK2LambdaLayer
+  S3BucketLambdaName:
+    Value: !Ref TexS3BucketLambdas
     Export:
-        Name: !Sub 'aws-sdk-2-layer-arn-${Environment}'
-    Description: Lambda layer with latest aws-sdk-2
-
-  TexPostgresLambdaLayerNew:
-    Value: !Ref PGLambdaLayer2
-    Export:
-      Name: !Sub 'postgres-log-layer-arn-${Environment}'
-    Description: Lambda layer to have everything related to Postgres
-
-  TexTwilioLambdaLayer:
-    Value: !Ref TwilioLambdaLayer
-    Export:
-        Name: !Sub 'twilio-layer-arn-${Environment}'
-    Description: Lambda layer to have everything related to Twilio integration
+      Name: !Sub 'tex-s3-lambda-bucket-${Environment}'
+    Description: name of S3 bucket for statics

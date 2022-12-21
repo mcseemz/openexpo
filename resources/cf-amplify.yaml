@@ -1,0 +1,194 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Database creation on the suggested instance using custom resourse.
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+  DomainName:
+    Description: domain name to deploy
+    Type: String
+  Repository:
+    Description: github repository
+    Type: String
+
+Resources:
+
+  AmplifyProject:
+    Type: AWS::Amplify::App
+    Properties:
+      AccessToken: !Sub "{{resolve:ssm:/access/github-${Environment}}}"
+      AutoBranchCreationConfig:
+        AutoBranchCreationPatterns:
+          - main
+        EnableAutoBranchCreation: True
+        EnableAutoBuild: True
+        EnablePerformanceMode: False
+        EnablePullRequestPreview: True
+#        EnvironmentVariables:
+#          - EnvironmentVariable
+        Framework: Node16
+        PullRequestEnvironmentName: dev
+#        Stage: String
+      BuildSpec: |
+        version: 0.1
+        frontend:
+          phases:
+            preBuild:
+              commands:
+                - cd UI/src
+                - npm install
+            build:
+              commands:
+                - npm run-script build
+          artifacts:
+            baseDirectory: UI/statics
+            files:
+              - '**/*'
+          customHeaders:
+            # cache static assets!
+            # js
+            - pattern: '**/*.js'
+              headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+            # css
+            - pattern: '**/*.css'
+              headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+            # images
+            - pattern: '**/*.gif'
+              headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+            - pattern: '**/*.jpg'
+              headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+            - pattern: '**/*.png'
+              headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+            - pattern: '**/*.svg'
+              headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+            - pattern: '**/*.woff2'
+              headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+            # videos
+            - pattern: '**/*.mp4'
+              headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+            - pattern: '**/*.webm'
+              headers: [ { key: 'Cache-Control', value: 'public,max-age=31536000,immutable' } ]
+          cache:
+        paths:
+              - nodes_modules/**/*
+        test:
+          artifacts:
+            baseDirectory: /UI/cypress
+            configFilePath: "**/mochawesome.json"
+            files:
+              - "**/*.png"
+              - "**/*.mp4"
+              - "**/mochawesome.json"
+          phases:
+            preTest:
+              commands:
+                - wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+                - yum install -y ./google-chrome-stable_current_*.rpm
+                - cd UI
+                - npm install
+                - npm install wait-on
+                - npm install mocha mochawesome mochawesome-merge mochawesome-report-generator
+                - npm install --save-dev cypress-audit
+                - "npm run serve & npx wait-on http://localhost:8080"
+            test:
+              commands:
+                - 'npx cypress run --browser chrome --headless --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
+            postTest:
+              commands:
+                - npx mochawesome-merge@4 cypress/report/mochawesome-report/*.json > cypress/report/mochawesome.json
+      CustomHeaders: |
+        customHeaders:
+          - pattern: '**/*.js'
+            headers:
+              - key: Cache-Control
+                value: 'public,max-age=31536000,immutable'
+          - pattern: '**/*.css'
+            headers:
+              - key: Cache-Control
+                value: 'public,max-age=31536000,immutable'
+          - pattern: '**/*.gif'
+            headers:
+              - key: Cache-Control
+                value: 'public,max-age=31536000,immutable'
+          - pattern: '**/*.jpg'
+            headers:
+              - key: Cache-Control
+                value: 'public,max-age=31536000,immutable'
+          - pattern: '**/*.png'
+            headers:
+              - key: Cache-Control
+                value: 'public,max-age=31536000,immutable'
+          - pattern: '**/*.svg'
+            headers:
+              - key: Cache-Control
+                value: 'public,max-age=31536000,immutable'
+          - pattern: '**/*.woff2'
+            headers:
+              - key: Cache-Control
+                value: 'public,max-age=31536000,immutable'
+          - pattern: '**/*.mp4'
+            headers:
+              - key: Cache-Control
+                value: 'public,max-age=31536000,immutable'
+          - pattern: '**/*.webp'
+            headers:
+              - key: Cache-Control
+                value: 'public,max-age=31536000,immutable'
+          - pattern: '**/*.webm'
+            headers:
+              - key: Cache-Control
+                value: 'public,max-age=31536000,immutable'
+#      CustomRules:
+#        - CustomRule
+      Description: !Sub '${DomainName} frontend setup'
+      EnableBranchAutoDeletion: True
+      EnvironmentVariables:
+        - Name: CHOKIDAR_USEPOLLING #Error: ENOSPC: System limit for number of file watchers reached
+          Value: 1
+#      IAMServiceRole: String
+      Name: !Sub '${DomainName}_${Environment}'
+#      OauthToken: String
+      Platform: WEB
+      Repository: !Ref Repository
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  AmplifyMainBranch:
+    Type: AWS::Amplify::Branch
+    Properties:
+      AppId: !GetAtt AmplifyProject.AppId
+#      BasicAuthConfig:
+#        BasicAuthConfig
+      BranchName: main
+#      BuildSpec: String
+      Description: main branch means prod
+      EnableAutoBuild: True
+      EnablePerformanceMode: False
+      EnablePullRequestPreview: True
+      EnvironmentVariables:
+        - Name: Environment
+          Value: !Ref 'Environment'
+        - Name: CHOKIDAR_USEPOLLING #Error: ENOSPC: System limit for number of file watchers reached
+          Value: 1
+      Framework: Vue
+      PullRequestEnvironmentName: dev
+#      Stage: dev
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+#  AmplifyDeployment:
+#    Type: AWS::Amplify::Domain
+#    Properties:
+#      AppId: !GetAtt AmplifyProject.AppId
+##      AutoSubDomainCreationPatterns:
+##        - pr*
+##      AutoSubDomainIAMRole: String
+#      DomainName: !Ref DomainName
+#      EnableAutoSubDomain: True
+##      SubDomainSettings:
+##        - SubDomainSetting
+#Outputs:

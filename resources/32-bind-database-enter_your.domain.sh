@@ -1,9 +1,8 @@
 #!/bin/bash
 
-# @file 02-prerequisites.sh
-# @brief prerequisites create/update
+# @file 32-bind-database-to-domain.sh
+# @brief Create VPC and Postgres RDS instance with default database.
 # @description
-#     upload initial prereqs and create/update stack
 #
 #   prerequesites:
 #
@@ -21,33 +20,40 @@ if [ -z "$1" ]; then
     exit
 fi
 
-STACKNAME=tex-prerequisites-$1
-CHANGESETNAME=tex-prerequisites-update-$1
-PARAMETERS=parameters-prerequisites-$1.json
-TEMPLATE=cf-prerequisites.yaml
+echo "0. update copy of model directory"
+
+#========================================================
+STACKNAME=tex-bind-database-enter_your.domain-$1
+CHANGESETNAME=tex-bind-database-enter_your.domain-update-$1
+PARAMETERS=parameters-bind-database-enter_your.domain-$1.json
+TEMPLATE=cf-bind-database-domain.yaml
 
 LEN=$(aws cloudformation list-stacks --query "StackSummaries[?StackName=='$STACKNAME']" --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE UPDATE_ROLLBACK_COMPLETE --profile openexpo | jq --raw-output 'length')
 
 echo "stacks found: $LEN"
 
-    echo '0. packing template'
+echo '0. packing template'
 
-    aws cloudformation package \
-	--profile openexpo \
-        --template-file $TEMPLATE \
-        --force-upload \
-        --output-template-file packaged.$TEMPLATE \
-        --s3-bucket openexpo-lambda-storage-$1
+aws cloudformation package \
+    --profile openexpo \
+    --template-file $TEMPLATE \
+    --force-upload \
+    --output-template-file packaged.$TEMPLATE \
+    --s3-bucket openexpo-lambda-storage-$1
 
+#upload template max size 460,800
+aws s3 cp ./packaged.$TEMPLATE s3://openexpo-lambda-storage-$1/packaged.$TEMPLATE --profile openexpo
 
 if [ $LEN == 0 ]; then
 #creation
     echo 'create'
+
     aws cloudformation create-stack \
 	--profile openexpo \
 	--stack-name $STACKNAME \
 	--capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM \
-	--template-body file://./packaged.$TEMPLATE \
+        --tags Key=Environment,Value=$1 \
+	--template-url https://s3.amazonaws.com/openexpo-lambda-storage-$1/packaged.$TEMPLATE \
 	--parameters file://./$PARAMETERS
 
     echo 'wait for creation complete'
@@ -62,7 +68,8 @@ else
         --stack-name $STACKNAME \
         --change-set-name $CHANGESETNAME \
         --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM \
-        --template-body file://./packaged.$TEMPLATE \
+        --tags Key=Environment,Value=$1 \
+	--template-url https://s3.amazonaws.com/openexpo-lambda-storage-$1/packaged.$TEMPLATE \
         --parameters file://./$PARAMETERS
 
     echo "2. waiting for changeset to be created"
