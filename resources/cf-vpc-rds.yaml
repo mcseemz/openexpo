@@ -36,7 +36,7 @@ Parameters:
     Default: postgres
   DBEngineVersion:
     Type: String
-    Default: '11.6'
+    Default: '13.7'
   DBSourceRegion:
     Type: String
     Default: eu-central-1
@@ -53,20 +53,10 @@ Parameters:
   DBAllocatedStorage:
     Type: Number
     Default: 5
-  DBName:
+  DBDefaultName:
     Type: String
     Default: db_name_dev
-    Description: 'now we use credentials from parameters file, but for security reasons
-      they should be in ssm, and used like: {{resolve:ssm:/rds_demo/db_name:1}}'
-  DBUser:
-    Type: String
-    Default: db_user_dev
-    Description: '{{resolve:ssm:/rds_demo/master_username:1}} check https://github.com/garystafford/aws-rds-postgres/blob/master/parameter_store_values.sh'
-  DBPassword:
-    Type: String
-    Default: db_passwoed_dev
-    NoEcho: true
-    Description: '{{resolve:ssm-secure:/rds_demo/master_password:1}}'
+    Description: 'default database name. Will not be used for operations'
 Conditions:
   CreateProdResources: !Equals
     - !Ref 'Environment'
@@ -153,6 +143,7 @@ Resources:
         - !Ref 'SubnetMasterDB'
         - !Ref 'SubnetReplicaDB'
     Type: AWS::RDS::DBSubnetGroup
+
   VpcDefaultSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -161,17 +152,29 @@ Resources:
       IpProtocol: tcp
       FromPort: 5432
       ToPort: 5432
+
+  SecretsManagerInstnceAdmin:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Description: AWS RDS admin credentials for env
+      Name: !Sub "${Environment}/dbinstance"
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username":"admin_${Environment}","default_db":"${DBDefaultName}"}'
+        GenerateStringKey: password
+        PasswordLength: 32
+        ExcludeCharacters: '"@/\'
+
   TexMasterInstance:
     Properties:
       DBInstanceIdentifier: !Ref 'DBInstanceIdentifier'
-      DBName: !Ref 'DBName'
+      DBName: !Ref DBDefaultName
       AllocatedStorage: !Ref 'DBAllocatedStorage'
       DBInstanceClass: !Ref 'DBInstanceClass'
       StorageType: !Ref 'DBStorageType'
       Engine: !Ref 'DBEngine'
       EngineVersion: !Ref 'DBEngineVersion'
-      MasterUsername: !Ref 'DBUser'
-      MasterUserPassword: !Ref 'DBPassword'
+      MasterUsername: !Sub '{{resolve:secretsmanager:${SecretsManagerInstnceAdmin}::username}}'
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${SecretsManagerInstnceAdmin}::password}}'
       PubliclyAccessible: true
       Tags:
         - Key: Name
@@ -198,23 +201,16 @@ Outputs:
     Value: !Ref 'TexMasterInstance'
     Export:
       Name: !Sub 'TexMasterInstance-${Environment}'
-  EndpointMasterConn:
-    Description: Endpoint of the newly created RDS master
-    Value: !Join
-      - /
-      - - !Join
-          - ':'
-          - - jdbc
-            - !GetAtt 'TexMasterInstance.Endpoint.Address'
-            - !GetAtt 'TexMasterInstance.Endpoint.Port'
-        - !Ref 'DBName'
-    Export:
-      Name: !Sub 'TexMasterInstanceConn-${Environment}'
   EndpointMasterURL:
     Description: Endpoint of the newly created RDS master
     Value: !GetAtt 'TexMasterInstance.Endpoint.Address'
     Export:
-      Name: !Sub 'TexMasterInstanceURL-${Environment}'
+      Name: !Sub 'tex-master-instance-endpoint-${Environment}'
+  EndpointMasterPort:
+    Description: Endpoint of the newly created RDS master
+    Value: !GetAtt 'TexMasterInstance.Endpoint.Port'
+    Export:
+      Name: !Sub 'tex-master-instance-port-${Environment}'
   EndpointReplica:
     Description: Endpoint of the newly created RDS replica
     Value: !Ref 'TexReadReplica'
@@ -230,7 +226,7 @@ Outputs:
           - - jdbc
             - !GetAtt 'TexReadReplica.Endpoint.Address'
             - !GetAtt 'TexReadReplica.Endpoint.Port'
-        - !Ref 'DBName'
+        - !Ref 'DBDefaultName'
     Export:
       Name: !Sub 'TexReadReplicaURL-${Environment}'
     Condition: CreateProdResources
@@ -243,4 +239,9 @@ Outputs:
     Description: main VPC to run resources in
     Value: !Ref SubnetMasterDB
     Export:
-      Name: !Sub 'TexMasterSubnet-${Environment}'
+      Name: !Sub 'tex-master-subnet-${Environment}'
+  TexMasterSecurityGroup:
+    Description: default VPC securitygroup to have access
+    Value: !GetAtt 'VPC.DefaultSecurityGroup'
+    Export:
+      Name: !Sub 'tex-master-security-group-${Environment}'

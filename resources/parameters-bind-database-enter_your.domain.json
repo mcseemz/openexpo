@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "dev"
+  }, 
+  {
+    "ParameterKey": "InstanceEnvironment",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "Domain",
+    "ParameterValue": "dev.enter_your.domain"
+  }
+]

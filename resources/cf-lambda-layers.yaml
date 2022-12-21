@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Basics required by multiple other templates and resources
+
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+
+Resources:
+
+#========================================================
+# LAYERS
+#========================================================
+
+  AWSSDK2LambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - nodejs12.x
+      Content:
+        S3Bucket:  !ImportValue
+          Fn::Sub: 'tex-s3-lambda-bucket-${Environment}'
+        S3Key: layer-aws.zip
+      Description: AWS SDK layer
+      LayerName: !Sub 'aws-sdk-2-layer-${Environment}'
+      LicenseInfo: MIT
+
+  PGLambdaLayer2:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - nodejs12.x
+      Content:
+        S3Bucket:  !ImportValue
+          Fn::Sub: 'tex-s3-lambda-bucket-${Environment}'
+        S3Key: layer-database.zip
+      Description: Postgres layer and Pino logging framework
+      LayerName: !Sub 'postgres-layer-${Environment}'
+      LicenseInfo: MIT
+
+
+  TwilioLambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - nodejs12.x
+        - nodejs10.x
+      Content:
+        S3Bucket:  !ImportValue
+          Fn::Sub: 'tex-s3-lambda-bucket-${Environment}'
+        S3Key: layer-twilio.zip
+      Description: Twilio layer
+      LayerName: !Sub 'twilio-layer-${Environment}'
+      LicenseInfo: MIT
+
+#========================================================
+
+Outputs:
+
+#-----------
+  TexAWSSDK2LambdaLayer:
+    Value: !Ref AWSSDK2LambdaLayer
+    Export:
+        Name: !Sub 'aws-sdk-2-layer-arn-${Environment}'
+    Description: Lambda layer with latest aws-sdk-2
+
+  TexPostgresLambdaLayerNew:
+    Value: !Ref PGLambdaLayer2
+    Export:
+      Name: !Sub 'postgres-log-layer-arn-${Environment}'
+    Description: Lambda layer to have everything related to Postgres
+
+  TexTwilioLambdaLayer:
+    Value: !Ref TwilioLambdaLayer
+    Export:
+        Name: !Sub 'twilio-layer-arn-${Environment}'
+    Description: Lambda layer to have everything related to Twilio integration

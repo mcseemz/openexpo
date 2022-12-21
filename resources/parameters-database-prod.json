@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "prod"
+  }, 
+  {
+    "ParameterKey": "InstanceEnvironment",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "DBName",
+    "ParameterValue": "openexpo"
+  }
+]

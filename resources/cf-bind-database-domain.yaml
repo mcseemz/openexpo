@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Database to domain mappting through secrets.'
+
+Parameters:
+  Environment:
+    Description: what environment we are deploying
+    Type: String
+    AllowedPattern: (dev|prod)
+  InstanceEnvironment:
+    Description: what environment is RDS in
+    Type: String
+    AllowedPattern: (dev|prod)
+  Domain:
+    Description: domain to bind
+    Type: String
+
+Resources:
+
+#================================================================
+#================================================================
+  SecretsManagerInstnceAdmin:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Description: Secret with database connection parameters per domain
+      Name: !Sub "${Domain}/database"
+      SecretString:
+        Fn::Join:
+          - ""
+          - - '{"username":"'
+            - !Sub "{{resolve:secretsmanager:${Environment}/dbinstance::username}}"
+            - '","password":"'
+            - !Sub "{{resolve:secretsmanager:${Environment}/dbinstance::password}}"
+            - '","engine":"postgres","host":"'
+            - !ImportValue
+              Fn::Sub: 'tex-master-instance-endpoint-${Environment}'
+            - '","port":"5432","dbname":"'
+            - !ImportValue
+              Fn::Sub: 'tex-database-name-${InstanceEnvironment}'
+            - '"}'
