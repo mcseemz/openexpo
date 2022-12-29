@@ -21,7 +21,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.4.1</version>
+      <version>42.5.1</version>
     </dependency>
   </dependencies>
   <build>
@@ -29,12 +29,12 @@
       <plugin>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-maven-plugin</artifactId>
-        <version>6.3.0</version>
+        <version>9.10.2</version>
         <dependencies>
           <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.4.1</version>
+            <version>42.5.1</version>
           </dependency>
         </dependencies>
       </plugin>

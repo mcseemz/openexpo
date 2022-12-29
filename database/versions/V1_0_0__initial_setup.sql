@@ -738,3 +738,115 @@ COMMENT ON COLUMN "tier"."logo" IS 'url for a logo';
 COMMENT ON COLUMN "tier"."event" IS 'null for default tiers';
 
 COMMENT ON COLUMN "tier"."switches" IS 'list of switches';
+
+-- =============
+-- initial data update
+--- global roles
+ INSERT INTO role ( name, grants ) VALUES ('platform-uberadmin', '["platform-moderate-event","platform-access-event","platform-access-stand","platform-access-company","platform-access-audit"]');
+ INSERT INTO role ( name, grants ) VALUES ('platform-manager', '["platform-moderate-event","platform-access-event","platform-access-stand","platform-access-company"]');
+ INSERT INTO role ( name, grants ) VALUES ('platform-moderator', '["platform-moderate-event"]');
+
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 1, 'name', 'en_GB', 'Admin', true);
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 2, 'name', 'en_GB', 'Platform manager', true);
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 3, 'name', 'en_GB', 'Platform moderator', true);
+
+--- company roles
+ INSERT INTO role ( name, grants ) VALUES ('company-owner', '["company-edit","company-delete","company-create-event","company-view-reports","company-manage-news","company-manage-staff","company-manage-news","company-manage-sponsorship"]');
+ INSERT INTO role ( name, grants ) VALUES ('company-helper', '["company-edit","company-manage-news","company-manage-staff"]');
+ INSERT INTO role ( name, grants ) VALUES ('company-staff', '[""]');
+
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 4, 'name', 'en_GB', 'Company owner', true);
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 5, 'name', 'en_GB', 'Company helper', true);
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 6, 'name', 'en_GB', 'Company staff', true);
+
+--- event roles
+ INSERT INTO role ( name, grants ) VALUES ('event-owner', '["event-edit","event-delete","event-manage-news","event-manage-staff","event-manage-money","event-view-report","event-invite-stand","event-manage-chat","event-use-chat","event-use-video","event-manage-news","event-manage-sponsorship"]');
+ INSERT INTO role ( name, grants ) VALUES ('event-manager', '["event-edit","event-manage-news","event-manage-staff","event-view-report","event-manage-chat","event-use-chat","event-use-video","event-manage-news","event-manage-sponsorship"]');
+ INSERT INTO role ( name, grants ) VALUES ('event-sales', '["event-use-chat","event-use-video"]');
+ INSERT INTO role ( name, grants ) VALUES ('event-support', '["event-use-chat"]');
+
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 7, 'name', 'en_GB', 'Event owner', true);
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 8, 'name', 'en_GB', 'Event manager', true);
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 9, 'name', 'en_GB', 'Event sales', true);
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 10,'name', 'en_GB', 'Event support', true);
+
+--- stand roles
+ INSERT INTO role ( name, grants ) VALUES ('stand-owner', '["stand-edit","stand-delete","stand-manage-news","stand-manage-staff","stand-view-report","stand-use-chat","stand-use-video","stand-manage-news"]');
+ INSERT INTO role ( name, grants ) VALUES ('stand-manager', '["stand-edit","stand-manage-news","stand-manage-staff","stand-view-report","stand-use-chat","stand-use-video","stand-manage-news"]');
+ INSERT INTO role ( name, grants ) VALUES ('stand-sales', '["stand-use-chat","stand-use-video"]');
+ INSERT INTO role ( name, grants ) VALUES ('stand-support', '["stand-use-chat"]');
+
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 11, 'name', 'en_GB', 'Stand owner', true);
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 12, 'name', 'en_GB', 'Stand manager', true);
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 13, 'name', 'en_GB', 'Stand sales', true);
+     INSERT INTO strings ( ref, ref_id, category, language, value, is_default ) VALUES ( 'role', 14, 'name', 'en_GB', 'Stand support', true);
+
+-- #=========================================================
+-- category
+INSERT INTO dictionary (category, value) VALUES ('category', 'Health');
+
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'en_GB', 'Health', true);
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'ru_RU', 'Здоровье', false);
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'de_DE', 'Gesundheit', false);
+
+----
+INSERT INTO dictionary (category, value) VALUES ('category', 'Technology');
+
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'en_GB', 'Technology', true);
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'ru_RU', 'Технологии', false);
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'de_DE', 'Technologie', false);
+
+----
+INSERT INTO dictionary (category, value) VALUES ('category', 'FilmMedia');
+
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'en_GB', 'Film & Media', true);
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'ru_RU', 'Фильмы и Медиа', false);
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'de_DE', 'Film & Medien', false);
+
+----
+INSERT INTO dictionary (category, value) VALUES ('category', 'Business');
+
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'en_GB', 'Business', true);
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'ru_RU', 'Бизнес', false);
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'de_DE', 'Geschäft', false);
+
+----
+INSERT INTO dictionary (category, value) VALUES ('category', 'TravelOutdoor');
+
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'en_GB', 'Travel & Outdoor', true);
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'ru_RU', 'Путешествия и Активности', false);
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'de_DE', 'Reisen & Outdoor', false);
+
+-- #=========================================================
+-- languages
+INSERT INTO dictionary (category, value) VALUES ('language', 'English');
+
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'en_GB', 'English', true);
+
+INSERT INTO dictionary (category, value) VALUES ('language', 'Russian');
+
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'ru_RU', 'Русский', true);
+
+INSERT INTO dictionary (category, value) VALUES ('language', 'German');
+
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'de_DE', 'Deutsche', true);
+
+INSERT INTO dictionary (category, value) VALUES ('language', 'French');
+
+    INSERT INTO strings (ref, ref_id, category, language, value, is_default ) VALUES ( 'dictionary', (SELECT currval('dictionary_id_seq')), 'name', 'fr_FR', 'Français', true);
+
+-- #=========================================================
+-- imagesize
+INSERT INTO dictionary (category, value) VALUES ('imagesize', '560x315');
+INSERT INTO dictionary (category, value) VALUES ('imagesize', '64x64');
+INSERT INTO dictionary (category, value) VALUES ('imagesize', '368x208');
+INSERT INTO dictionary (category, value) VALUES ('imagesize', '448x252');
+INSERT INTO dictionary (category, value) VALUES ('imagesize', '144x56');
+INSERT INTO dictionary (category, value) VALUES ('imagesize', '302x211');
+INSERT INTO dictionary (category, value) VALUES ('imagesize', '315x674');
+
+----------
+-- currency
+INSERT INTO dictionary (category, value) VALUES ('currency', 'EUR');
+INSERT INTO dictionary (category, value) VALUES ('currency', 'USD');
+INSERT INTO dictionary (category, value) VALUES ('currency', 'RUB');

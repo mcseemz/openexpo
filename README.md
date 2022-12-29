@@ -13,46 +13,53 @@ Deployment files are numbered and ordered, (almost) each can deploy and update t
 For example, we reuse RDS for cost optimization.
 Deployment resources expect you use one of the two environments: dev|prod. Otherwise, you hould update templates.
 
-* 01-auto-set-log-group-retention-dev.sh
+* `01-auto-set-log-group-retention-dev.sh <env>` 
   * that will get your cloudwatch logs cleaned up after a week
-* 02-prerequisites.sh
+* `02-prerequisites.sh <env>`
   * required entities - permissions, buckets etc.
   * (post-config) you will need to fill proper secrets values
-* 03-lamda-layers.sh
+* `03-lamda-layers.sh <env>`
   * lambda layers prerequisites
-* 10-cloudformation-create-lambda-delete-s3.sh
-  * bucket cleanup automation on CF template undeployment 
-* 20-s3-resources.sh
+* `10-cloudformation-create-lambda-delete-s3.sh` 
+  * bucket cleanup automation on CF template undeployment. Required for next dependencies.
+  * ⚠️Executes once per account
+* `20-s3-resources.sh <env>`
   * remaining required S3 buckets
-* 25-es.sh (optional)
+* `25-es.sh <env>`
   * elasticsearch support
-* 30-rds.sh
+  * ⚠️ optional
+* `30-rds.sh <env>`
   * database instance setup. Mind that default database is not used on the instance
-* 31-database.sh
+* `31-database.sh <env>`
   * non-default database creation
-* 32-bind-database-enter_your.domain.sh
+* `32-bind-database-enter_your.domain.sh <env>`
   * It is possible, that due to cost-cutting you may have several databases for different environments on a single RDS instance. 
   * So you need to match the web domain with proper database on the instance. That is also needed for multi-domain deployment (e.g. openexpo.fr and openexpo.de)
   * This will create proper secret with connection credentials per domain
-* 32-bind-database-localhost.sh
+* `32-bind-database-localhost.sh <env>`
   * This is working example of routing localhost to dev database - for a local frontend development with dev backend
-* 35-sns-sqs.sh
+* `database\migrate.sh <domain>`
+  * this will initiate database with the proper tables and initial values.
+  * domain is the one you set up on step `32`, for dev environment `localhost` will do.
+* `35-sns-sqs.sh <env>`
   * required buses
-* 36-timestream.sh (optional)
-  * timestream setup for lambda execution loggng
-* 40-amplify.sh
+* `36-timestream.sh <env>`
+  * timestream setup for lambda execution logging
+  * ⚠️ optional
+* `40-amplify.sh <env> <github token>`
   * preconfigured initial amplify setup. Basically, you need only one deployment per project
   *  (post-config) Check Amplify Deployment section below
-* 50-cloudfront.sh
+* `50-cloudfront.sh <env>`
   * s3 routing basically
-* 60-cognito.sh
+* `60-cognito.sh <env>`
   * authentication setup and login
-* 69-non-api-lambda.sh
+* `69-non-api-lambda.sh <env>`
   * backend lambdas fired by non-frontend events
-* 70-api-lambda.sh
+* `70-api-lambda.sh <env>`
   * backend lambdas mapped to API Gateway, along with Gateway itself. Basically, API implementation
-* 71-api-domain-com.sh
+* `71-api-domain-com.sh <env>`
   * mapping domain name to API. You will need several configurations per-domain
+  * this one is the example, multiply and configure per your need.
 
 ### (Post-config) Secret setup
 

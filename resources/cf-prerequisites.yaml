@@ -424,42 +424,6 @@ Resources:
   ZoomIntegrationSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Description: Zoom integration parameters for environment
-      Name: !Sub "${Environment}/zoomintegration"
-      SecretString:
-        "{\"secret\":\"<zoom secret>\",\"key\":\"<zoom key>\"}"
-      Tags:
-        - Key: "Environment"
-          Value: !Ref 'Environment'
-
-  MessengerpeopleSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Description: Messengerpeople integration parameters for environment
-      Name: !Sub "${Environment}/messengerpeople"
-      SecretString:
-        "{\"secret\":\"<secret>\",\"verificationToken\":\"<token>\",\"bearer\":\"<bearer>\",\"telegramIdentifier\":\"<telegram channel identifier>\"}"
-      Tags:
-        - Key: "Environment"
-          Value: !Ref 'Environment'
-
-  TwilioSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Description: Twilio integration parameters for environment
-      Name: !Sub "${Environment}/twilio"
-      SecretString:
-        "{\"chat_api_key\":\"<chat_api_key>\",\"chat_api_secret\":\"<chat_api_secret>\",\"chat_servicesid\":\"<chat_setvicesid>\",\"chat_accountsid\":\"<chat_accountsid>\",\"auth_token\":\"<twilio_authtoken>\"}"
-      Tags:
-        - Key: "Environment"
-          Value: !Ref 'Environment'
-
-#========================================================
-# SECRETS
-#========================================================
-  ZoomIntegrationSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
       Description: !Sub "Zoom integration parameters for ${Environment}"
       Name: !Sub "${Environment}/zoomintegration"
       SecretString:

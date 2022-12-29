@@ -212,11 +212,11 @@ Resources:
   cleanupLambdaBucketOnDelete:
     Type: Custom::cleanupbucket2
     Condition: CreateDevResources
-    DependsOn: TexS3BucketLambdas
     Properties:
       ServiceToken: !ImportValue
         Fn::Sub: TexEmptyBucketLambda
-      BucketName: !Ref 'TexS3BucketLambdas'
+      BucketName: !ImportValue
+        Fn::Sub: 'tex-s3-lambda-bucket-${Environment}'
   cleanupBinaryBucketOnDelete:
     Type: Custom::cleanupbucket3
     Condition: CreateDevResources

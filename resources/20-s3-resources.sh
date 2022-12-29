@@ -29,15 +29,10 @@ npm install
 npm prune --production
 cd ../../resources
 
+STACKNAME=tex-s3-$1
 CHANGESETNAME=tex-s3-update-$1
 PARAMETERS=parameters-s3-$1.json
 TEMPLATE=cf-s3.yaml
-
-if [ "$1" = "dev" ]; then
-   STACKNAME=tex-s3
-else
-   STACKNAME=tex-s3-$1
-fi
 
 echo "stack name: $STACKNAME"
 
@@ -91,4 +86,6 @@ else
 fi
 
 aws s3 cp ./statics/resizeFailed.gif s3://tex-statics-$1/img/resizeFailed.gif --profile openexpo
-aws s3 cp ./statics/fb.png ./statics/instagram.png ./statics/twitter.png s3://tex-statics-$1/img/ --profile openexpo
+aws s3 cp ./statics/instagram.png s3://tex-statics-$1/img/ --profile openexpo
+aws s3 cp ./statics/fb.png s3://tex-statics-$1/img/ --profile openexpo
+aws s3 cp ./statics/twitter.png s3://tex-statics-$1/img/ --profile openexpo
