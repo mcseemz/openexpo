@@ -23,7 +23,7 @@ if [ -z "$1" ]; then
     exit
 fi
 
-old_string=expoze.live
+old_string=enter_your.domain
 new_string=$1
 
 tmpfile=/tmp/msv.$$
