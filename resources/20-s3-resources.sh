@@ -25,6 +25,10 @@ mkdir ../lambdas/S3/model
 cp ../lambdas/API/model/* ../lambdas/S3/model
 
 cd ../lambdas/S3
+rm -rf ../layers/nodejs #kill the folder
+unzip ../layers/layer-database.zip -d ../layers #prepare database
+
+
 npm install
 npm prune --production
 cd ../../resources
@@ -85,7 +89,7 @@ else
     aws cloudformation wait stack-update-complete --stack-name $STACKNAME --profile openexpo
 fi
 
-aws s3 cp ./statics/resizeFailed.gif s3://tex-statics-$1/img/resizeFailed.gif --profile openexpo
-aws s3 cp ./statics/instagram.png s3://tex-statics-$1/img/ --profile openexpo
-aws s3 cp ./statics/fb.png s3://tex-statics-$1/img/ --profile openexpo
-aws s3 cp ./statics/twitter.png s3://tex-statics-$1/img/ --profile openexpo
+aws s3 cp ./statics/resizeFailed.gif s3://openexpo-statics-$1/img/resizeFailed.gif --profile expoze
+aws s3 cp ./statics/instagram.png s3://openexpo-statics-$1/img/ --profile expoze
+aws s3 cp ./statics/fb.png s3://openexpo-statics-$1/img/ --profile expoze
+aws s3 cp ./statics/twitter.png s3://openexpo-statics-$1/img/ --profile expoze

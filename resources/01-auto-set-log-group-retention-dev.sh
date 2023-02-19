@@ -3,4 +3,4 @@ aws cloudformation create-stack \
 	--stack-name auto-set-log-group-retention-dev \
 	--capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
 	--template-body file://./external/auto-set-log-group-retention.yaml \
-	--parameters file://./external/paramaters-auto-set-log-group-retention-dev.json
+	--parameters file://./external/parameters-auto-set-log-group-retention-dev.json

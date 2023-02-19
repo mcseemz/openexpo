@@ -100,7 +100,7 @@ Resources:
     Type: AWS::S3::Bucket
     Description: frontend statics storage
     Properties:
-      BucketName: !Sub 'tex-statics-${Environment}'
+      BucketName: !Sub 'openexpo-statics-${Environment}'
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html

@@ -36,7 +36,7 @@ Resources:
                 - CreateLogGroup
       CodeUri:
         Bucket: awsserverlessrepo-changesets-1xxlnameudh3r
-        Key: 698718118888/arn:aws:serverlessrepo:us-east-1:374852340823:applications-auto-set-log-group-retention-versions-1.4.0/c9626a53-9683-4357-8167-2296ace95bcc
+        Key: enter_your_aws_account/arn:aws:serverlessrepo:us-east-1:374852340823:applications-auto-set-log-group-retention-versions-1.4.0/c9626a53-9683-4357-8167-2296ace95bcc
   SetRetentionForNewLogGroupsLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -57,7 +57,7 @@ Resources:
           Resource: '*'
       CodeUri:
         Bucket: awsserverlessrepo-changesets-1xxlnameudh3r
-        Key: 698718118888/arn:aws:serverlessrepo:us-east-1:374852340823:applications-auto-set-log-group-retention-versions-1.4.0/c9626a53-9683-4357-8167-2296ace95bcc
+        Key: enter_your_aws_account/arn:aws:serverlessrepo:us-east-1:374852340823:applications-auto-set-log-group-retention-versions-1.4.0/c9626a53-9683-4357-8167-2296ace95bcc
   SetRetentionForExistingLogGroupsLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:

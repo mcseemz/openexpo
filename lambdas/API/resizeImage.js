@@ -40,7 +40,7 @@
         "extendedRequestId": "Ox8cZEbHliAFrdQ=",
         "requestTime": "27/Jun/2020:09:14:16 +0000",
         "path": "/resizeimage/branding/company/1/events/9/f-172360d4c3b-f905d0f3ca421.560x315.jpg",
-        "accountId": "698718118888",
+        "accountId": "enter_your_aws_account",
         "protocol": "HTTP/1.1",
         "stage": "LATEST",
         "domainPrefix": "apidev",
@@ -163,7 +163,7 @@ exports.handler = async function (event, context) {
     if (lambdaResponse['StatusCode'] === 200) {
       console.log('Success');
     } else {
-      const url = `https://tex-statics-${env}.s3.eu-central-1.amazonaws.com/img/resizeFailed.gif`;
+      const url = `https://openexpo-statics-${env}.s3.eu-central-1.amazonaws.com/img/resizeFailed.gif`;
       console.log('Resize failed returning stub image');
       return util.handle301(event, url);
     }
