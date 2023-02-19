@@ -17,6 +17,6 @@
   },
   {
     "ParameterKey": "CertificateArn",
-    "ParameterValue": "arn:aws:acm:us-east-1:698718118888:certificate/f492d557-b591-4c89-ab5c-e64e82152a1a"
+    "ParameterValue": "enter_your_domain_certificate"
   }
 ]

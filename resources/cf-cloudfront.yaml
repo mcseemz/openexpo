@@ -169,7 +169,7 @@ Resources:
           GeoRestriction:
             RestrictionType: none
         ViewerCertificate:
-          AcmCertificateArn: arn:aws:acm:us-east-1:698718118888:certificate/f492d557-b591-4c89-ab5c-e64e82152a1a
+          AcmCertificateArn: enter_your_domain_certificate
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2018
       Tags:

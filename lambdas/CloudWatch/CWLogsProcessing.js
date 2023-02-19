@@ -53,7 +53,7 @@ exports.handler = async function(event, context) {
   //Create publish parameters
   const params = {
     Message: JSON.stringify(messages),
-    TopicArn: process.env.LogStreamArn //'arn:aws:sns:eu-central-1:698718118888:LogStream'
+    TopicArn: process.env.LogStreamArn //'arn:aws:sns:eu-central-1:enter_your_aws_account:LogStream'
   };
 
   if (messages.length > 0)

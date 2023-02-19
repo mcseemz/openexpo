@@ -1,7 +1,7 @@
 [
   {
     "ParameterKey": "RetentionDays",
-    "ParameterValue": 7
+    "ParameterValue": "7"
   }
 ]
 	

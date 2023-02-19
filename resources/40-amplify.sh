@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# @file 30-rds.sh
-# @brief Create VPC and Postgres RDS instance with default database.
+# @file 40-amplify.sh
+# @brief Set up Amplify connection to project's github repo.
 # @description
-#
+#   It may require additional tuning after installation, e.g. set up pull request builds etc. Please check carefully.
 #   prerequesites:
 #
 #      * jq installed
@@ -11,6 +11,7 @@
 #
 
 # @arg $1 string API deployment environment dev/prod
+# @arg $2 string github token to set up webhooks.
 # @exitcode 0 If successful.
 # @exitcode 1 If an empty string passed.
 documentation() { echo '---------------------'; }

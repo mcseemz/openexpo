@@ -1,11 +1,16 @@
 # Openexpo
 
 ### Preconfiguration
-6. Prepare Github repo with the code, if you hadn'd done it yet. You will bind webhooks to Amplify CICD
+1. Prepare Github repo with the code, if you hadn'd done it yet. You will bind webhooks to Amplify CICD
 0. run ./01-set-domain.sh to configure your base domain on a project.
 1. configure ./aws/config to have new profile for your project
 1. run ./02-aws-profile.sh to configure all scripts to run in this profile.
 2. check all Cloudformation parameter files for proper values (esp. database section)
+1. run ./03-project-name.sh to replace `openexpo` to your custom project name in resources, e.g. S3 bucket names.
+2. run ./04-aws-account.sh to replace `enter_your_aws_account` to your custom AWS account, that is required for proper permissions in different places.
+
+1. create your own domain certificate, or import existing one in AWS Certificate Manager (ACM). You will need it to bind your APIs and static files provisioning. Validate the certificate in AWS if required.
+1. run ./05-domain-certificate.sh to inject the cerificate in configurations
 
 ### Setup sequence
 Deployment is done in `resources` folder, where CloudFormation templates reside.
