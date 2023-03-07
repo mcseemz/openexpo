@@ -83,11 +83,19 @@ The installation will create several Secrets placeholders, that you need to fulf
       This one is for chat fnctionality on the platform. We base chats on Twilio Chat technology
 
 ### (Post-config) Amplify deployment
-1. install Amplify from Console onto Github, and give it enough permissions to work with your repo.
+1. install Amplify from Console onto Github, and give it enough permissions to work with your repo ("Reconnect to repository" message).
 2. run Amplify template script to install (40-amplify.sh).
 3. Go to Amplify console and install webhooks to your repo so all PRs and branch updates are tracked
 4. You might need to initiate initial build of the main branch manually.
 5. You might need to set up rewrite rules and subscriber notifications on your app.
+
+### (Post-config) redirect domain to AWS
+1. you should have 50-cloudfront.sh already executed, and hosted zone for your domain already created
+2. https://docs.aws.amazon.com/amplify/latest/userguide/to-add-a-custom-domain-managed-by-a-third-party-dns-provider.html
+You may not skip certificate validation if you already created one for your domain nd subdomains
+3. You need also add all other subdomains `*` to the same cloudfront distribution as the Amplify app (`www`).
+
+
 
 ### (Post-config) domain mapping to internal objects
 

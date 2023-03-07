@@ -12,6 +12,15 @@ Parameters:
   BinaryPrefixName:
     Description: Prefix for binary domain (binary)
     Type: String
+  DomainACMCertificate:
+    Description: Domain ACM certificate covering base domain and subdomains
+    Type: String
+  CreateHostedZone:
+    Description: Should we create hosted zone or it is already created
+    Type: String
+    AllowedValues:
+      - "true"
+      - "false"
 
 Conditions:
   CreateProdResources: !Equals
@@ -20,6 +29,9 @@ Conditions:
   CreateDevResources: !Equals
     - !Ref 'Environment'
     - dev
+  CreateHostedZoneResources: !Equals
+    - !Ref 'CreateHostedZone'
+    - "true"
 
 Mappings:
   RegionMap:
@@ -68,6 +80,16 @@ Mappings:
 
 Resources:
 
+  TexHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: 'General hosted zone for the domain'
+      Name: !Ref 'DomainName'
+      HostedZoneTags:
+        - Key: 'creator'
+          Value: 'CF template'
+
   TexCFDistributionS3Dev:
     Type: AWS::CloudFront::Distribution
     Description: create distribution, bind it to route53 domain and statics bucket
@@ -77,7 +99,7 @@ Resources:
         Origins:
           - DomainName: !ImportValue
               Fn::Sub: TexS3BucketStatics-${Environment}
-            Id: !Sub 'tex-S3-statics-${Environment}'
+            Id: !Sub 'openexpo-S3-statics-${Environment}'
             S3OriginConfig:
               OriginAccessIdentity: ''
         Enabled: true
@@ -85,7 +107,7 @@ Resources:
         Comment: TEX Cloudfront for statics
         DefaultRootObject: index.html
         DefaultCacheBehavior:
-          TargetOriginId: !Sub 'tex-S3-statics-${Environment}'
+          TargetOriginId: !Sub 'openexpo-S3-statics-${Environment}'
           ForwardedValues:
             QueryString: false
             Cookies:
@@ -122,6 +144,7 @@ Resources:
   TexCFDistributionBinariesS3:
     Type: AWS::CloudFront::Distribution
     Description: create distribution, bind it to route53 domain and statics bucket
+    DependsOn: TexHostedZone
     Properties:
       DistributionConfig:
         Origins:
@@ -131,7 +154,7 @@ Resources:
               - "//"
               - !ImportValue
                 Fn::Sub: TexBinariesWebsiteURL-${Environment}
-            Id: !Sub 'tex-S3-statics-${Environment}'
+            Id: !Sub 'openexpo-S3-statics-${Environment}'
             CustomOriginConfig:
               OriginProtocolPolicy: http-only
         Enabled: true
@@ -141,7 +164,7 @@ Resources:
         Aliases:
           - !Sub '${BinaryPrefixName}.${DomainName}'
         DefaultCacheBehavior:
-          TargetOriginId: !Sub 'tex-S3-statics-${Environment}'
+          TargetOriginId: !Sub 'openexpo-S3-statics-${Environment}'
           ForwardedValues:
             QueryString: true
             Cookies:
@@ -169,7 +192,7 @@ Resources:
           GeoRestriction:
             RestrictionType: none
         ViewerCertificate:
-          AcmCertificateArn: enter_your_domain_certificate
+          AcmCertificateArn: !Ref 'DomainACMCertificate'
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2018
       Tags:
@@ -193,6 +216,7 @@ Resources:
 
   binaryBucketDNS:
     Type: AWS::Route53::RecordSetGroup
+    DependsOn: TexHostedZone
     Properties:
       HostedZoneName: !Sub 
           - ${Domain}.

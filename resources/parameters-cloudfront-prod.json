@@ -10,5 +10,13 @@
   {
     "ParameterKey": "DomainName",
     "ParameterValue": "enter_your.domain"
+  },
+  {
+    "ParameterKey": "DomainACMCertificate",
+    "ParameterValue": "enter_your_domain_certificate"
+  },
+  {
+    "ParameterKey": "CreateHostedZone",
+    "ParameterValue": "false"
   }
 ]

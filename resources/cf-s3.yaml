@@ -140,7 +140,7 @@ Resources:
       only. After ObjectCreated calls lambda to finish upload operation
     DependsOn: TexUploadBinaryBucketLambda
     Properties:
-      BucketName: !Sub 'tex-binary-${Environment}'
+      BucketName: !Sub 'openexpo-binary-${Environment}'
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false

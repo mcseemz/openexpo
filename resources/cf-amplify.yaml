@@ -15,6 +15,26 @@ Parameters:
 
 Resources:
 
+  AmplifyServiceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - amplify.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess-Amplify
+      RoleName: !Sub "AmplifyRole-${AWS::Region}-${Environment}"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
   AmplifyProject:
     Type: AWS::Amplify::App
     Properties:
@@ -147,7 +167,10 @@ Resources:
       EnvironmentVariables:
         - Name: CHOKIDAR_USEPOLLING #Error: ENOSPC: System limit for number of file watchers reached
           Value: 1
-#      IAMServiceRole: String
+      IAMServiceRole:
+        Fn::GetAtt:
+        - AmplifyServiceRole
+        - Arn
       Name: !Sub '${DomainName}_${Environment}'
 #      OauthToken: String
       Platform: WEB
